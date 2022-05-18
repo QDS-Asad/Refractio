@@ -1,55 +1,58 @@
-import React,{useState} from "react";
-import Auth from "./Auth";
-import { Input,Checkbox,Button,Form } from "semantic-ui-react";
+import React, { useState } from 'react';
+import Auth from './Auth';
+import {
+  Input,
+  Checkbox,
+  Button,
+  Form,
+  Header,
+  Container,
+} from 'semantic-ui-react';
+import { Link } from 'react-router-dom';
 
 const Login = () => {
-  let myStyle = {
-    fontWeight : "bold" ,
-    fontSize : 20,
-    marginBottom : 10
-  }
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword]= useState("")
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(false);
-  const [errEmail , setErrEmail] = useState("");
-  const [errPassword , setErrPassword] = useState("");
-  
+  const [errEmail, setErrEmail] = useState('');
+  const [errPassword, setErrPassword] = useState('');
 
-  const handleClick = () =>{
-    console.log("clicked");
+  const handleClick = () => {
+    console.log('clicked');
   };
   const handleSubmit = (event) => {
     event.preventDefault();
-  }
+  };
 
   return (
     <Auth>
-      <div className="login-container">
-        <div className="heading" style={myStyle} >Log In</div>
-        <p className="paragraph">Enter your email address and password to access account</p>
+      <Container>
+        <Header size='medium' className='primary-dark-color'>
+          Log In
+        </Header>
+        <p className='mt-3 mb-5'>
+          Enter your email address and password to access account.
+        </p>
         <Form onSubmit={handleSubmit}>
-        <div className="login-label mb-10">Email Address</div>
-        <div class="ui input">
-          <div class="ui input">
-            <Input placeholder="Enter your Email"/>
-          </div>
-        </div>
-        <div className="login-label mt-norm mb-10">Password</div>
-        <div>
-        <div class="ui input">
-            <Input placeholder="Enter your Password" />
-          </div>
-        </div>
-        <div className="remember-me mb-10 mt-norm">
-        <Checkbox label='Remember me' />
-        </div>
+          <Form.Field>
+            <label>Email address</label>
+            <input placeholder='Enter your email' />
+          </Form.Field>
+          <Form.Field>
+            <label className='d-inline-block'>Password</label>
+            <Link className='float-end' to='/password-recover'>
+              Forget your password?
+            </Link>
+            <input placeholder='Enter your password' />
+          </Form.Field>
+          <Form.Field>
+            <Checkbox label='Remember me' />
+          </Form.Field>
+          <Button type='submit' fluid primary>
+            Log In
+          </Button>
         </Form>
-        <Button
-         className="btn"
-         onClick={handleClick}
-         >Login</Button>
-      </div>
+      </Container>
     </Auth>
   );
 };
