@@ -9,7 +9,7 @@ const Auth = ({ children }) => {
           <Header
             className='position-absolute'
             as='h1'
-            image='/logo192.png'
+            image='/logo-dark.svg'
             content='Refractio'
           />
           <div className='d-flex justify-content-center align-items-center h-100'>
