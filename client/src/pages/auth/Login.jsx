@@ -1,28 +1,59 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import Auth from './Auth';
 import {
-  Input,
   Checkbox,
   Button,
   Form,
-  Header,
+  Message,
   Container,
+  Header,
 } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [remember, setRemember] = useState(false);
-  const [errEmail, setErrEmail] = useState('');
-  const [errPassword, setErrPassword] = useState('');
+  const { register, setValue, handleSubmit, errors, trigger } = useForm({
+    mode: 'onBlur',
+  });
+  const [loading, setLoading] = useState(false);
 
-  const handleClick = () => {
-    console.log('clicked');
+  const handleLogin = (data) => {
+    console.log(data);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 1500);
   };
-  const handleSubmit = (event) => {
-    event.preventDefault();
+
+  const handleChange = (e) => {
+    e.persist();
+    setValue(e.target.name, e.target.value);
+    trigger(e.target.name);
   };
+
+  const loginOptions = {
+    email: {
+      required: 'Email is required',
+      pattern: {
+        value: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:.[a-zA-Z0-9-]+)*$/,
+        message: 'Invalid Email. Must include “@” and “.”',
+      },
+    },
+
+    password: {
+      required: 'Password is required',
+      pattern: {
+        value: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
+        message:
+          'Invalid password. Password length should be min 8 symbols. Password should contain numbers, letters, special characters.',
+      },
+    },
+  };
+
+  useEffect(() => {
+    register({ name: 'email' }, loginOptions.email);
+    register({ name: 'password' }, loginOptions.password);
+  }, []);
 
   return (
     <Auth>
@@ -33,17 +64,36 @@ const Login = () => {
         <p className='mt-3 mb-5'>
           Enter your email address and password to access account.
         </p>
-        <Form onSubmit={handleSubmit}>
+        <Form onSubmit={handleSubmit(handleLogin)} loading={loading} error>
           <Form.Field>
-            <label>Email address</label>
-            <input placeholder='Enter your email' />
+            <label>Email Address</label>
+            <Form.Input
+              name='email'
+              fluid
+              placeholder='Enter your Email'
+              onBlur={handleChange}
+              error={!!errors.email}
+            />
+            {errors && errors.email && (
+              <Message error content={errors.email.message} />
+            )}
           </Form.Field>
           <Form.Field>
             <label className='d-inline-block'>Password</label>
             <Link className='float-end' to='/password-recover'>
               Forget your password?
             </Link>
-            <input placeholder='Enter your password' />
+            <Form.Input
+              name='password'
+              type='password'
+              fluid
+              placeholder='Enter your Password'
+              onBlur={handleChange}
+              error={!!errors.password}
+            />
+            {errors && errors.password && (
+              <Message error content={errors.password.message} />
+            )}
           </Form.Field>
           <Form.Field>
             <Checkbox label='Remember me' />

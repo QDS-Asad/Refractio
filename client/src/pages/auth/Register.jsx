@@ -39,7 +39,6 @@ const Register = () => {
         <div className='mt-norm'>
           <Checkbox label='I accept' />
           <span>
-            {' '}
             <Link to='/' className='primary-color'>
               Terms and Conditions
             </Link>
