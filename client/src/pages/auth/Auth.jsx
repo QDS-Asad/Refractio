@@ -5,18 +5,18 @@ const Auth = ({ children }) => {
   return (
     <Grid celled className='auth vh-100'>
       <Grid.Row>
-        <Grid.Column width={6} className='p-4'>
+        <Grid.Column width={5} className='p-4'>
           <Header
             className='position-absolute'
             as='h1'
-            image='/logo192.png'
+            image='/logo-dark.svg'
             content='Refractio'
           />
           <div className='d-flex justify-content-center align-items-center h-100'>
             {children}
           </div>
         </Grid.Column>
-        <Grid.Column width={10} className='primary-bg'>
+        <Grid.Column width={11} className='primary-bg'>
           <div className='d-flex justify-content-center align-items-center h-100'>
             <div className='logo'>
               <Header

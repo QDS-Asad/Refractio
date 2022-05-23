@@ -15,6 +15,7 @@ const App = () => {
       <Route path='/register' element={<Register />} />
       <Route path='/new-password' element={<NewPassword />} />
       <Route path='/password-recover' element={<ResetPasswordFlow />} />
+      <Route path='/password-recover-success' element={<PasswordRecoverMail />} />
       <Route path='/verify-code' element={<VerificationCode />} />
       <Route path='/invite-account' element={<InviteAccount />} />
     </Routes>
