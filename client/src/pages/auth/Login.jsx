@@ -65,7 +65,7 @@ const Login = () => {
       </p>
       <Form onSubmit={handleSubmit(handleLogin)} loading={loading} error>
         <Form.Field>
-          <label>Email Address</label>
+          <label >Email Address</label>
           <Form.Input
             name='email'
             fluid

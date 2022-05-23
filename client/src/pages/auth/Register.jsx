@@ -35,7 +35,7 @@ const Register = () => {
     fullName: {
       required: 'Full Name is required',
       pattern: {
-        value: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:.[a-zA-Z0-9-]+)*$/,
+        value:  /^[a-zA-Z]+ [a-zA-Z]+$/,
         message: 'Invalid Full Name. Only letters are allowed.',
       },
     },
@@ -101,6 +101,7 @@ const Register = () => {
             name='password'
             className='input-field'
             placeholder='Enter your password'
+            type='password'
             error={!!errors.password}
             onBlur={handleChange}
           />
