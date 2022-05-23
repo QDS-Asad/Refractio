@@ -1,7 +1,8 @@
 import React from 'react';
+import { Outlet } from 'react-router-dom';
 import { Grid, Header } from 'semantic-ui-react';
 
-const Auth = ({ children }) => {
+const Auth = () => {
   return (
     <Grid celled className='auth vh-100'>
       <Grid.Row>
@@ -13,7 +14,7 @@ const Auth = ({ children }) => {
             content='Refractio'
           />
           <div className='d-flex justify-content-center align-items-center h-100'>
-            {children}
+            <Outlet />
           </div>
         </Grid.Column>
         <Grid.Column width={11} className='primary-bg'>

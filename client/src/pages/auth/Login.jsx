@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import Auth from './Auth';
 import {
   Checkbox,
   Button,
@@ -57,54 +56,52 @@ const Login = () => {
   }, []);
 
   return (
-    <Auth>
-      <Container>
-        <Header size='medium' className='primary-dark-color'>
+    <Container>
+      <Header size='medium' className='primary-dark-color'>
+        Log In
+      </Header>
+      <p className='mt-3 mb-5'>
+        Enter your email address and password to access account.
+      </p>
+      <Form onSubmit={handleSubmit(handleLogin)} loading={loading} error>
+        <Form.Field>
+          <label>Email Address</label>
+          <Form.Input
+            name='email'
+            fluid
+            placeholder='Enter your Email'
+            onBlur={handleChange}
+            error={!!errors.email}
+          />
+          {errors && errors.email && (
+            <Message error content={errors.email.message} />
+          )}
+        </Form.Field>
+        <Form.Field>
+          <label className='d-inline-block'>Password</label>
+          <Link className='float-end' to='/auth/password-recover'>
+            Forget your password?
+          </Link>
+          <Form.Input
+            name='password'
+            type='password'
+            fluid
+            placeholder='Enter your Password'
+            onBlur={handleChange}
+            error={!!errors.password}
+          />
+          {errors && errors.password && (
+            <Message error content={errors.password.message} />
+          )}
+        </Form.Field>
+        <Form.Field>
+          <Checkbox label='Remember me' />
+        </Form.Field>
+        <Button type='submit' fluid primary>
           Log In
-        </Header>
-        <p className='mt-3 mb-5'>
-          Enter your email address and password to access account.
-        </p>
-        <Form onSubmit={handleSubmit(handleLogin)} loading={loading} error>
-          <Form.Field>
-            <label>Email Address</label>
-            <Form.Input
-              name='email'
-              fluid
-              placeholder='Enter your Email'
-              onBlur={handleChange}
-              error={!!errors.email}
-            />
-            {errors && errors.email && (
-              <Message error content={errors.email.message} />
-            )}
-          </Form.Field>
-          <Form.Field>
-            <label className='d-inline-block'>Password</label>
-            <Link className='float-end' to='/password-recover'>
-              Forget your password?
-            </Link>
-            <Form.Input
-              name='password'
-              type='password'
-              fluid
-              placeholder='Enter your Password'
-              onBlur={handleChange}
-              error={!!errors.password}
-            />
-            {errors && errors.password && (
-              <Message error content={errors.password.message} />
-            )}
-          </Form.Field>
-          <Form.Field>
-            <Checkbox label='Remember me' />
-          </Form.Field>
-          <Button type='submit' fluid primary>
-            Log In
-          </Button>
-        </Form>
-      </Container>
-    </Auth>
+        </Button>
+      </Form>
+    </Container>
   );
 };
 

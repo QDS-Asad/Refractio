@@ -1,23 +1,30 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import React from 'react';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import InviteAccount from './pages/auth/InviteAccount';
 import VerificationCode from './pages/auth/VerificationCode';
 import PasswordRecover from './pages/auth/PasswordRecover';
-import PasswordRecoverMail from './pages/auth/PasswordRecoverMail';
 import NewPassword from './pages/auth/NewPassword';
-import ResetPasswordFlow from './pages/auth/ResetPasswordFlow'
+import PasswordRecoverMail from './pages/auth/PasswordRecoverMail';
+import Auth from './pages/auth/Auth';
 const App = () => {
   return (
     <Routes>
-      <Route path='/login' element={<Login />} />
-      <Route path='/register' element={<Register />} />
-      <Route path='/new-password' element={<NewPassword />} />
-      <Route path='/password-recover' element={<ResetPasswordFlow />} />
-      <Route path='/password-recover-success' element={<PasswordRecoverMail />} />
-      <Route path='/verify-code' element={<VerificationCode />} />
-      <Route path='/invite-account' element={<InviteAccount />} />
+      <Route path='auth' element={<Auth />}>
+        <Route path='' element={<Navigate replace to='login' />} />
+        {/* <Route index element={<Login />} /> */}
+        <Route path='login' element={<Login />} />
+        <Route path='register' element={<Register />} />
+        <Route path='new-password' element={<NewPassword />} />
+        <Route path='password-recover' element={<PasswordRecover />} />
+        <Route
+          path='password-recover-success'
+          element={<PasswordRecoverMail />}
+        />
+        <Route path='verify-code' element={<VerificationCode />} />
+        <Route path='invite-account' element={<InviteAccount />} />
+      </Route>
     </Routes>
   );
 };
