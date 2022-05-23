@@ -78,3 +78,19 @@ html,body {
 .text-center {
   text-align: center;
 }
+#main-sidebar-segment .pusher {
+  min-height: calc(100vh - 240px);
+}
+.sidebar{
+  border-bottom: 0 none !important;
+  box-shadow: none !important
+
+}
+.sidebar{
+  min-width: 250px !important;
+}
+/* label {
+  width:65px;
+  height:20px
+  
+} */

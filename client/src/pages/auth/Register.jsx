@@ -100,7 +100,7 @@ const Register = () => {
           <Form.Input
             name='password'
             className='input-field'
-            placeholder='Enter your password'
+            placeholder='Enter new password'
             type='password'
             error={!!errors.password}
             onBlur={handleChange}
