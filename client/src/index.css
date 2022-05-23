@@ -74,3 +74,7 @@ html,body {
   margin: 6% !important;
     text-align: center;
 }
+
+.text-center {
+  text-align: center;
+}

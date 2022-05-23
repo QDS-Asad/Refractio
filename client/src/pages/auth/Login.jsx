@@ -26,6 +26,7 @@ const Login = () => {
   };
 
   const handleChange = (e) => {
+    console.log('HELLO');
     e.persist();
     setValue(e.target.name, e.target.value);
     trigger(e.target.name);
