@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-
 import { Button, Form, Message, Container, Header } from 'semantic-ui-react';
 import { useForm } from 'react-hook-form';
 
 const NewPassword = () => {
-  const { register, setValue, handleSubmit, errors, trigger } = useForm({
+  const { register, setValue, handleSubmit, errors, trigger, watch } = useForm({
     mode: 'onBlur',
   });
 
@@ -27,19 +26,21 @@ const NewPassword = () => {
     newPassword: {
       required: 'Password is required',
       pattern: {
-        value: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:.[a-zA-Z0-9-]+)*$/,
+        value: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
         message:
           'Invalid password. Password length should be min 8 symbols. Password should contain numbers, letters, special characters.',
       },
     },
 
     confirmPassword: {
-      required: 'Password is required',
+      required: 'Confirm password is required',
       pattern: {
         value: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
         message:
           'Invalid password. Password length should be min 8 symbols. Password should contain numbers, letters, special characters.',
       },
+      validate: (value) =>
+        value === watch('newPassword') || 'Passwords are not identical ',
     },
   };
 
@@ -50,39 +51,39 @@ const NewPassword = () => {
 
   return (
     <Container>
-      <Header size='medium' className='primary-dark-color'>
+      <Header size='medium' className='primary-dark-color mb-4'>
         Create New Password
       </Header>
       <Form onSubmit={handleSubmit(handlePasChange)} loading={loading} error>
-        <Form.Field>
-          <label>Enter New Password</label>
+        <Form.Field className='mb-3'>
+          <label>New Password</label>
           <Form.Input
+            type='password'
             name='newPassword'
             placeholder='Enter new password'
-            type='password'
             fluid
             onBlur={handleChange}
             error={!!errors.newPassword}
-          />
+          ></Form.Input>
           {errors && errors.newPassword && (
             <Message error content={errors.newPassword.message} />
           )}
         </Form.Field>
-        <Form.Field>
-          <label>Enter New Password</label>
+        <Form.Field className='mb-3'>
+          <label>Confirm New Password</label>
           <Form.Input
+            type='password'
             name='confirmPassword'
             placeholder='Enter confirm password'
-            type='password'
             fluid
             onBlur={handleChange}
-            error={!!errors.newPassword}
+            error={!!errors.confirmPassword}
           />
           {errors && errors.confirmPassword && (
             <Message error content={errors.confirmPassword.message} />
           )}
         </Form.Field>
-        <Button type='submit' fluid primary>
+        <Button type='submit' fluid primary className='mt-3'>
           Reset Password
         </Button>
       </Form>

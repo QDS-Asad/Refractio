@@ -9,11 +9,11 @@ const Auth = () => {
         <Grid.Column width={5} className='p-4'>
           <Header
             className='position-absolute'
-            as='h1'
+            as='h2'
             image='/logo-dark.svg'
             content='Refractio'
           />
-          <div className='d-flex justify-content-center align-items-center h-100'>
+          <div className='d-flex justify-content-center align-items-center h-100 pt-5'>
             <Outlet />
           </div>
         </Grid.Column>

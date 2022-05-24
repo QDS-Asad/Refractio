@@ -75,6 +75,36 @@ html,body {
     text-align: center;
 }
 
-.text-center {
-  text-align: center;
+.ui.form .field {
+  clear: both;
+  margin: 0 0 0.5em;
+}
+
+.ui.message {
+  position: relative;
+  min-height: 1em;
+  margin: 0;
+  background: none;
+  padding: 0;
+  line-height: 1.4285em;
+  color: rgba(0,0,0,.87);
+  box-shadow: none;
+}
+
+.ui.error.message {
+  background-color: transparent !important;
+  box-shadow: none;
+}
+
+
+#main-sidebar-segment .pusher {
+  min-height: calc(100vh - 240px);
+}
+.sidebar{
+  border-bottom: 0 none !important;
+  box-shadow: none !important
+
+}
+.sidebar{
+  min-width: 250px !important;
 }

@@ -1,13 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Checkbox,
-  Button,
-  Form,
-  Message,
-  Container,
-  Header,
-} from 'semantic-ui-react';
-import { Link } from 'react-router-dom';
+import { Button, Form, Message, Container, Header } from 'semantic-ui-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 
 const Register = () => {
@@ -16,16 +9,17 @@ const Register = () => {
   });
 
   const [loading, setLoading] = useState(false);
-  const handleSinUp = (data) => {
+  const navigation = useNavigate();
+  const handleSignup = (data) => {
     console.log(data);
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
+      navigation('/auth/verify-code');
     }, 1500);
   };
 
   const handleChange = (e) => {
-    console.log('saad');
     e.persist();
     setValue(e.target.name, e.target.value);
     trigger(e.target.name);
@@ -35,7 +29,7 @@ const Register = () => {
     fullName: {
       required: 'Full Name is required',
       pattern: {
-        value: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:.[a-zA-Z0-9-]+)*$/,
+        value: /^[a-zA-Z ]*$/,
         message: 'Invalid Full Name. Only letters are allowed.',
       },
     },
@@ -60,15 +54,16 @@ const Register = () => {
     register({ name: 'fullName' }, signupOptions.fullName);
     register({ name: 'email' }, signupOptions.email);
     register({ name: 'password' }, signupOptions.password);
+    register({ name: 'agreement' });
   }, []);
 
   return (
     <Container>
-      <Header size='medium' className='primary-dark-color'>
+      <Header size='medium' className='primary-dark-color mb-4'>
         Sign Up
       </Header>
-      <Form onSubmit={handleSubmit(handleSinUp)} loading={loading} error>
-        <Form.Field>
+      <Form onSubmit={handleSubmit(handleSignup)} loading={loading} error>
+        <Form.Field className='mb-3'>
           <label className='label'>Full Name </label>
           <Form.Input
             name='fullName'
@@ -81,7 +76,7 @@ const Register = () => {
             <Message error content={errors.fullName.message} />
           )}
         </Form.Field>
-        <Form.Field>
+        <Form.Field className='mb-3'>
           <label className='label mt-norm'>Email address </label>
           <Form.Input
             name='email'
@@ -95,12 +90,13 @@ const Register = () => {
             <Message error content={errors.email.message} />
           )}
         </Form.Field>
-        <Form.Field>
+        <Form.Field className='mb-3'>
           <label className='label mt-norm'>Password</label>
           <Form.Input
             name='password'
             className='input-field'
-            placeholder='Enter your password'
+            placeholder='Enter new password'
+            type='password'
             error={!!errors.password}
             onBlur={handleChange}
           />
@@ -108,21 +104,31 @@ const Register = () => {
             <Message error content={errors.password.message} />
           )}
         </Form.Field>
-        <Form.Field>
-          <Checkbox label='I accept ' />
-          <span>
-            <Link to='/' className='primary-color ms-1'>
-              Terms and Conditions
-            </Link>
-          </span>
+        <Form.Field className='mb-3'>
+          <Form.Checkbox
+            name='agreement'
+            error={!!errors.agreement}
+            onBlur={handleChange}
+            label={
+              <label>
+                I accept{' '}
+                <Link to='/' className='primary-color ms-1'>
+                  Terms and Conditions
+                </Link>
+              </label>
+            }
+          />
+          {errors && errors.agreement && (
+            <Message error content={errors.agreement.message} />
+          )}
         </Form.Field>
 
-        <Button type='submit' fluid primary>
+        <Button type='submit' fluid primary className='mt-3'>
           Reset Password
         </Button>
       </Form>
       <div className='backToLogin'>
-        Already have account? <Link to='/login'>Log In</Link>
+        Already have account? <Link to='/auth/login'>Log In</Link>
       </div>
     </Container>
   );
