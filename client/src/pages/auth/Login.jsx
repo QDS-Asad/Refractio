@@ -25,7 +25,6 @@ const Login = () => {
   };
 
   const handleChange = (e) => {
-    console.log('HELLO');
     e.persist();
     setValue(e.target.name, e.target.value);
     trigger(e.target.name);
@@ -60,12 +59,12 @@ const Login = () => {
       <Header size='medium' className='primary-dark-color'>
         Log In
       </Header>
-      <p className='mt-3 mb-5'>
+      <p className='mt-3 mb-4'>
         Enter your email address and password to access account.
       </p>
       <Form onSubmit={handleSubmit(handleLogin)} loading={loading} error>
-        <Form.Field>
-          <label >Email Address</label>
+        <Form.Field className='mb-3'>
+          <label>Email Address</label>
           <Form.Input
             name='email'
             fluid
@@ -77,7 +76,7 @@ const Login = () => {
             <Message error content={errors.email.message} />
           )}
         </Form.Field>
-        <Form.Field>
+        <Form.Field className='mb-3'>
           <label className='d-inline-block'>Password</label>
           <Link className='float-end' to='/auth/password-recover'>
             Forget your password?
@@ -97,7 +96,7 @@ const Login = () => {
         <Form.Field>
           <Checkbox label='Remember me' />
         </Form.Field>
-        <Button type='submit' fluid primary>
+        <Button type='submit' fluid primary className='mt-3'>
           Log In
         </Button>
       </Form>

@@ -11,10 +11,9 @@ const Auth = () => {
             className='position-absolute'
             as='h2'
             image='/logo-dark.svg'
-            style={{ height: 56, width: 66 }}
             content='Refractio'
           />
-          <div className='d-flex justify-content-center align-items-center h-100'>
+          <div className='d-flex justify-content-center align-items-center h-100 pt-5'>
             <Outlet />
           </div>
         </Grid.Column>
