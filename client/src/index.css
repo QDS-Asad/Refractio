@@ -1,0 +1,92 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;500;600;700&display=swap');
+
+html,body {
+  font-family: 'Nunito', sans-serif;
+}
+ 
+.auth.ui.grid {
+  margin: 0 !important;
+}
+.paragraph {
+  margin: 10% auto;
+}
+.primary-bg {
+  background-color: #083B66 !important;
+}
+
+.primary-dark-color {
+  color: #083B66 !important;
+}
+
+.primary-color{
+  color:#454FC8  !important
+}
+.color-white{
+  color:#fff !important
+}
+
+.vh-100 {
+  height: 100vh;
+}
+
+.ui.input {
+  width: 100%;
+}
+
+label {
+  font-weight: 600 !important;
+  color: #3B3B3B !important;
+}
+
+.fs-heading {
+  font-size: 3rem !important;
+}
+
+
+.btn {
+  background: #454FC8 !important;
+  width: 100%;
+  color: #fff !important;
+  border-radius: 2px !important;
+  margin-top: 13px !important;
+}
+
+.backToLogin {
+  margin: 6% !important;
+    text-align: center;
+}
+
+.ui.form .field {
+  clear: both;
+  margin: 0 0 0.5em;
+}
+
+.ui.message {
+  position: relative;
+  min-height: 1em;
+  margin: 0;
+  background: none;
+  padding: 0;
+  line-height: 1.4285em;
+  color: rgba(0,0,0,.87);
+  box-shadow: none;
+}
+
+.ui.error.message {
+  background-color: transparent !important;
+  box-shadow: none;
+}
+
+
+#main-sidebar-segment .pusher {
+  min-height: calc(100vh - 240px);
+}
+.sidebar{
+  border-bottom: 0 none !important;
+  box-shadow: none !important
+
+}
+.sidebar{
+  min-width: 250px !important;
+}
