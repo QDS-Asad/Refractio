@@ -74,7 +74,7 @@ const VerificationCode = () => {
           )}
         </Form.Field>
 
-        <Button type='submit' fluid primary className='mt-3'>
+        <Button type='submit' fluid primary className='mt-3 btn'>
           Next
         </Button>
 

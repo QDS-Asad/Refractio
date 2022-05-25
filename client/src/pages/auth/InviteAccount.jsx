@@ -127,7 +127,7 @@ const InviteAccount = () => {
             <Message error content={errors.confirmPassword.message} />
           )}
         </Form.Field>
-        <Button type='submit' fluid primary className='mt-3'>
+        <Button type='submit' fluid primary className='mt-3 btn'>
           Sign Up
         </Button>
       </Form>

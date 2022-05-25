@@ -24,7 +24,7 @@ const Auth = () => {
                 as='h1'
                 image='/logo192.png'
                 content='Refractio'
-                className='text-light'
+                className='text-light fs-heading fw-light'
               />
             </div>
           </div>

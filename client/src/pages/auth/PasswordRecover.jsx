@@ -61,7 +61,7 @@ const PasswordRecover = () => {
           </p>
           <Form onSubmit={handleSubmit(handleRecover)} loading={loading} error>
             <Form.Field className='mb-3'>
-              <label className='label'>Email address </label>
+              <label>Email address </label>
               <Form.Input
                 name='email'
                 fluid
@@ -74,7 +74,7 @@ const PasswordRecover = () => {
               )}
             </Form.Field>
 
-            <Button type='submit' fluid primary className='mt-3'>
+            <Button type='submit' fluid primary className='mt-3 btn'>
               Reset Password
             </Button>
 
@@ -107,7 +107,7 @@ const PasswordRecover = () => {
             fluid
             primary
             onClick={handleBackToLogin}
-            className='mt-3'
+            className='mt-3 btn'
           >
             Back to Login
           </Button>

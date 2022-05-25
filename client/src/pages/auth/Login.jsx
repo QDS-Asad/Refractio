@@ -96,7 +96,7 @@ const Login = () => {
         <Form.Field>
           <Checkbox label='Remember me' />
         </Form.Field>
-        <Button type='submit' fluid primary className='mt-3'>
+        <Button type='submit' fluid primary className='mt-3 btn'>
           Log In
         </Button>
       </Form>

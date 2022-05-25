@@ -20,8 +20,14 @@ const Register = () => {
   };
 
   const handleChange = (e) => {
+    debugger;
     e.persist();
-    setValue(e.target.name, e.target.value);
+    if (e.target.type === 'checkbox') {
+      setValue(e.target.name, e.target.checked);
+    } else {
+      setValue(e.target.name, e.target.value);
+    }
+
     trigger(e.target.name);
   };
 
@@ -48,13 +54,16 @@ const Register = () => {
           'Invalid password. Password length should be min 8 symbols. Password should contain numbers, letters, special characters.',
       },
     },
+    agreement: {
+      required: 'Agreement is required',
+    },
   };
 
   useEffect(() => {
     register({ name: 'fullName' }, signupOptions.fullName);
     register({ name: 'email' }, signupOptions.email);
     register({ name: 'password' }, signupOptions.password);
-    register({ name: 'agreement' });
+    register({ name: 'agreement' }, signupOptions.agreement);
   }, []);
 
   return (
@@ -64,7 +73,7 @@ const Register = () => {
       </Header>
       <Form onSubmit={handleSubmit(handleSignup)} loading={loading} error>
         <Form.Field className='mb-3'>
-          <label className='label'>Full Name </label>
+          <label>Full Name </label>
           <Form.Input
             name='fullName'
             fluid
@@ -77,7 +86,7 @@ const Register = () => {
           )}
         </Form.Field>
         <Form.Field className='mb-3'>
-          <label className='label mt-norm'>Email address </label>
+          <label>Email address </label>
           <Form.Input
             name='email'
             type='email'
@@ -91,10 +100,9 @@ const Register = () => {
           )}
         </Form.Field>
         <Form.Field className='mb-3'>
-          <label className='label mt-norm'>Password</label>
+          <label>Password</label>
           <Form.Input
             name='password'
-            className='input-field'
             placeholder='Enter new password'
             type='password'
             error={!!errors.password}
@@ -123,7 +131,7 @@ const Register = () => {
           )}
         </Form.Field>
 
-        <Button type='submit' fluid primary className='mt-3'>
+        <Button type='submit' fluid primary className='mt-3 btn'>
           Reset Password
         </Button>
       </Form>
