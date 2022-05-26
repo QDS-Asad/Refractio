@@ -7,6 +7,8 @@ import VerificationCode from './pages/auth/VerificationCode';
 import PasswordRecover from './pages/auth/PasswordRecover';
 import NewPassword from './pages/auth/NewPassword';
 import Auth from './pages/auth/Auth';
+import AppLayout from './layouts/AppLayout';
+import Oppertunities from './pages/app/Oppertunities';
 const App = () => {
   return (
     <Routes>
@@ -18,6 +20,13 @@ const App = () => {
         <Route path='password-recover' element={<PasswordRecover />} />
         <Route path='verify-code' element={<VerificationCode />} />
         <Route path='invite-account' element={<InviteAccount />} />
+      </Route>
+      <Route path='' element={<AppLayout />}>
+        <Route
+          path=''
+          element={<Navigate replace to='oppertunities' />}
+        ></Route>
+        <Route path='oppertunities' element={<Oppertunities />} />
       </Route>
     </Routes>
   );
