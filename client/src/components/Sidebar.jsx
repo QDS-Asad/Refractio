@@ -32,7 +32,7 @@ const SideBar = () => (
       </Menu.Item>
       <Menu.Item as='a' active>
         <Image src='/images/opportunities.svg' verticalAlign='middle' />
-        <span className='ps-2'>Oppertunities</span>
+        <span className='ps-2'>Opportunities</span>
       </Menu.Item>
       <Menu.Item as='a'>
         <Image src='/images/team.svg' verticalAlign='middle' />

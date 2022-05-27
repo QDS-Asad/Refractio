@@ -4,26 +4,36 @@
 * {
   font-family: 'Nunito', sans-serif !important;
 }
+:root {
+  --primary-dark: #083B66;
+  --primary: #454FC8;
+  --secondary: #6C757D;
+  --white: #FFFFFF;
+  --dark: #3B3B3B;
+}
  
 .auth.ui.grid {
   margin: 0 !important;
 }
-.paragraph {
-  margin: 10% auto;
-}
+
 .primary-bg {
-  background-color: #083B66 !important;
+  background-color: var(--primary-dark) !important;
 }
 
 .primary-dark-color {
-  color: #083B66 !important;
+  color: var(--primary-dark) !important;
 }
 
 .primary-color{
-  color:#454FC8  !important
+  color: var(--primary) !important
 }
-.color-white{
-  color:#fff !important
+
+.secondary-color {
+  color: var(--secondary) !important
+}
+
+.white-color {
+  color: var(--white) !important;
 }
 
 .vh-100 {
@@ -36,7 +46,7 @@
 
 label {
   font-weight: 600 !important;
-  color: #3B3B3B !important;
+  color: var(--dark) !important;
 }
 
 .fs-heading {
@@ -45,8 +55,8 @@ label {
 
 
 .btn {
-  background: #454FC8 !important;
-  color: #fff !important;
+  background: var(--primary) !important;
+  color: var(--white) !important;
   border-radius: 2px !important;
 }
 
@@ -91,18 +101,18 @@ label {
   width: calc(100vw - 260px);
 }
 
-.oppertunities-tabs {
+.opportunities-tabs {
   width: 100px;
   text-align: center;
   display: inline-block !important;
-  color: #6C757D !important;
+  color: var(--secondary) !important;
 }
 
-.oppertunities-tabs.active  {
- border-color: #083B66 ;
- color: #6C757D !important;
+.opportunities-tabs.active  {
+ border-color: var(--primary-dark) ;
+ color: var(--text-secondary)  !important;
 }
 
-.oppertunities-tabs-height {
+.opportunities-tabs-height {
   min-height: calc(100vh - 215px);
 }

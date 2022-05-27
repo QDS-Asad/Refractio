@@ -8,7 +8,7 @@ import PasswordRecover from './pages/auth/PasswordRecover';
 import NewPassword from './pages/auth/NewPassword';
 import Auth from './pages/auth/Auth';
 import AppLayout from './layouts/AppLayout';
-import Oppertunities from './pages/app/Oppertunities';
+import Opportunities from './pages/app/Opportunities/Opportunities';
 const App = () => {
   return (
     <Routes>
@@ -24,9 +24,9 @@ const App = () => {
       <Route path='' element={<AppLayout />}>
         <Route
           path=''
-          element={<Navigate replace to='oppertunities' />}
+          element={<Navigate replace to='opportunities' />}
         ></Route>
-        <Route path='oppertunities' element={<Oppertunities />} />
+        <Route path='opportunities' element={<Opportunities />} />
       </Route>
     </Routes>
   );
