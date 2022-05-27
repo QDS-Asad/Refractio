@@ -1,33 +1,15 @@
 const mongoose = require('mongoose');
 
-// mongoose.connect(
-//     "mongodb://localhost:27017/",
-//     {
-//       dbName: "refractio_db",
-//       useNewUrlParser: true,
-//       useUnifiedTopology: true,
-//     },
-//     (err) =>
-//       err ? console.log(err) : console.log(
-//         "Connected to refractio database")
-//   );
+const dbUrl = "mongodb+srv://qdsravi:iBQFBbRGpVOgbkSQ@cluster0.mt4zc.mongodb.net/refractio_db?retryWrites=true&w=majority"
 
-mongoose.connect('mongodb://localhost:27017/refractio_db');
-// const MyModel = mongoose.model('Test', new Schema({ name: String }));
-// // Works
-// MyModel.findOne(function(error, result) { /* ... */ });
-//const Schema = mongoose.Schema;
-// const schema = new mongoose.Schema({
-//     name: String
-//   }, {
-//     capped: { size: 1024 },
-//     bufferCommands: false,
-//     autoCreate: false // disable `autoCreate` since `bufferCommands` is false
-//   });
-  
-  //const Model = mongoose.model('Test', schema);
-  // Explicitly create the collection before using it
-  // so the collection is capped.
- // Model.createCollection();
+const connectionParams = {
+  useNewUrlParser : true,
+  useUnifiedTopology: true,
+}
 
-  
+mongoose.connect(dbUrl, connectionParams).then(()=>{
+console.info("Connected to the Database");
+})
+.catch((e)=>{
+  console.log("Error:", e)
+})
