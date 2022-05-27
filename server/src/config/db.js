@@ -1,13 +1,14 @@
 const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+dotenv.config();
 
-const dbUrl = "mongodb+srv://qdsravi:iBQFBbRGpVOgbkSQ@cluster0.mt4zc.mongodb.net/refractio_db?retryWrites=true&w=majority"
 
 const connectionParams = {
   useNewUrlParser : true,
   useUnifiedTopology: true,
 }
 
-mongoose.connect(dbUrl, connectionParams).then(()=>{
+mongoose.connect(process.env.DB_URI, connectionParams).then(()=>{
 console.info("Connected to the Database");
 })
 .catch((e)=>{
