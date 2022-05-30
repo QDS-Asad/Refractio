@@ -11,7 +11,7 @@ const verifyToken = require('../middlewares/verifyToken');
 router.post('/api/register',generalRegister,UserController.register);
 router.post('/api/login',generalLogin,UserController.login);
 router.post('/api/verify-login',UserController.verifyOtp);
-router.get('/api/test',verifyToken,(req, res)=>{res.send({message:"Token verfied successfully."})})
+//router.get('/api/test',verifyToken,(req, res)=>{res.send({message:"Token verfied successfully."})})
 
 
 module.exports = router;
