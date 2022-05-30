@@ -193,3 +193,21 @@ const sendOTPVerficationEmail = async({id, email}, res)=>{
         });
     }
 }
+
+// exports.verifyOtp = async(req, res)=>{
+// try {
+//       let {userId, otp} = req.body;
+//       if(!userId || !otp){
+//           throw Error("Empty otp details are not allowed");
+//       } else {
+//         let userOtpRecords = await UserService.verfiyOtp(userId, otp);
+//         if(userOtpRecords.length <= 0){
+//             throw new Error(
+//                 "Account record doesn't exists or has been verfied already. Please sign up or log in."
+//             )
+//         } 
+//       } 
+// } catch (error) {
+    
+// }
+// }

@@ -33,3 +33,10 @@ exports.userOtpVerification = async(id, otp, createdAt, expiresAt)=>{
       expiresAt
    })
 }
+
+// exports.verfiyOtp = async(userId, otp)=>{
+//    let userOtp = await UserOTPVerification.findOne({
+//       id:userId
+//    });
+//    return userOtp;
+// }
