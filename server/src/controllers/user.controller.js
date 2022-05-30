@@ -4,69 +4,54 @@ const jwt = require ('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const dotenv = require('dotenv');
 dotenv.config();
-const generalRegisterValidation = require('../middlewares/generalRegister.middleware')
+const generalRegisterValidation = require('../middlewares/generalRegister')
 const { validationResult } = require('express-validator');
-//const UserOTPVerification = require('../models/userOtpVerification');
 const userOtpVerification = require('../models/userOtpVerification');
+const { User } = require('../models/user');
+const { UserOTPVerification } = require('../models/userOtpVerification');
 
 
 exports.register = async (req, res, next) =>{
-    //const errors = validationResult(req);
-    //   if (!errors.isEmpty()) {
-    //     res.status(422).json({ errors: errors.array() });
-    //     return;
-    //   }
+
     const {fullName, email, password} = req.body;
-
-    if(!fullName){
-       return res.status(400).send({
-            status: "error",
-            error: "Fullname is required"
-        })
-    }
-
-    if(!email){
-       return res.status(400).send({
-            status:"error",
-            error:"Email is required"
-        })
-    }
-
-    if(!password) {
-        return res.status(400).send({
-            status: "error",
-            error: "Password is required"
-        });
-    }
-
-
-    if(password.length < 5){
-        return res.status(400).send({
-            status: "error",
-            error: "Password too small. Should be atleat 6 characters"
-        });
-    }
-
     const passwordhash = await bcrypt.hash(password, 10);
     try {
-        await UserService.signUp(fullName, email, passwordhash).then((result)=>{
-            let email = result.email;
-            let id = result.id;
-        //     sendOTPVerficationEmail({id, email}, res).then((result)=>{
-        //         console.log("email send result", result)
-        //        res.status(200).send({
-        //            result
-        //        })
-        //    });
-            return res.status(200).send({
-                status:"User created successfully"
+        await UserService.getUserByEmail(email).then(async(user)=>{
+          if(user){
+            if(user.verified) {
+                res.status(200).send({
+                    message: "You already registered!"
+                });
+            } else {
+                sendOTPVerficationEmail({"id":user.id, "email":email}, res).then((result)=>{
+                    console.log("email send result", result, "alerady register")
+                   res.status(200).send({
+                       result
+                   })
+               });
+            }
+          } else{
+            await UserService.signUp(fullName, email, passwordhash).then((result)=>{
+                let email = result.email;
+                let id = result.id;
+                sendOTPVerficationEmail({id, email}, res).then((result)=>{
+                    console.log("email send result", result)
+                   res.status(200).send({
+                       result
+                   })
+               });
+                // return res.status(200).send({
+                //     status:"User created successfully"
+                // })
+            }).catch((error)=>{
+               res.status(500).send({
+                   status:"error", 
+                   message:error.message       
+               })
             })
-        }).catch((error)=>{
-           res.status(500).send({
-               status:"error", 
-               message:error.message       
-           })
+          }
         })
+        
 
         
     } catch (error) {
@@ -80,19 +65,7 @@ exports.register = async (req, res, next) =>{
 
 exports.login = async(req, res)=>{
     const {email, password} = req.body;
-    if(!email){
-        return res.status(400).send({
-            status:"error",
-            error:"Email is required"
-        })
-    }
 
-    if(!password){
-        return res.status(400).send({
-            status:"error",
-            error:"Password is required"
-        })
-    }
       try {
           let user = await UserService.login(email, password);
           if(!user){
@@ -194,20 +167,51 @@ const sendOTPVerficationEmail = async({id, email}, res)=>{
     }
 }
 
-// exports.verifyOtp = async(req, res)=>{
-// try {
-//       let {userId, otp} = req.body;
-//       if(!userId || !otp){
-//           throw Error("Empty otp details are not allowed");
-//       } else {
-//         let userOtpRecords = await UserService.verfiyOtp(userId, otp);
-//         if(userOtpRecords.length <= 0){
-//             throw new Error(
-//                 "Account record doesn't exists or has been verfied already. Please sign up or log in."
-//             )
-//         } 
-//       } 
-// } catch (error) {
-    
-// }
-// }
+exports.verifyOtp = async(req, res)=>{
+try {
+      let hashedOTP;
+      let {userId, otp} = req.body;
+      if(!userId || !otp){
+          throw Error("Empty otp details are not allowed");
+      } else {
+         hashedOTP = otp;
+        let userOtpRecords = await UserService.verfiyOtp(userId, otp);
+        if(userOtpRecords.length <= 0){
+            // no record found
+            throw new Error(
+                "Account record doesn't exists or has been verfied already. Please sign up or log in."
+            );
+        } else {
+            //user otp record exits
+            console.log("records",userOtpRecords);
+            const {expiresAt,otp} = userOtpRecords;
+            if(expiresAt < Date.now()){
+                //user otp record has expired
+                await UserService.deleteExpiredOtp(userId);
+                throw new Error("Code has expired. Please request again.")
+            } else {
+                console.log(hashedOTP, otp);
+                const validOtp = await bcrypt.compare( hashedOTP.toString(), otp);
+
+                if(!validOtp){
+                    throw new Error("Invalid code passed. Check your inbox.")
+                } else {
+                    await User.updateOne({_id: userId}, {verified: true});
+                    await UserOTPVerification.deleteMany({userId});
+                    
+                    res.status(200).send({
+                        status: "Verified",
+                        message: "User email verified successfully."
+                    })
+                }
+            }
+        }
+      } 
+} catch (error) {
+    console.log(error);
+    res.status(500).send({
+        status: "Failed",
+        message: error.message
+    })
+}
+}
