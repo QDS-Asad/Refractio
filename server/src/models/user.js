@@ -1,4 +1,5 @@
 var mongoose = require("mongoose");
+const { boolean } = require("webidl-conversions");
 
 var UserSchema = new mongoose.Schema({
   firstName: {
@@ -23,6 +24,11 @@ var UserSchema = new mongoose.Schema({
   password:{
       type: String,
       required: true
+  },
+  verified:{
+      type: Boolean,
+      required: true,
+      default:false
   },
   roles:[
       {

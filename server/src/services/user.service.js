@@ -1,4 +1,5 @@
 const User = require("../models/user").User
+const UserOTPVerification = require("../models/userOtpVerification").UserOTPVerification;
 
 exports.signUp = async(fullName, email, password)=>{
    // let user = await User.findOne({
@@ -22,4 +23,13 @@ exports.login = async(email, password)=>{
       email:email
    });
    return user;
+}
+
+exports.userOtpVerification = async(id, otp, createdAt, expiresAt)=>{
+   return await UserOTPVerification.create({
+      id,
+      otp,
+      createdAt,
+      expiresAt
+   })
 }
