@@ -10,6 +10,7 @@
   --secondary: #6C757D;
   --white: #FFFFFF;
   --dark: #3B3B3B;
+  --success: #74D14C;
 }
  
 .auth.ui.grid {
@@ -20,9 +21,18 @@
   background-color: var(--primary-dark) !important;
 }
 
+.secondary-bg {
+  background-color: var(--secondary) !important;
+}
+
+.success-bg{
+  background-color: var(--success) !important;
+}
+
 .primary-dark-color {
   color: var(--primary-dark) !important;
 }
+
 
 .primary-color{
   color: var(--primary) !important
@@ -58,6 +68,14 @@ label {
   background: var(--primary) !important;
   color: var(--white) !important;
   border-radius: 2px !important;
+}
+
+.btn-outline {
+  background: none !important;
+  color: var(--primary) !important;
+  font-weight: 700;
+  border: none;
+  padding: 1rem;
 }
 
 .backToLogin {
@@ -115,4 +133,29 @@ label {
 
 .opportunities-tabs-height {
   min-height: calc(100vh - 215px);
+}
+
+.ui.secondary.pointing.menu .active.item  {
+  color: var(--secondary) !important;
+  border-color: var(--primary-dark) !important;
+}
+.ui.secondary.pointing.menu .item {
+  min-width: 100px;
+  text-align: center;
+  display: inline-block;
+}
+.ui.segment.tab {
+  border: none;
+  box-shadow: none;
+}
+
+.ui.modal.visible.active {
+  position: static;
+  height: auto;
+}
+
+.error-message {
+  padding: 1rem !important;
+  font-size: 1.25rem !important;
+  text-align: center;
 }

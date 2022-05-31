@@ -10,23 +10,23 @@ import {
   Grid,
   Header,
   Loader,
-  Menu,
   Message,
   Segment,
   Image,
+  Tab,
 } from 'semantic-ui-react';
 import AllOpportunities from './AllOpportunities';
 import CompletedOpportunities from './CompletedOpportunities';
 import EmptyOpportunities from './EmptyOpportunities';
+import CreateOpportunity from './CreateOpportunity';
 
 const Opportunities = () => {
-  const [activeItem, setActiveItem] = useState('all');
-
+  const [showCreate, setShowCreate] = useState(false);
   // set up dispatch
   const dispatch = useDispatch();
 
   // fetch data from our store
-  const { loading, error, opportunities } = useSelector(
+  const { loading, error, opportunities, completedOpportunities } = useSelector(
     opportunityListSelector
   );
 
@@ -35,7 +35,7 @@ const Opportunities = () => {
     dispatch(fetchOpportunities());
   }, [dispatch]);
 
-  const renderItems = () => {
+  const renderItems = (activeItem) => {
     // loading state
     if (loading)
       return (
@@ -54,16 +54,37 @@ const Opportunities = () => {
     // regular data workflow
     return (
       <>
-        {opportunities.length === 0 && <EmptyOpportunities />}
+        {opportunities.length === 0 && (
+          <EmptyOpportunities setShowCreate={setShowCreate} />
+        )}
         {opportunities.length > 0 && activeItem === 'all' && (
           <AllOpportunities opportunities={opportunities} />
         )}
         {opportunities.length > 0 && activeItem === 'completed' && (
-          <CompletedOpportunities opportunities={opportunities} />
+          <CompletedOpportunities opportunities={completedOpportunities} />
         )}
+        <CreateOpportunity
+          showCreate={showCreate}
+          setShowCreate={setShowCreate}
+        />
       </>
     );
   };
+
+  const panes = [
+    {
+      menuItem: 'All',
+      render: () => <Tab.Pane attached={false}>{renderItems('all')}</Tab.Pane>,
+    },
+    {
+      menuItem: 'Completed',
+      render: () => (
+        <Tab.Pane loading={loading} attached={false}>
+          {renderItems('completed')}
+        </Tab.Pane>
+      ),
+    },
+  ];
 
   return (
     <>
@@ -74,30 +95,16 @@ const Opportunities = () => {
           </Header>
         </Grid.Column>
         <Grid.Column floated='right' width={2}>
-          <Button primary className='btn'>
+          <Button primary className='btn' onClick={() => setShowCreate(true)}>
             Create New
           </Button>
         </Grid.Column>
       </Grid>
       <Grid>
         <Grid.Column>
-          <Menu pointing secondary>
-            <Menu.Item
-              name='All'
-              active={activeItem === 'all'}
-              onClick={() => setActiveItem('all')}
-              className='opportunities-tabs'
-            />
-            <Menu.Item
-              name='Completed'
-              active={activeItem === 'completed'}
-              onClick={() => setActiveItem('completed')}
-              className='pportunities-tabs'
-            />
-          </Menu>
+          <Tab menu={{ secondary: true, pointing: true }} panes={panes} />
         </Grid.Column>
       </Grid>
-      {renderItems()}
     </>
   );
 };

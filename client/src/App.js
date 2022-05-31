@@ -9,6 +9,7 @@ import NewPassword from './pages/auth/NewPassword';
 import Auth from './pages/auth/Auth';
 import AppLayout from './layouts/AppLayout';
 import Opportunities from './pages/app/Opportunities/Opportunities';
+import OpportunityDetail from './pages/app/Opportunities/OpportunityDetail';
 const App = () => {
   return (
     <Routes>
@@ -27,6 +28,7 @@ const App = () => {
           element={<Navigate replace to='opportunities' />}
         ></Route>
         <Route path='opportunities' element={<Opportunities />} />
+        <Route path='opportunities/:id' element={<OpportunityDetail />} />
       </Route>
     </Routes>
   );

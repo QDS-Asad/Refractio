@@ -5,25 +5,21 @@ import refractioApi from '../../common/refractioApi';
 export const initialState = {
   loading: false,
   error: null,
-  opportunities: [],
-  completedOpportunities: [],
+  opportunity: null,
 };
 
 // our slice
-const opportunityListSlice = createSlice({
-  name: 'opportunityList',
+const opportunityDetailSlice = createSlice({
+  name: 'opportunityDetail',
   initialState,
   reducers: {
     setLoading: (state) => {
       state.loading = true;
     },
-    setOpportunityList: (state, { payload }) => {
+    setOpportunity: (state, { payload }) => {
       state.loading = false;
       state.error = false;
-      state.opportunities = payload;
-      state.completedOpportunities = payload.filter(
-        (a) => a.status.toLowerCase() === 'completed'
-      );
+      state.opportunity = payload;
     },
     setError: (state, { payload }) => {
       state.loading = false;
@@ -34,24 +30,31 @@ const opportunityListSlice = createSlice({
 // export the actions
 export const {
   setLoading,
-  setOpportunityList,
+  setOpportunity,
   setError,
-} = opportunityListSlice.actions;
+} = opportunityDetailSlice.actions;
 
 // export the selector (".items" being same as in slices/index.js's "items: something")
-export const opportunityListSelector = (state) => state.opportunityList;
+export const opportunityDetailSelector = (state) => state.opportunityDetail;
 
 // export the default reducer
-export default opportunityListSlice.reducer;
+export default opportunityDetailSlice.reducer;
 
-// fetch all opportunities
-export const fetchOpportunities = () => async (dispatch) => {
+// fetch opportunity details
+export const fetchOpportunity = (id) => async (dispatch) => {
   try {
     dispatch(setLoading());
     let { data } = await refractioApi.get('/opportunities.json');
-    setTimeout(() => {
-      dispatch(setOpportunityList(data));
-    }, 1500);
+    let opportunity = data.find((o) => o._id === id);
+    if (opportunity) {
+      setTimeout(() => {
+        dispatch(setOpportunity(opportunity));
+      }, 1500);
+    } else {
+      setTimeout(() => {
+        dispatch(setError('Opportunity not found.'));
+      }, 1500);
+    }
   } catch (error) {
     dispatch(setError(error.message));
   }

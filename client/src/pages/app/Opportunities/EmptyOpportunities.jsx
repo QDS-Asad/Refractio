@@ -1,7 +1,7 @@
 import React from 'react';
 import { Grid, Header, Button } from 'semantic-ui-react';
 
-const EmptyOpportunities = () => {
+const EmptyOpportunities = ({ setShowCreate }) => {
   return (
     <Grid
       verticalAlign='middle'
@@ -17,7 +17,7 @@ const EmptyOpportunities = () => {
               There are no opportunities. Start creating your first opportunity.
             </Header.Subheader>
           </Header>
-          <Button primary className='btn'>
+          <Button primary className='btn' onClick={() => setShowCreate(true)}>
             Create New
           </Button>
         </Grid.Column>

@@ -5,52 +5,52 @@ import refractioApi from '../../common/refractioApi';
 export const initialState = {
   loading: false,
   error: null,
-  opportunities: [],
-  completedOpportunities: [],
+  opportunity: null,
+  success: false,
 };
 
 // our slice
-const opportunityListSlice = createSlice({
-  name: 'opportunityList',
+const opportunityCreateSlice = createSlice({
+  name: 'opportunityCreate',
   initialState,
   reducers: {
     setLoading: (state) => {
       state.loading = true;
     },
-    setOpportunityList: (state, { payload }) => {
+    setOpportunity: (state, { payload }) => {
       state.loading = false;
       state.error = false;
-      state.opportunities = payload;
-      state.completedOpportunities = payload.filter(
-        (a) => a.status.toLowerCase() === 'completed'
-      );
+      state.opportunity = payload;
+      state.success = true;
     },
     setError: (state, { payload }) => {
       state.loading = false;
       state.error = payload;
+      state.success = false;
     },
   },
 });
 // export the actions
 export const {
   setLoading,
-  setOpportunityList,
+  setOpportunity,
   setError,
-} = opportunityListSlice.actions;
+} = opportunityCreateSlice.actions;
 
 // export the selector (".items" being same as in slices/index.js's "items: something")
-export const opportunityListSelector = (state) => state.opportunityList;
+export const opportunityCreateSelector = (state) => state.opportunityCreate;
 
 // export the default reducer
-export default opportunityListSlice.reducer;
+export default opportunityCreateSlice.reducer;
 
-// fetch all opportunities
-export const fetchOpportunities = () => async (dispatch) => {
+// fetch opportunity details
+export const createOpportunity = (opportunity) => async (dispatch) => {
   try {
     dispatch(setLoading());
     let { data } = await refractioApi.get('/opportunities.json');
+    console.log(data);
     setTimeout(() => {
-      dispatch(setOpportunityList(data));
+      dispatch(setOpportunity(opportunity));
     }, 1500);
   } catch (error) {
     dispatch(setError(error.message));

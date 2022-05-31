@@ -1,5 +1,5 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 import { Header, Menu, Segment, Sidebar, Image } from 'semantic-ui-react';
 import NavBar from './Navbar';
 
@@ -30,7 +30,7 @@ const SideBar = () => (
           <Menu.Item name='Manage' className='fs-6 text-uppercase' />
         </Menu.Menu>
       </Menu.Item>
-      <Menu.Item as='a' active>
+      <Menu.Item as={Link} active to='/opportunities'>
         <Image src='/images/opportunities.svg' verticalAlign='middle' />
         <span className='ps-2'>Opportunities</span>
       </Menu.Item>
