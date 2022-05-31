@@ -1,5 +1,7 @@
 const User = require("../models/user").User
 const UserOTPVerification = require("../models/userOtpVerification").UserOTPVerification;
+const UserToken = require("../models/userToken").UserToken;
+
 
 exports.signUp = async(fullName, email, password)=>{
    let user = await User.findOne({
@@ -51,4 +53,30 @@ exports.getUserByEmail = async(email)=>{
    return await User.findOne({
       email:email
    })
+}
+
+exports.getUserById = async(userId)=>{
+   return await User.findOne({
+      id:userId
+   })
+}
+
+exports.userToken = async(userid, token, createdAt, expiresAt)=>{
+   return await UserToken.create({
+      userId:userid,
+      token:token,
+      createdAt:createdAt,
+      expiresAt:expiresAt
+   })
+}
+
+exports.getUserByToken = async(token)=>{
+   return await UserToken.findOne({
+      token:token
+   })
+}
+
+exports.modifyUserPassword = async(userid, password)=>{
+  let result =  await User.findByIdAndUpdate(userid,{password});
+  return result;  
 }
