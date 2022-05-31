@@ -2,6 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const path = require('path');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 
 dotenv.config();
 
@@ -16,6 +17,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
 
 app.use(bodyParser.json());
+
+app.use(cors());
 
 app.get('/api/status', (req, res) => {
   res.json({ message: 'Api is working.' });
