@@ -92,7 +92,7 @@ exports.login = async(req, res)=>{
               res.status(200).send(userData)
           }
           if(user && !(await bcrypt.compare(password, user.password))){
-              res.status(200).json({
+              res.status(401).json({
                   message:"Invalid Credentials"
               })
           }
