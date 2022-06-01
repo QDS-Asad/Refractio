@@ -10,10 +10,9 @@ const userOtpVerification = require('../models/userOtpVerification');
 const { User } = require('../models/user');
 const { UserOTPVerification } = require('../models/userOtpVerification');
 
-
 exports.register = async (req, res, next) =>{
-
-    const {fullName, email, password} = req.body;
+    
+    const {fullName, email, password, roles} = req.body;
     const passwordhash = await bcrypt.hash(password, 10);
     try {
         await UserService.getUserByEmail(email).then(async(user)=>{
@@ -31,7 +30,7 @@ exports.register = async (req, res, next) =>{
                });
             }
           } else{
-            await UserService.signUp(fullName, email, passwordhash).then((result)=>{
+            await UserService.signUp(fullName, email, passwordhash, roles).then((result)=>{
                 let email = result.email;
                 let id = result.id;
                 sendOTPVerficationEmail({id, email}, res).then((result)=>{
@@ -58,7 +57,9 @@ exports.register = async (req, res, next) =>{
         console.log(error);
         return res.status(500).send({
             status:'error',
-            message:"Something went wrong"
+            message:"Something went wrong",
+            data:null,
+            description:error
         })
     }
 }
@@ -86,6 +87,7 @@ exports.login = async(req, res)=>{
                 id:user._id,
                 fullName: user.fullName,
                 email: user.email,
+                roles:user.roles,
                 verified:user.verified,
                 token: token,
             }
@@ -93,13 +95,18 @@ exports.login = async(req, res)=>{
           }
           if(user && !(await bcrypt.compare(password, user.password))){
               res.status(401).json({
-                  message:"Invalid Credentials"
+                  status:'error',
+                  message:"Invalid credentials",
+                  data:null,
+                  description:error
               })
           }
       } catch (error) {
         return res.status(500).send({
             status:'error',
-            message:"Something went wrong"
+            message:"Something went wrong",
+            data:null,
+            description:error
         })
       }
 }
@@ -175,9 +182,11 @@ const sendOTPVerficationEmail = async({id, email}, res)=>{
             }
         }
     } catch (error) {
-        res.send({
-            status:"FAILED",
-            message: error.message
+        res.status(500).send({
+            status:'error',
+            message:"Something went wrong",
+            data:null,
+            description:error
         });
     }
 }
@@ -226,7 +235,9 @@ try {
     console.log(error);
     res.status(500).send({
         status: "Failed",
-        message: error.message
+        message: error.message,
+        data:null,
+        description:error
     })
 }
 }
@@ -303,7 +314,9 @@ exports.forgetPassword = async(req, res)=>{
         console.log(error);
         res.status(500).send({
             status: "Failed",
-            message: error.message
+            message: error.message,
+            data:null,
+            description:error
         })
     }
     }

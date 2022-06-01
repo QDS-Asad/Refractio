@@ -3,7 +3,7 @@ const UserOTPVerification = require("../models/userOtpVerification").UserOTPVeri
 const UserToken = require("../models/userToken").UserToken;
 
 
-exports.signUp = async(fullName, email, password)=>{
+exports.signUp = async(fullName, email, password,roles)=>{
    let user = await User.findOne({
       email:email
    })
@@ -13,9 +13,10 @@ exports.signUp = async(fullName, email, password)=>{
       })
    }
    return await User.create({
-      fullName,
-      email,
-      password
+      fullName:fullName,
+      email:email,
+      password:password,
+      roles:roles
    })
 }
 
