@@ -11,10 +11,10 @@ const verifyToken = require('../middlewares/verifyToken');
 const metaData = require('../models/projectmetadata').MetaData;
 
 router.post('/api/register',generalRegister,UserController.register);
-router.post('/api/login',generalLogin,UserController.login);
+router.post('/api/login',UserController.login);
 router.post('/api/verify-login',UserController.verifyOtp);
 router.post('/api/forget-password',UserController.forgetPassword);
-router.post('/api/reset-password',generalResetPassword,UserController.resetPassword)
+router.post('/api/reset-password/:token',generalResetPassword,UserController.resetPassword)
 //router.get('/api/test',verifyToken,(req, res)=>{res.send({message:"Token verfied successfully."})})
 
 //seeding project meta-data

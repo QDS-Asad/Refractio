@@ -70,7 +70,7 @@ exports.login = async(req, res)=>{
       try {
           let user = await UserService.login(email, password);
           if(!user){
-              res.status(401).json({
+              res.status(401).send({
                   message:"User does not exists"
               })
           }
@@ -94,11 +94,9 @@ exports.login = async(req, res)=>{
               res.status(200).send(userData)
           }
           if(user && !(await bcrypt.compare(password, user.password))){
-              res.status(401).json({
-                  status:'error',
+              res.status(401).send({
+                  status:'Unauthorized',
                   message:"Invalid credentials",
-                  data:null,
-                  description:error
               })
           }
       } catch (error) {
@@ -193,30 +191,25 @@ const sendOTPVerficationEmail = async({id, email}, res)=>{
 
 exports.verifyOtp = async(req, res)=>{
 try {
-      let hashedOTP;
       let {userId, otp} = req.body;
       if(!userId || !otp){
           throw Error("Empty otp details are not allowed");
-      } else {
-         hashedOTP = otp;
-        let userOtpRecords = await UserService.verfiyOtp(userId, otp);
-        if(userOtpRecords.length <= 0){
+      }
+        const hashedOTP = otp;
+        let userOtpRecords = await UserService.verfiyOtp(userId); 
+        if(!userOtpRecords){
             // no record found
             throw new Error(
                 "Account record doesn't exists or has been verfied already. Please sign up or log in."
             );
         } else {
-            //user otp record exits
-            console.log("records",userOtpRecords);
             const {expiresAt,otp} = userOtpRecords;
             if(expiresAt < Date.now()){
                 //user otp record has expired
                 await UserService.deleteExpiredOtp(userId);
                 throw new Error("Code has expired. Please request again.")
             } else {
-                console.log(hashedOTP, otp);
                 const validOtp = await bcrypt.compare( hashedOTP.toString(), otp);
-
                 if(!validOtp){
                     throw new Error("Invalid code passed. Check your inbox.")
                 } else {
@@ -230,7 +223,6 @@ try {
                 }
             }
         }
-      } 
 } catch (error) {
     console.log(error);
     res.status(500).send({
@@ -274,7 +266,8 @@ exports.forgetPassword = async(req, res)=>{
         let result = await UserService.userToken(id, token, createdAt, expiresAt);
 
         //Send Frontend URL Here
-        const link = `http://localhost:8000/api/reset-password`;
+        const link = `http://54.185.166.224/auth/new-password/${token}`;
+
 
         //mail options
         const mailOptions = {
@@ -322,8 +315,9 @@ exports.forgetPassword = async(req, res)=>{
     }
     
 exports.resetPassword = async(req, res)=>{
-    const {token, newPassword, confirmPassword} = req.body;
-    let usertoken = await UserService.getUserByToken(token);    
+    const {token} = req.params;
+    const {newPassword, confirmPassword} = req.body;
+    let usertoken = await UserService.getUserByToken(token);
     if(!usertoken){
         res.status(200).send({
             status: "Error",

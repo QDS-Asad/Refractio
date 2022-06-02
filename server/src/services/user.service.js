@@ -29,19 +29,20 @@ exports.login = async(email, password)=>{
 
 exports.userOtpVerification = async(id, otp, createdAt, expiresAt)=>{
    return await UserOTPVerification.create({
-      id,
-      otp,
-      createdAt,
-      expiresAt
+      userId:id,
+      otp:otp,
+      createdAt:createdAt,
+      expiresAt:expiresAt
    })
 }
 
-exports.verfiyOtp = async(userId, otp)=>{
-   let userOtp = await UserOTPVerification.findOne({
-      id:userId
-   });
-   return userOtp;
+exports.verfiyOtp = async(userId)=>{
+   return await UserOTPVerification.findOne({
+      userId:userId
+   })
 }
+
+
 
 exports.deleteExpiredOtp = async(userId)=>{
    let userOtp = await UserOTPVerification.deleteMany({
