@@ -30,12 +30,10 @@ var UserSchema = new mongoose.Schema({
       required: true,
       default:false
   },
-  roles:[
-      {
-          type: String,
-          //required: true
-      }
-  ],
+  roles:{
+      type:Array,
+      default:[{role:"Participant",key:"participant"}]
+},
   subscriptions:[
       {
         subscriptionType:{
