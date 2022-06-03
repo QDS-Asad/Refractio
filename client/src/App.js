@@ -7,6 +7,10 @@ import VerificationCode from './pages/auth/VerificationCode';
 import PasswordRecover from './pages/auth/PasswordRecover';
 import NewPassword from './pages/auth/NewPassword';
 import Auth from './pages/auth/Auth';
+import AppLayout from './layouts/AppLayout';
+import Opportunities from './pages/app/Opportunities/Opportunities';
+import OpportunityDetail from './pages/app/Opportunities/OpportunityDetail';
+import OpportunityEdit from './pages/app/Opportunities/OpportunityEdit';
 const App = () => {
   return (
     <Routes>
@@ -18,6 +22,15 @@ const App = () => {
         <Route path='password-recover' element={<PasswordRecover />} />
         <Route path='verify-code' element={<VerificationCode />} />
         <Route path='invite-account' element={<InviteAccount />} />
+      </Route>
+      <Route path='' element={<AppLayout />}>
+        <Route
+          path=''
+          element={<Navigate replace to='opportunities' />}
+        ></Route>
+        <Route path='opportunities' element={<Opportunities />} />
+        <Route path='opportunities/:id' element={<OpportunityDetail />} />
+        <Route path='opportunities/:id/edit' element={<OpportunityEdit />} />
       </Route>
     </Routes>
   );

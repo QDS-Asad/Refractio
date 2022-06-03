@@ -1,33 +1,57 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;500;600;700&display=swap');
 
-html,body {
-  font-family: 'Nunito', sans-serif;
+* {
+  font-family: 'Nunito', sans-serif !important;
+}
+:root {
+  --primary-dark: #083B66;
+  --primary: #454FC8;
+  --secondary: #6C757D;
+  --white: #FFFFFF;
+  --dark: #3B3B3B;
+  --success: #74D14C;
 }
  
 .auth.ui.grid {
   margin: 0 !important;
 }
-.paragraph {
-  margin: 10% auto;
-}
+
 .primary-bg {
-  background-color: #083B66 !important;
+  background-color: var(--primary-dark) !important;
+}
+
+.secondary-bg {
+  background-color: var(--secondary) !important;
+}
+
+.success-bg{
+  background-color: var(--success) !important;
 }
 
 .primary-dark-color {
-  color: #083B66 !important;
+  color: var(--primary-dark) !important;
 }
 
+
 .primary-color{
-  color:#454FC8  !important
+  color: var(--primary) !important
 }
-.color-white{
-  color:#fff !important
+
+.secondary-color {
+  color: var(--secondary) !important
+}
+
+.white-color {
+  color: var(--white) !important;
 }
 
 .vh-100 {
   height: 100vh;
+}
+
+.min-vh-100 {
+  min-height: 100vh;
 }
 
 .ui.input {
@@ -36,7 +60,7 @@ html,body {
 
 label {
   font-weight: 600 !important;
-  color: #3B3B3B !important;
+  color: var(--dark) !important;
 }
 
 .fs-heading {
@@ -45,11 +69,34 @@ label {
 
 
 .btn {
-  background: #454FC8 !important;
-  width: 100%;
-  color: #fff !important;
+  background: var(--primary) !important;
+  color: var(--white) !important;
   border-radius: 2px !important;
-  margin-top: 13px !important;
+  min-width: 10rem !important;
+}
+
+.btn-secondary {
+  background: var(--secondary) !important;
+  color: var(--white) !important;
+  border-radius: 2px !important;
+  min-width: 10rem !important;
+}
+
+.btn-link {
+  background: none !important;
+  color: var(--primary) !important;
+  font-weight: 700;
+  border: none;
+  padding: 1rem;
+  min-width: 10rem !important;
+}
+
+.btn-outline {
+  background: none !important;
+  color: var(--primary) !important;
+  font-weight: 700;
+  outline: 2px solid var(--primary) !important;
+  min-width: 10rem !important;
 }
 
 .backToLogin {
@@ -78,15 +125,67 @@ label {
   box-shadow: none;
 }
 
-
-#main-sidebar-segment .pusher {
-  min-height: calc(100vh - 240px);
+.ui.vertical.menu .item:before {
+  height: 0px;
+  width: 0px;
 }
-.sidebar{
-  border-bottom: 0 none !important;
-  box-shadow: none !important
-
+.ui.inverted.menu .active.item {
+  background-color: transparent;
 }
-.sidebar{
-  min-width: 250px !important;
+.ui.inverted.menu .item {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.sidebar-pusher {
+  width: calc(100vw - 260px);
+}
+
+.opportunities-tabs {
+  width: 100px;
+  text-align: center;
+  display: inline-block !important;
+  color: var(--secondary) !important;
+}
+
+.opportunities-tabs.active  {
+ border-color: var(--primary-dark) ;
+ color: var(--text-secondary)  !important;
+}
+
+.opportunities-tabs-height {
+  min-height: calc(100vh - 215px);
+}
+
+.ui.secondary.pointing.menu .active.item  {
+  color: var(--secondary) !important;
+  border-color: var(--primary-dark) !important;
+}
+.ui.secondary.pointing.menu .item {
+  min-width: 100px;
+  text-align: center;
+  display: inline-block;
+}
+.ui.segment.tab {
+  border: none;
+  box-shadow: none;
+}
+
+.ui.modal.visible.active {
+  position: static;
+  height: auto;
+}
+
+.error-message {
+  padding: 1rem !important;
+  font-size: 1.25rem !important;
+  text-align: center;
+}
+
+.ui.modal>.close {
+  top: 1rem;
+  right: 1rem;
+  color: var(--dark) !important;
+}
+i.icon.close:before {
+  content: "\f00d";
 }
