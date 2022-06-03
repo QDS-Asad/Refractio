@@ -9,6 +9,7 @@ dotenv.config();
 const db = require('./server/src/config/db');
 
 const users = require('./server/src/routes/user.routes');
+const opportunities = require('./server/src/routes/opportunity.routes');
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.get('/api/status', (req, res) => {
 });
 
 app.use('/api/users', users);
+app.use('/api/opportunities', opportunities)
 
 app.use('/', express.static(path.join(__dirname, '/client/build')));
 
