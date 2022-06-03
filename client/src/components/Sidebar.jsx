@@ -1,14 +1,7 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { Link, Outlet } from 'react-router-dom';
-import {
-  Header,
-  Menu,
-  Segment,
-  Sidebar,
-  Image,
-  Container,
-} from 'semantic-ui-react';
+import { Header, Menu, Segment, Sidebar, Image } from 'semantic-ui-react';
 import { logoutUser } from '../features/auth/authLoginSlice';
 import NavBar from './Navbar';
 

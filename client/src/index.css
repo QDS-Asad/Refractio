@@ -175,7 +175,7 @@ label {
   height: auto;
 }
 
-.error-message {
+.error-message, .success-message {
   padding: 1rem !important;
   font-size: 1.25rem !important;
   text-align: center;

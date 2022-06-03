@@ -59,10 +59,6 @@ const Login = () => {
   useEffect(() => {
     register({ name: 'email' }, loginOptions.email);
     register({ name: 'password' }, loginOptions.password);
-    fetch(`/api/status`)
-      .then((res) => res.json())
-      .then((data) => console.log(data))
-      .catch((err) => console.error(err));
   }, []);
 
   useEffect(() => {
