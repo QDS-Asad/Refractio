@@ -10,6 +10,7 @@ import Auth from './pages/auth/Auth';
 import AppLayout from './layouts/AppLayout';
 import Opportunities from './pages/app/Opportunities/Opportunities';
 import OpportunityDetail from './pages/app/Opportunities/OpportunityDetail';
+import OpportunityEdit from './pages/app/Opportunities/OpportunityEdit';
 const App = () => {
   return (
     <Routes>
@@ -29,6 +30,7 @@ const App = () => {
         ></Route>
         <Route path='opportunities' element={<Opportunities />} />
         <Route path='opportunities/:id' element={<OpportunityDetail />} />
+        <Route path='opportunities/:id/edit' element={<OpportunityEdit />} />
       </Route>
     </Routes>
   );

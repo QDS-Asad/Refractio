@@ -105,7 +105,7 @@ const OpportunityDetail = () => {
                           >
                             <List.Item>
                               <List.Content floated='right'>
-                                <button className='btn-outline'>Remove</button>
+                                <button className='btn-link'>Remove</button>
                               </List.Content>
 
                               <List.Content>

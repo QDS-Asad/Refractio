@@ -50,6 +50,10 @@
   height: 100vh;
 }
 
+.min-vh-100 {
+  min-height: 100vh;
+}
+
 .ui.input {
   width: 100%;
 }
@@ -68,14 +72,31 @@ label {
   background: var(--primary) !important;
   color: var(--white) !important;
   border-radius: 2px !important;
+  min-width: 10rem !important;
+}
+
+.btn-secondary {
+  background: var(--secondary) !important;
+  color: var(--white) !important;
+  border-radius: 2px !important;
+  min-width: 10rem !important;
+}
+
+.btn-link {
+  background: none !important;
+  color: var(--primary) !important;
+  font-weight: 700;
+  border: none;
+  padding: 1rem;
+  min-width: 10rem !important;
 }
 
 .btn-outline {
   background: none !important;
   color: var(--primary) !important;
   font-weight: 700;
-  border: none;
-  padding: 1rem;
+  outline: 2px solid var(--primary) !important;
+  min-width: 10rem !important;
 }
 
 .backToLogin {
@@ -158,4 +179,13 @@ label {
   padding: 1rem !important;
   font-size: 1.25rem !important;
   text-align: center;
+}
+
+.ui.modal>.close {
+  top: 1rem;
+  right: 1rem;
+  color: var(--dark) !important;
+}
+i.icon.close:before {
+  content: "\f00d";
 }

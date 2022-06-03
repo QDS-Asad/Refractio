@@ -1,15 +1,19 @@
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, Form, Message, Modal, TextArea } from 'semantic-ui-react';
+import { Button, Form, Message, Modal } from 'semantic-ui-react';
 import {
   createOpportunity,
   opportunityCreateSelector,
 } from '../../../features/opportunities/opportunityCreateSlice';
 
-const CreateOpportunity = ({ showCreate, setShowCreate }) => {
-  const { register, setValue, handleSubmit, errors, trigger } = useForm({
+const OpportunityCreate = ({ showCreate, setShowCreate }) => {
+  const { register, setValue, handleSubmit, watch, errors, trigger } = useForm({
     mode: 'onBlur',
+    defaultValues: {
+      name: '',
+      description: '',
+    },
   });
 
   // set up dispatch
@@ -32,10 +36,18 @@ const CreateOpportunity = ({ showCreate, setShowCreate }) => {
   const createOptions = {
     name: {
       required: 'Name is required',
+      maxLength: {
+        value: 100,
+        message: 'Maximum characters are 100.',
+      },
     },
 
     description: {
       required: 'Description is required',
+      maxLength: {
+        value: 800,
+        message: 'Maximum characters are 800.',
+      },
     },
   };
 
@@ -44,25 +56,46 @@ const CreateOpportunity = ({ showCreate, setShowCreate }) => {
     register({ name: 'description' }, createOptions.description);
   }, []);
 
+  useEffect(() => {
+    if (success) {
+      setShowCreate(false);
+    }
+  }, [success]);
+
+  const watchName = watch('name', '');
+  const watchDescription = watch('description', '');
+
   return (
-    <Form onSubmit={handleSubmit(handleCreate)} loading={loading} error>
-      <Modal
-        onClose={() => setShowCreate(false)}
-        onOpen={() => setShowCreate(true)}
-        open={showCreate}
-        dimmer='blurring'
-        size='tiny'
-      >
-        <Modal.Header>Create Opportunity</Modal.Header>
-        <Modal.Content>
+    <Modal
+      onClose={() => setShowCreate(false)}
+      onOpen={() => setShowCreate(true)}
+      open={showCreate}
+      dimmer='blurring'
+      size='tiny'
+      closeIcon
+    >
+      <Modal.Header>Create Opportunity</Modal.Header>
+      <Modal.Content>
+        <Form
+          id='create-opportunity'
+          onSubmit={handleSubmit(handleCreate)}
+          loading={loading}
+          error
+        >
           <Modal.Description>
+            {error && (
+              <Message color='red' className='error-message mb-3'>
+                {error}
+              </Message>
+            )}
             <Form.Field className='mb-3'>
               <label className='d-inline-block'>Opportunity Name</label>
-              <span className='float-end'>(0 / 100)</span>
+              <span className='float-end'>({watchName.length}/ 100)</span>
               <Form.Input
                 name='name'
                 fluid
                 placeholder='Enter opportunity name'
+                onChange={handleChange}
                 onBlur={handleChange}
                 error={!!errors.name}
               />
@@ -72,10 +105,13 @@ const CreateOpportunity = ({ showCreate, setShowCreate }) => {
             </Form.Field>
             <Form.Field className='mb-3'>
               <label className='d-inline-block'>Description</label>
-              <span className='float-end'>(0 / 800)</span>
-              <Form.Input
+              <span className='float-end'>
+                ({watchDescription.length} / 800)
+              </span>
+              <Form.TextArea
                 name='description'
                 placeholder='Enter description'
+                onChange={handleChange}
                 onBlur={handleChange}
                 error={!!errors.description}
               />
@@ -84,13 +120,18 @@ const CreateOpportunity = ({ showCreate, setShowCreate }) => {
               )}
             </Form.Field>
           </Modal.Description>
-        </Modal.Content>
-        <Modal.Actions>
-          <Button type='submit' content='Save' className='btn' />
-        </Modal.Actions>
-      </Modal>
-    </Form>
+        </Form>
+      </Modal.Content>
+      <Modal.Actions>
+        <Button
+          type='submit'
+          form='create-opportunity'
+          content='Save'
+          className='btn'
+        />
+      </Modal.Actions>
+    </Modal>
   );
 };
 
-export default CreateOpportunity;
+export default OpportunityCreate;

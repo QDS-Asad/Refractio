@@ -18,7 +18,7 @@ import {
 import AllOpportunities from './AllOpportunities';
 import CompletedOpportunities from './CompletedOpportunities';
 import EmptyOpportunities from './EmptyOpportunities';
-import CreateOpportunity from './CreateOpportunity';
+import OpportunityCreate from './OpportunityCreate';
 
 const Opportunities = () => {
   const [showCreate, setShowCreate] = useState(false);
@@ -63,7 +63,7 @@ const Opportunities = () => {
         {opportunities.length > 0 && activeItem === 'completed' && (
           <CompletedOpportunities opportunities={completedOpportunities} />
         )}
-        <CreateOpportunity
+        <OpportunityCreate
           showCreate={showCreate}
           setShowCreate={setShowCreate}
         />
@@ -89,13 +89,18 @@ const Opportunities = () => {
   return (
     <>
       <Grid>
-        <Grid.Column floated='left' width={5}>
-          <Header as='h3' className='primary-dark-color'>
+        <Grid.Column width={8}>
+          <Header as='h3' className='primary-dark-color' floated='left'>
             Opportunities
           </Header>
         </Grid.Column>
-        <Grid.Column floated='right' width={2}>
-          <Button primary className='btn' onClick={() => setShowCreate(true)}>
+        <Grid.Column width={8}>
+          <Button
+            primary
+            className='btn'
+            onClick={() => setShowCreate(true)}
+            floated='right'
+          >
             Create New
           </Button>
         </Grid.Column>

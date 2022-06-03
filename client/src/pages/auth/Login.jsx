@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import {
   Checkbox,
@@ -8,20 +8,27 @@ import {
   Container,
   Header,
 } from 'semantic-ui-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import {
+  authLoginSelector,
+  loginUser,
+} from '../../features/auth/authLoginSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 const Login = () => {
   const { register, setValue, handleSubmit, errors, trigger } = useForm({
     mode: 'onBlur',
   });
-  const [loading, setLoading] = useState(false);
+  // set up dispatch
+  const dispatch = useDispatch();
 
-  const handleLogin = (data) => {
-    console.log(data);
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 1500);
+  const navigate = useNavigate();
+
+  // fetch data from our store
+  const { loading, error, userLogin } = useSelector(authLoginSelector);
+
+  const handleLogin = ({ email, password }) => {
+    dispatch(loginUser(email, password));
   };
 
   const handleChange = (e) => {
@@ -54,6 +61,12 @@ const Login = () => {
     register({ name: 'password' }, loginOptions.password);
   }, []);
 
+  useEffect(() => {
+    if (userLogin) {
+      navigate('/');
+    }
+  }, [userLogin]);
+
   return (
     <Container>
       <Header size='medium' className='primary-dark-color'>
@@ -62,6 +75,11 @@ const Login = () => {
       <p className='mt-3 mb-4'>
         Enter your email address and password to access account.
       </p>
+      {error && (
+        <Message color='red' className='error-message mb-3'>
+          {error}
+        </Message>
+      )}
       <Form onSubmit={handleSubmit(handleLogin)} loading={loading} error>
         <Form.Field className='mb-3'>
           <label>Email Address</label>
@@ -71,6 +89,7 @@ const Login = () => {
             placeholder='Enter your Email'
             onBlur={handleChange}
             error={!!errors.email}
+            tabIndex='1'
           />
           {errors && errors.email && (
             <Message error content={errors.email.message} />
@@ -88,15 +107,16 @@ const Login = () => {
             placeholder='Enter your Password'
             onBlur={handleChange}
             error={!!errors.password}
+            tabIndex='2'
           />
           {errors && errors.password && (
             <Message error content={errors.password.message} />
           )}
         </Form.Field>
         <Form.Field>
-          <Checkbox label='Remember me' />
+          <Checkbox label='Remember me' tabIndex='3' />
         </Form.Field>
-        <Button type='submit' fluid primary className='mt-3 btn'>
+        <Button type='submit' fluid primary className='mt-3 btn' tabIndex='4'>
           Log In
         </Button>
       </Form>
