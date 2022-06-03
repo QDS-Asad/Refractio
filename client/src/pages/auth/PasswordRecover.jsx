@@ -1,39 +1,37 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button, Container, Header, Message, Form } from 'semantic-ui-react';
 import { Link, useNavigate } from 'react-router-dom';
+import {
+  authForgetPasswordSelector,
+  userForgetPassword,
+} from '../../features/auth/authForgetPasswordSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 const PasswordRecover = () => {
-  const {
-    register,
-    setValue,
-    handleSubmit,
-    errors,
-    trigger,
-    getValues,
-  } = useForm({
+  const { register, setValue, handleSubmit, errors, trigger } = useForm({
     mode: 'onBlur',
   });
-  const [loading, setLoading] = useState(false);
-  const [submited, setSubmited] = useState(false);
-  const navigation = useNavigate();
+  const navigate = useNavigate();
+  // set up dispatch
+  const dispatch = useDispatch();
+  // fetch data from our store
+  const { loading, error, forgetPassword } = useSelector(
+    authForgetPasswordSelector
+  );
 
-  const handleRecover = (data) => {
-    console.log(data);
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setSubmited(true);
-    }, 1500);
+  const handleRecover = ({ email }) => {
+    dispatch(userForgetPassword(email));
   };
+
   const handleChange = (e) => {
     e.persist();
     setValue(e.target.name, e.target.value);
     trigger(e.target.name);
   };
 
-  const handleBackToLogin = (e) => {
-    navigation('/auth/login');
+  const handleBackToLogin = () => {
+    navigate('/auth/login');
   };
 
   const recoverOptions = {
@@ -45,12 +43,14 @@ const PasswordRecover = () => {
       },
     },
   };
+
   useEffect(() => {
     register({ name: 'email' }, recoverOptions.email);
   }, []);
+
   return (
     <Container>
-      {!submited ? (
+      {!forgetPassword ? (
         <>
           <Header size='medium' className='primary-dark-color'>
             Recover Password
@@ -59,6 +59,11 @@ const PasswordRecover = () => {
             Enter your email address and we'll send you an email with
             instructions to reset your password.
           </p>
+          {error && (
+            <Message color='red' className='error-message mb-3'>
+              {error}
+            </Message>
+          )}
           <Form onSubmit={handleSubmit(handleRecover)} loading={loading} error>
             <Form.Field className='mb-3'>
               <label>Email address </label>
@@ -67,6 +72,7 @@ const PasswordRecover = () => {
                 fluid
                 placeholder='Enter your Email'
                 onBlur={handleChange}
+                onChange={handleChange}
                 error={!!errors.email}
               />
               {errors && errors.email && (
@@ -97,7 +103,7 @@ const PasswordRecover = () => {
             Please check your Email
           </Header>
           <p className='text-center'>
-            A email has been send to your <strong>{getValues('email')}</strong>.{' '}
+            A email has been send to <strong>{forgetPassword.email}</strong>.{' '}
             <br /> Please check for an email from company and click on the
             included link to reset your password.
           </p>

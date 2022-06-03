@@ -18,7 +18,7 @@ const App = () => {
         <Route path='' element={<Navigate replace to='login' />} />
         <Route path='login' element={<Login />} />
         <Route path='register' element={<Register />} />
-        <Route path='new-password' element={<NewPassword />} />
+        <Route path='new-password/:token' element={<NewPassword />} />
         <Route path='password-recover' element={<PasswordRecover />} />
         <Route path='verify-code' element={<VerificationCode />} />
         <Route path='invite-account' element={<InviteAccount />} />
