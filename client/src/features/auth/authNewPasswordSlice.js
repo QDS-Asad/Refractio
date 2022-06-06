@@ -53,9 +53,10 @@ export const userNewPassword = (token, body) => async (dispatch) => {
     let { data } = await authApi.post(`/users/reset-password/${token}`, body);
     dispatch(setNewPassword(data));
   } catch (error) {
-    const errorMessage = error.response
-      ? error.response.data.message
-      : error.message;
+    const errorMessage =
+      error.response && error.response.data
+        ? error.response.data.message
+        : error.message;
     dispatch(setError(errorMessage));
   }
 };

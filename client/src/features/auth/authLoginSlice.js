@@ -68,9 +68,10 @@ export const loginUser = (email, password) => async (dispatch) => {
     dispatch(setUserLogin(data));
     window.localStorage.setItem('userInfo', JSON.stringify(data));
   } catch (error) {
-    const errorMessage = error.response
-      ? error.response.data.message
-      : error.message;
+    const errorMessage =
+      error.response && error.response.data
+        ? error.response.data.message
+        : error.message;
     dispatch(setError(errorMessage));
   }
 };
