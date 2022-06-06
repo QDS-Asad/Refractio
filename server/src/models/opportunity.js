@@ -25,7 +25,7 @@ isDraft:{
     default:false,
     required:true
 },
-evaluations:{
+questions:{
     comprehension:{
         questions:[
             {
