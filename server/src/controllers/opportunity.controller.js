@@ -3,7 +3,7 @@ const OpportunityService = require('../services/opportunity.service');
 
 exports.createNewOpportunity = async (req, res) => {
     try {
-        const {userId, name, description, questions} = req.body;
+        const {userId, name, description, questions,isPublished, isDraft} = req.body;
         const {comprehension, qualityOfIdeaResponse} =  questions;
         if(!comprehension){
             return res.status(200).send({
@@ -30,7 +30,7 @@ exports.createNewOpportunity = async (req, res) => {
         //     name:name,
         //     description:description,
         // }
-    await OpportunityService.createOpportunity(userId, name, description, questions).then(result=>{
+    await OpportunityService.createOpportunity(userId, name, description, questions, isPublished, isDraft).then(result=>{
         res.status(200).send({
             result,
           });

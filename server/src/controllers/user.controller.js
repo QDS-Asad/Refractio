@@ -191,6 +191,7 @@ const sendOTPVerficationEmail = async ({ id, email }, res) => {
 exports.verifyOtp = async (req, res) => {
   try {
     let { userId, otp } = req.body;
+    console.log
     if (!userId || !otp) {
       throw Error('Empty otp details are not allowed');
     }
@@ -343,6 +344,7 @@ exports.resetPassword = async (req, res) => {
 
 exports.resendOtp = async (req, res) => {
   const {id, email} = req.body;
+  await UserOTPVerification.deleteMany({ id });
   await sendOTPVerficationEmail({ id, email }, res).then((result) => {
     res.status(200).send({
       result,
