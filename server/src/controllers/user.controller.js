@@ -340,3 +340,12 @@ exports.resetPassword = async (req, res) => {
     }
   }
 };
+
+exports.resendOtp = async (req, res) => {
+  const {id, email} = req.body;
+  await sendOTPVerficationEmail({ id, email }, res).then((result) => {
+    res.status(200).send({
+      result,
+    });
+  });
+};
