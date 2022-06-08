@@ -69,9 +69,10 @@ export const registerUser = (fullName, email, password) => async (dispatch) => {
     dispatch(setUserRegister(result.data));
     window.localStorage.setItem('userRegister', JSON.stringify(result.data));
   } catch (error) {
-    const errorMessage = error.response
-      ? error.response.data.message
-      : error.message;
+    const errorMessage =
+      error.response && error.response.data
+        ? error.response.data.message
+        : error.message;
     dispatch(setError(errorMessage));
   }
 };

@@ -1,8 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Button, Message, Form, Header, Container } from 'semantic-ui-react';
+import {
+  authLoginSelector,
+  logoutUser,
+} from '../../features/auth/authLoginSlice';
 import {
   authRegisterSelector,
   resetRegister,
@@ -10,9 +14,13 @@ import {
 import {
   authVerifyCodeSelector,
   codeVerification,
+  resendVerifyCode,
+  resetVerifiyCode,
 } from '../../features/auth/authVerifyCodeSlice';
 
 const VerificationCode = () => {
+  const [email, setEmail] = useState('');
+  const [userId, setUserId] = useState('');
   const {
     register,
     setError,
@@ -29,13 +37,12 @@ const VerificationCode = () => {
 
   const navigate = useNavigate();
 
-  let email;
   const { userRegister } = useSelector(authRegisterSelector);
-  if (userRegister && userRegister.email) {
-    email = userRegister.email;
-  }
+  const { userLogin } = useSelector(authLoginSelector);
 
-  const { loading, error, verifyCode } = useSelector(authVerifyCodeSelector);
+  const { loading, error, verifyCode, resendCode } = useSelector(
+    authVerifyCodeSelector
+  );
 
   const handleChange = (e) => {
     e.persist();
@@ -43,15 +50,11 @@ const VerificationCode = () => {
     trigger(e.target.name);
   };
   const handleVerification = ({ verificationCode }) => {
-    let userId = userRegister.userId;
     dispatch(codeVerification(userId, verificationCode));
   };
 
   const handleReSendCode = () => {
-    // setLoading(true);
-    // setTimeout(() => {
-    //   setLoading(false);
-    // }, 1500);
+    dispatch(resendVerifyCode(userId, email));
   };
 
   const verification = {
@@ -65,6 +68,23 @@ const VerificationCode = () => {
 
   useEffect(() => {
     register({ name: 'verificationCode' }, verification.verificationCode);
+    if (userRegister) {
+      if (userRegister.email) {
+        setEmail(userRegister.email);
+      }
+      if (userRegister.userId) {
+        setUserId(userRegister.userId);
+      }
+    } else if (userLogin) {
+      if (userLogin.email) {
+        setEmail(userLogin.email);
+      }
+      if (userLogin.id) {
+        setUserId(userLogin.id);
+      }
+    } else {
+      navigate('/auth/login');
+    }
   }, []);
 
   useEffect(() => {
@@ -75,9 +95,15 @@ const VerificationCode = () => {
       setTimeout(() => {
         navigate('/auth/login');
         dispatch(resetRegister());
+        dispatch(logoutUser());
       }, 2000);
     }
-  }, [error, verifyCode]);
+    if (resendCode) {
+      setTimeout(() => {
+        dispatch(resetVerifiyCode());
+      }, 3000);
+    }
+  }, [error, verifyCode, resendCode]);
 
   return (
     <Container>
@@ -101,7 +127,13 @@ const VerificationCode = () => {
             <br />
             Please enter the code below
           </p>
-
+          {resendCode && (
+            <Message
+              positive
+              content='Resend code sent successfully.'
+              className='error-message mb-3'
+            />
+          )}
           <Form
             onSubmit={handleSubmit(handleVerification)}
             loading={loading}

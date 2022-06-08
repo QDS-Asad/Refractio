@@ -56,9 +56,10 @@ export const userForgetPassword = (email) => async (dispatch) => {
     let { data } = response;
     dispatch(setForgetPassword(data));
   } catch (error) {
-    const errorMessage = error.response
-      ? error.response.data.message
-      : error.message;
+    const errorMessage =
+      error.response && error.response.data
+        ? error.response.data.message
+        : error.message;
     dispatch(setError(errorMessage));
   }
 };

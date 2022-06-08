@@ -1,7 +1,12 @@
 import axios from 'axios';
 
+let baseURL = process.env.REACT_APP_URL;
+if (process.env.REACT_APP_NODE_ENV === 'production') {
+  baseURL = '';
+}
+
 export default axios.create({
-  baseURL: 'http://54.185.166.224/data',
+  baseURL: `${baseURL}/data`,
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',
@@ -9,7 +14,7 @@ export default axios.create({
 });
 
 export const authApi = axios.create({
-  baseURL: 'http://54.185.166.224/api',
+  baseURL: `${baseURL}/api`,
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',
