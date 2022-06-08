@@ -17,6 +17,7 @@ router.post('/login', UserController.login);
 router.post('/verify-login', UserController.verifyOtp);
 router.post('/forget-password', UserController.forgetPassword);
 router.post('/reset-password/:token', UserController.resetPassword);
+router.post('/resend-otp', UserController.resendOtp);
 //router.get('/api/test',verifyToken,(req, res)=>{res.send({message:"Token verfied successfully."})})
 
 //seeding project meta-data
