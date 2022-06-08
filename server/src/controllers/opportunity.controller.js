@@ -59,3 +59,41 @@ exports.createNewOpportunity = async (req, res) => {
           });
       }
   }
+
+  exports.editOpportunity = async(req, res)=>{
+    try {
+        const {opportunityId, name, description, questions,isPublished, isDraft} = req.body
+        let result = await OpportunityService.modifyOpportunity(opportunityId, name, description, questions,isPublished, isDraft);
+        if (result) {
+          res.status(200).send({
+            status: 'Success',
+            message: 'Opportunities Updated Successfully.',
+          });
+        }
+    } catch (error) {
+        console.log(error);
+      res.status(500).send({
+          status: 'error',
+          message: error.message,
+        });
+    }
+}
+
+exports.deleteOpportunity = async(req, res)=>{
+    try {
+        const {opportunityId} = req.body
+        let result = await OpportunityService.deleteOpportunity(opportunityId);
+        if (result) {
+          res.status(200).send({
+            status: 'Success',
+            message: 'Opportunities Deleted Successfully.',
+          });
+        }
+    } catch (error) {
+        console.log(error);
+      res.status(500).send({
+          status: 'error',
+          message: error.message,
+        });
+    }
+}
