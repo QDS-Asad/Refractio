@@ -136,6 +136,10 @@ label {
   color: rgba(255, 255, 255, 0.5);
 }
 
+.ui.menu .item.logo:before {
+  background: none;
+}
+
 .sidebar-pusher {
   width: calc(100vw - 260px);
 }
@@ -188,4 +192,7 @@ label {
 }
 i.icon.close:before {
   content: "\f00d";
+}
+.ui.action.input>.button {
+  display: block;
 }

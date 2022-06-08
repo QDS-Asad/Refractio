@@ -11,6 +11,8 @@ import AppLayout from './layouts/AppLayout';
 import Opportunities from './pages/app/Opportunities/Opportunities';
 import OpportunityDetail from './pages/app/Opportunities/OpportunityDetail';
 import OpportunityEdit from './pages/app/Opportunities/OpportunityEdit';
+import SubscriptionLayout from './layouts/SubscriptionLayout';
+import Subscription from './pages/subscription/Subscription';
 const App = () => {
   return (
     <Routes>
@@ -22,6 +24,9 @@ const App = () => {
         <Route path='password-recover' element={<PasswordRecover />} />
         <Route path='verify-code' element={<VerificationCode />} />
         <Route path='invite-account' element={<InviteAccount />} />
+      </Route>
+      <Route path='subscription' element={<SubscriptionLayout />}>
+        <Route path='' element={<Subscription />} />
       </Route>
       <Route path='' element={<AppLayout />}>
         <Route
