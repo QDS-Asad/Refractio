@@ -8,9 +8,12 @@ import PasswordRecover from './pages/auth/PasswordRecover';
 import NewPassword from './pages/auth/NewPassword';
 import Auth from './pages/auth/Auth';
 import AppLayout from './layouts/AppLayout';
-import Opportunities from './pages/app/Opportunities/Opportunities';
-import OpportunityDetail from './pages/app/Opportunities/OpportunityDetail';
-import OpportunityEdit from './pages/app/Opportunities/OpportunityEdit';
+import Opportunities from './pages/app/opportunities/Opportunities';
+import OpportunityDetail from './pages/app/opportunities/OpportunityDetail';
+import OpportunityEdit from './pages/app/opportunities/OpportunityEdit';
+import SubscriptionLayout from './layouts/SubscriptionLayout';
+import Subscription from './pages/subscription/Subscription';
+import TeamMembers from './pages/app/team/TeamMembers';
 const App = () => {
   return (
     <Routes>
@@ -23,6 +26,9 @@ const App = () => {
         <Route path='verify-code' element={<VerificationCode />} />
         <Route path='invite-account' element={<InviteAccount />} />
       </Route>
+      <Route path='subscription' element={<SubscriptionLayout />}>
+        <Route path='' element={<Subscription />} />
+      </Route>
       <Route path='' element={<AppLayout />}>
         <Route
           path=''
@@ -31,6 +37,7 @@ const App = () => {
         <Route path='opportunities' element={<Opportunities />} />
         <Route path='opportunities/:id' element={<OpportunityDetail />} />
         <Route path='opportunities/:id/edit' element={<OpportunityEdit />} />
+        <Route path='team' element={<TeamMembers />} />
       </Route>
     </Routes>
   );

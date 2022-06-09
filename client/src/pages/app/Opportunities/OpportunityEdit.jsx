@@ -49,35 +49,23 @@ const OpportunityEdit = () => {
                   the opportunity.
                 </Header.Subheader>
               </Header>
-              <Form.Group className='my-3' inline>
-                <Form.Field className='w-100 ps-5 ms-2'>
-                  <label className='d-inline-block'>
-                    Question 1 (Required)
-                  </label>
-                  <span className='float-end pe-3'>(0 / 120)</span>
-                  <Form.Input
-                    name='q1'
-                    fluid
-                    placeholder='e.g. What is the best reason for Team to pursue Opportunity'
-                  />
-                </Form.Field>
-              </Form.Group>
+              <Form.Field>
+                <label>Question 1 (Required)</label>
+                <Form.Input
+                  name='q1'
+                  fluid
+                  placeholder='e.g. What is the best reason for Team to pursue Opportunity'
+                />
+              </Form.Field>
 
-              <Form.Group className='my-3' inline>
-                <Form.Field className='mt-4 ps-1'>
-                  <Form.Checkbox />
-                </Form.Field>
-
-                <Form.Field className='w-100'>
-                  <label className='d-inline-block'>Question 2</label>
-                  <span className='float-end pe-3'>(0 / 120)</span>
-                  <Form.Input
-                    name='q1'
-                    fluid
-                    placeholder='e.g. What is the best reason for Team to NOT pursue Opportunity'
-                  />
-                </Form.Field>
-              </Form.Group>
+              <Form.Field>
+                <label>Question 2</label>
+                <Form.Input
+                  name='q1'
+                  fluid
+                  placeholder='e.g. What is the best reason for Team to NOT pursue Opportunity'
+                />
+              </Form.Field>
               <Header>
                 Evaluation of Quality of Idea-Response
                 <Header.Subheader>
@@ -85,87 +73,54 @@ const OpportunityEdit = () => {
                   responses.
                 </Header.Subheader>
               </Header>
-              <Form.Group className='my-3' inline>
-                <Form.Field className='w-100 ps-5 ms-2'>
-                  <label className='d-inline-block'>
-                    Question 1 (Required)
-                  </label>
-                  <span className='float-end pe-3'>(0 / 120)</span>
-                  <Form.Input
-                    name='q1'
-                    fluid
-                    placeholder='e.g. Describe the Stakeholders involved in the Idea you are submitting'
-                  />
-                </Form.Field>
-              </Form.Group>
+              <Form.Field>
+                <label>Question 1 (Required)</label>
+                <Form.Input
+                  name='q1'
+                  fluid
+                  placeholder='e.g. Describe the Stakeholders involved in the Idea you are submitting'
+                />
+              </Form.Field>
 
-              <Form.Group className='my-3' inline>
-                <Form.Field className='mt-4 ps-1'>
-                  <Form.Checkbox readOnly />
-                </Form.Field>
+              <Form.Field>
+                <label>Question 2</label>
+                <Form.Input
+                  name='q2'
+                  fluid
+                  readOnly
+                  placeholder='e.g. Describe the EXPECTED RESULTS from action taken to pursue Opportunity'
+                />
+              </Form.Field>
 
-                <Form.Field className='w-100'>
-                  <label className='d-inline-block'>Question 2</label>
-                  <span className='float-end pe-3'>(0 / 120)</span>
-                  <Form.Input
-                    name='q2'
-                    fluid
-                    readOnly
-                    placeholder='e.g. Describe the EXPECTED RESULTS from action taken to pursue Opportunity'
-                  />
-                </Form.Field>
-              </Form.Group>
+              <Form.Field>
+                <label>Question 3</label>
+                <Form.Input
+                  name='q3'
+                  fluid
+                  readOnly
+                  placeholder='e.g. Describe the EXPECTED RESULTS from action taken to pursue Opportunity'
+                />
+              </Form.Field>
 
-              <Form.Group className='my-3' inline>
-                <Form.Field className='mt-4 ps-1'>
-                  <Form.Checkbox readOnly />
-                </Form.Field>
+              <Form.Field>
+                <label>Question 4</label>
+                <Form.Input
+                  name='q4'
+                  fluid
+                  readOnly
+                  placeholder='e.g. Describe the RISKS from action taken to pursue Opportunity'
+                />
+              </Form.Field>
 
-                <Form.Field className='w-100'>
-                  <label className='d-inline-block'>Question 3</label>
-                  <span className='float-end pe-3'>(0 / 120)</span>
-                  <Form.Input
-                    name='q3'
-                    fluid
-                    readOnly
-                    placeholder='e.g. Describe the EXPECTED RESULTS from action taken to pursue Opportunity'
-                  />
-                </Form.Field>
-              </Form.Group>
-
-              <Form.Group className='my-3' inline>
-                <Form.Field className='mt-4 ps-1'>
-                  <Form.Checkbox readOnly />
-                </Form.Field>
-
-                <Form.Field className='w-100'>
-                  <label className='d-inline-block'>Question 4</label>
-                  <span className='float-end pe-3'>(0 / 120)</span>
-                  <Form.Input
-                    name='q4'
-                    fluid
-                    readOnly
-                    placeholder='e.g. Describe the RISKS from action taken to pursue Opportunity'
-                  />
-                </Form.Field>
-              </Form.Group>
-
-              <Form.Group className='my-3' inline>
-                <Form.Field className='mt-4 ps-1'>
-                  <Form.Checkbox readOnly />
-                </Form.Field>
-
-                <Form.Field className='w-100'>
-                  <label className='d-inline-block'>Question 5</label>
-                  <span className='float-end pe-3'>(0 / 120)</span>
-                  <Form.Input
-                    name='q5'
-                    fluid
-                    readOnly
-                    placeholder='e.g. WHEN can or should Team work on pursuing Opportunity? What are DEPENDENCIES?'
-                  />
-                </Form.Field>
-              </Form.Group>
+              <Form.Field>
+                <label>Question 5</label>
+                <Form.Input
+                  name='q5'
+                  fluid
+                  readOnly
+                  placeholder='e.g. WHEN can or should Team work on pursuing Opportunity? What are DEPENDENCIES?'
+                />
+              </Form.Field>
             </>
           )}
         </Tab.Pane>
@@ -233,9 +188,13 @@ const OpportunityEdit = () => {
                   dimmer='blurring'
                   size='tiny'
                 >
-                  <Modal.Header>Manage Participants</Modal.Header>
+                  <Modal.Header>Add Participants</Modal.Header>
                   <Modal.Content scrolling>
                     <Modal.Description>
+                      <p>
+                        Participants will be notified of opportunity via e-mail
+                        once it’s published.
+                      </p>
                       {opportunity &&
                         opportunity.participants.map((participant) => (
                           <List
@@ -245,7 +204,7 @@ const OpportunityEdit = () => {
                           >
                             <List.Item>
                               <List.Content floated='right'>
-                                <button className='btn-link'>Remove</button>
+                                <button className='btn btn-outline'>Add</button>
                               </List.Content>
 
                               <List.Content>
@@ -263,10 +222,14 @@ const OpportunityEdit = () => {
                   </Modal.Content>
                   <Modal.Actions>
                     <Button
-                      content='Done'
+                      content='Add Participants'
                       onClick={() => setViewParticipant(false)}
                       className='btn'
                     />
+                    <p className='mt-3'>
+                      If a Team Member is not in the list above, please add them
+                      first in “Team” section.
+                    </p>
                   </Modal.Actions>
                 </Modal>
               </Header.Subheader>
@@ -285,13 +248,15 @@ const OpportunityEdit = () => {
             </>
           )}
         </Grid.Column>
-        <Grid.Column width={16}>
-          <p>
-            To publish an Opportunity you need at least one question for
-            Comprehension and one for Quality of Idea-Response. You need to
-            select the Team Members you want to respond with an Idea.
-          </p>
-        </Grid.Column>
+        {opportunity && opportunity.status === 'Draft' && (
+          <Grid.Column width={16}>
+            <p>
+              To publish an Opportunity you need at least one question for
+              Comprehension and one for Quality of Idea-Response. You need to
+              select the Team Members you want to respond with an Idea.
+            </p>
+          </Grid.Column>
+        )}
       </Grid>
       <Grid>
         <Grid.Column>

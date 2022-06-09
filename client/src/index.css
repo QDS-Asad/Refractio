@@ -2,8 +2,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;500;600;700&display=swap');
 
 * {
-  font-family: 'Nunito', sans-serif !important;
+  font-family: 'Nunito', sans-serif;
 }
+
+
 :root {
   --primary-dark: #083B66;
   --primary: #454FC8;
@@ -11,6 +13,7 @@
   --white: #FFFFFF;
   --dark: #3B3B3B;
   --success: #74D14C;
+  --danger: #FA6767;
 }
  
 .auth.ui.grid {
@@ -82,6 +85,13 @@ label {
   min-width: 10rem !important;
 }
 
+.btn-danger {
+  background: var(--danger) !important;
+  color: var(--white) !important;
+  border-radius: 2px !important;
+  min-width: 10rem !important;
+}
+
 .btn-link {
   background: none !important;
   color: var(--primary) !important;
@@ -136,6 +146,10 @@ label {
   color: rgba(255, 255, 255, 0.5);
 }
 
+.ui.menu .item.logo:before {
+  background: none;
+}
+
 .sidebar-pusher {
   width: calc(100vw - 260px);
 }
@@ -188,4 +202,19 @@ label {
 }
 i.icon.close:before {
   content: "\f00d";
+}
+.ui.action.input>.button {
+  display: block;
+}
+
+.ui.pagination.secondary.menu .active.item {
+
+  background: var(--primary-dark);
+  color: var(--white);
+ 
+}
+
+.ui.pagination.secondary.menu .item {
+  border-radius: 50%;
+  display: inline;
 }
