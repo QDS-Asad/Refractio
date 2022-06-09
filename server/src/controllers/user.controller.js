@@ -9,6 +9,7 @@ const { validationResult } = require('express-validator');
 const userOtpVerification = require('../models/userOtpVerification');
 const { User } = require('../models/user');
 const { UserOTPVerification } = require('../models/userOtpVerification');
+const {MetaData} = require('../models/projectmetadata');
 
 exports.register = async (req, res, next) => {
   const { fullName, email, password, roles } = req.body;
@@ -351,3 +352,11 @@ exports.resendOtp = async (req, res) => {
     });
   });
 };
+
+exports.getMetaData = async(req, res)=>{
+let result = await MetaData.find();
+return res.status(200).send({
+  status:"Success",
+  data:result
+})
+}

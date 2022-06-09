@@ -1,4 +1,6 @@
 const Opportunity = require("../models/opportunity").Opportunity;
+const User = require("../models/user").User;
+
 
 
 exports.createOpportunity = async(userId, name, description, questions, isPublished, isDraft)=>{
@@ -25,3 +27,10 @@ exports.createOpportunity = async(userId, name, description, questions, isPublis
     let result =  await Opportunity.findByIdAndDelete(opportunityId);
     return result;  
   }
+
+  exports.getUserById = async(userId)=>{
+    return await User.findOne({
+       _id:userId
+    })
+ }
+ 

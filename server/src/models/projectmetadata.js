@@ -10,8 +10,23 @@ var MetaDataSchema = new mongoose.Schema({
        key:{
            type:String,
            default:"participant"
-       }
-   }] 
+       },
+       permissions:[
+           {
+               type:String
+           }
+       ],
+   }],
+   permissions:[
+    {
+        value:{
+            type:String
+        },
+        key:{
+            type:String
+        }
+    }
+] 
 });
 
 
