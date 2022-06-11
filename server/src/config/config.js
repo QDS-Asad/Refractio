@@ -13,6 +13,9 @@ mongoose
     // console.info(SUCCESS_MESSAGE.DB_CONNECTED);
   })
   .catch((e) => {
-    console.log(ERROR_MESSAGE.DB_NOT_CONNECTED, e);
-    process.exit(1);
+    mongoose.connect(MIGRATION_STRING, connectionParams)
+    .catch((e) => {
+      console.log(ERROR_MESSAGE.DB_NOT_CONNECTED, e);
+      process.exit(1);
+    });
   });

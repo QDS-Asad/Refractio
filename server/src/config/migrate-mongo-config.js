@@ -1,7 +1,6 @@
 // In this file you can configure migrate-mongo
 require('./config');
 const { MIGRATION_STRING } = require("../lib/constants");
-console.log(MIGRATION_STRING);
 const config = {
   mongodb: {
     // TODO Change (or review) the url to your MongoDB:
@@ -22,7 +21,7 @@ const config = {
   migrationsDir: "../migrations",
 
   // The mongodb collection where the applied changes are stored. Only edit this when really necessary.
-  changelogCollectionName: "changelog",
+  changelogCollectionName: "migrations_changelog",
 
   // The file extension to create migrations and search for in migration dir 
   migrationFileExtension: ".js",

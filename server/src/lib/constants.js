@@ -6,7 +6,7 @@ module.exports = Object.freeze({
     CRYPTO_KEY: `${process.env.CRYPTO_KEY}`,
     JWT_KEY: `${process.env.JWT_KEY}`,
     CONNECTION_STRING: `${process.env.DB_URI}`,
-    MIGRATION_STRING: 'mongodb://localhost:27017/refractio_db',
+    MIGRATION_STRING: 'mongodb+srv://qdsravi:iBQFBbRGpVOgbkSQ@cluster0.mt4zc.mongodb.net/refractio_db_new?retryWrites=true&w=majority',
     SESSION_SECRET: `${process.env.SESSION_SECRET}`,
     CLIENT_HOST: `${process.env.CLIENT_HOST}`,
     SERVER_HOST: `${process.env.SERVER_HOST}`,

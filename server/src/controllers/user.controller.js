@@ -10,7 +10,7 @@ exports.createSuperAdmin = async (req, res) => {
   try {
     const role = await RoleService.getRoleByRoleId(ROLES.SUPER_ADMIN);
     const superAdmin = await UserService.getUserByRoleId(role._id);
-    if (!superAdmin.length) {
+    if (!superAdmin) {
       const adminData = {
         roleId: role._id,
         fullName: role.name,
