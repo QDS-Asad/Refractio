@@ -7,12 +7,19 @@ import {
   Pagination,
   Table,
 } from 'semantic-ui-react';
+import CancelInvitation from './CancelInvitation';
+import DeleteAccount from './DeleteAccount';
 import InviteTeamMember from './InviteTeamMember';
 import RemoveTeamMember from './RemoveTeamMember';
+import ResendInvitation from './ResendInvitation';
 
 const TeamMembers = () => {
   const [inviteTeamMember, setInviteTeamMember] = useState(false);
   const [removeTeamMember, setRemoveTeamMember] = useState(false);
+  const [cancelInvitation, setCancelInvitation] = useState(false);
+  const [resendInvitation, setResendInvitation] = useState(false);
+  const [deleteAccount, setDeleteAccount] = useState(false);
+  const [selectedMember, setSelectedMember] = useState(null);
   const roles = [
     { name: 'Administrator', id: 1 },
     { name: 'Organizer', id: 2 },
@@ -99,6 +106,26 @@ const TeamMembers = () => {
     },
   ];
 
+  const removeTeamMemberHandler = (id) => {
+    setSelectedMember(id);
+    setRemoveTeamMember(true);
+  };
+
+  const resendInvitationHandler = (id) => {
+    setSelectedMember(id);
+    setResendInvitation(true);
+  };
+
+  const cancelInvitationHandler = (id) => {
+    setSelectedMember(id);
+    setCancelInvitation(true);
+  };
+
+  // const deleteAccountHandler = (id) => {
+  //   setSelectedMember(id);
+  //   setDeleteAccount(true);
+  // };
+
   return (
     <>
       <Grid>
@@ -123,6 +150,22 @@ const TeamMembers = () => {
           <RemoveTeamMember
             removeTeamMember={removeTeamMember}
             setRemoveTeamMember={setRemoveTeamMember}
+            member={selectedMember}
+          />
+          <CancelInvitation
+            cancelInvitation={cancelInvitation}
+            setCancelInvitation={setCancelInvitation}
+            member={selectedMember}
+          />
+          <ResendInvitation
+            resendInvitation={resendInvitation}
+            setResendInvitation={setResendInvitation}
+            member={selectedMember}
+          />
+          <DeleteAccount
+            deleteAccount={deleteAccount}
+            setDeleteAccount={setDeleteAccount}
+            member={selectedMember}
           />
         </Grid.Column>
       </Grid>
@@ -166,16 +209,24 @@ const TeamMembers = () => {
                       <Button
                         className='btn-link'
                         floated='right'
-                        onClick={() => setRemoveTeamMember(true)}
+                        onClick={() => removeTeamMemberHandler(user.id)}
                       >
                         Remove
                       </Button>
                     ) : (
                       <>
-                        <Button className='btn-link' floated='right'>
+                        <Button
+                          className='btn-link'
+                          floated='right'
+                          onClick={() => resendInvitationHandler(user.id)}
+                        >
                           Resend invitation
                         </Button>
-                        <Button className='btn-link' floated='right'>
+                        <Button
+                          className='btn-link'
+                          floated='right'
+                          onClick={() => cancelInvitationHandler(user.id)}
+                        >
                           Cancel invitation
                         </Button>
                       </>

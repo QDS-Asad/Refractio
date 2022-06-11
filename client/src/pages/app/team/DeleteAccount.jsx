@@ -1,22 +1,17 @@
 import React from 'react';
 import { Button, Message, Modal } from 'semantic-ui-react';
-
-const RemoveTeamMember = ({
-  removeTeamMember,
-  setRemoveTeamMember,
-  member,
-}) => {
+const DeleteAccount = ({ deleteAccount, setDeleteAccount, member }) => {
   const error = null;
   return (
     <Modal
-      onClose={() => setRemoveTeamMember(false)}
-      onOpen={() => setRemoveTeamMember(true)}
-      open={removeTeamMember}
+      onClose={() => setDeleteAccount(false)}
+      onOpen={() => setDeleteAccount(true)}
+      open={deleteAccount}
       dimmer='blurring'
       size='tiny'
       closeIcon
     >
-      <Modal.Header color='red'>Remove from Team</Modal.Header>
+      <Modal.Header color='red'>Delete Account</Modal.Header>
       <Modal.Content>
         <Modal.Description>
           {error && (
@@ -24,19 +19,19 @@ const RemoveTeamMember = ({
               {error}
             </Message>
           )}
-          <p>Do you want to remove this person from your team?</p>
+          <p>Do you want to delete account?</p>
         </Modal.Description>
       </Modal.Content>
       <Modal.Actions>
-        <Button content='Cancel' onClick={() => setRemoveTeamMember(false)} />
+        <Button content='Close' onClick={() => setDeleteAccount(false)} />
         <Button
-          content='Remove'
+          content='Delete'
           className='btn-danger'
-          onClick={() => setRemoveTeamMember(false)}
+          onClick={() => setDeleteAccount(false)}
         />
       </Modal.Actions>
     </Modal>
   );
 };
 
-export default RemoveTeamMember;
+export default DeleteAccount;
