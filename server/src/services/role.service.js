@@ -13,6 +13,10 @@ exports.getRoles = () =>{
    return Role.find({roleId: {$nin: 1}});
 }
 
+exports.getRoleById = (id) =>{
+   return Role.findOne({_id: id});
+}
+
 exports.getRoleByRoleId = (roleId) =>{
    return Role.findOne({roleId});
 }

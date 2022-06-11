@@ -25,6 +25,16 @@ module.exports = Object.freeze({
         ORGANIZER: 3,
         PARTICIPANT: 4,
     },
+    USER_STATUS : {
+      ACTIVE: "active",
+      DISABLED: "disabled",
+      INVITE_SENT: "invite_sent",
+      SUBSCRIPTION_PENDING: "subscription_pending",
+    },
+    SUBSCRIPTION_STATUS: {
+      SUCCESS: "success",
+      FAILED: "failed",
+    },
     HTTP_STATUS: {
         SUCCESS: {CODE: 200, TEXT: "Success"},
         BAD_REQUEST: {CODE: 400, TEXT: "Bad Request"},
@@ -35,6 +45,8 @@ module.exports = Object.freeze({
     REGEX_PATTERN: {
         PASSWORD: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$@!%&*?])[A-Za-z\d#$@!%&*?]{8,30}$/
     },
+    TOKEN_EXPIRY: 3600000,//1hr
+    JWT_EXPIRY: '2h',//2hrs
     SUCCESS_MESSAGE:{
         ACTIVATION_MAIL_SENT: "Activation email is sent successfully",
         ACTIVATION_MAIL_VERIFIED: "Email verified successfully",
@@ -63,6 +75,7 @@ module.exports = Object.freeze({
         NEW_PASSWORD: "New Password name can not be empty!",
         CONFIRM_PASSWORD: "Confirm Password name can not be empty!",
         ALLREADY_REGISTERED: "Already registered!",
+        ALLREADY_VERIFIED: "Already Verified!",
         EMAIL_SENT_FAILED: "unable to send email!",
         DEFAULT_ROLES_FAILED: "Error in creating Default Roles!",
         SUPER_ADMIN_FAILED: "Error in creating Super Admin!",
