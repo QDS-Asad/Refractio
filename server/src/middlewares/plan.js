@@ -1,23 +1,22 @@
 const { check, validationResult } = require('express-validator');
 const { errorResp } = require("../helpers/error_helper");
-const { HTTP_STATUS, ERROR_MESSAGE, REGEX_PATTERN } = require("../lib/constants");
+const { HTTP_STATUS, ERROR_MESSAGE } = require("../lib/constants");
 
-module.exports.validateResetPassword = [
-    
-    check('newPassword')
+module.exports.validatePlan = [
+    check('name')
+    .exists().bail().withMessage(ERROR_MESSAGE.REQUIRED)
+    .notEmpty().bail().withMessage(ERROR_MESSAGE.NOT_EMPTY),
+    check('description')
+    .exists().bail().withMessage(ERROR_MESSAGE.REQUIRED)
+    .notEmpty().bail().withMessage(ERROR_MESSAGE.NOT_EMPTY),
+    check('monthlyPrice', ERROR_MESSAGE.MONTHLY_PRICE)
     .exists().bail().withMessage(ERROR_MESSAGE.REQUIRED)
     .notEmpty().bail().withMessage(ERROR_MESSAGE.NOT_EMPTY)
-    .matches(REGEX_PATTERN.PASSWORD).bail().withMessage(ERROR_MESSAGE.INVALID_PASSWORD),
-    check('confirmPassword')
+    .isNumeric().bail().withMessage(ERROR_MESSAGE.MUST_NUMERIC),
+    check('yearlyPrice')
     .exists().bail().withMessage(ERROR_MESSAGE.REQUIRED)
     .notEmpty().bail().withMessage(ERROR_MESSAGE.NOT_EMPTY)
-    .matches(REGEX_PATTERN.PASSWORD).bail().withMessage(ERROR_MESSAGE.INVALID_PASSWORD)
-    .custom(async (confirmPassword, {req}) => {
-        const newPassword = req.body.newPassword
-        if(newPassword !== confirmPassword){
-          throw new Error(ERROR_MESSAGE.PASSWORD_MUST_SAME)
-        }
-      }),
+    .isNumeric().bail().withMessage(ERROR_MESSAGE.MUST_NUMERIC),
     (req, res, next) => {
         try {
             const errors = validationResult(req);

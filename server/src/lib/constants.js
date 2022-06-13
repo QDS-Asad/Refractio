@@ -7,6 +7,7 @@ module.exports = Object.freeze({
     JWT_KEY: `${process.env.JWT_KEY}`,
     CONNECTION_STRING: `${process.env.DB_URI}`,
     MIGRATION_STRING: 'mongodb+srv://qdsravi:iBQFBbRGpVOgbkSQ@cluster0.mt4zc.mongodb.net/refractio_db_new?retryWrites=true&w=majority',
+    STRIPE_KEY: `${process.env.STRIPE_KEY}`,
     SESSION_SECRET: `${process.env.SESSION_SECRET}`,
     CLIENT_HOST: `${process.env.CLIENT_HOST}`,
     SERVER_HOST: `${process.env.SERVER_HOST}`,
@@ -46,7 +47,8 @@ module.exports = Object.freeze({
         PASSWORD: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$@!%&*?])[A-Za-z\d#$@!%&*?]{8,30}$/
     },
     TOKEN_EXPIRY: 3600000,//1hr
-    JWT_EXPIRY: '2h',//2hrs
+    JWT_EXPIRY: '24h',//24hrs
+    JWT_EXPIRY_REMEMBER_ME: '7d',//7days
     SUCCESS_MESSAGE:{
         ACTIVATION_MAIL_SENT: "Activation email is sent successfully",
         ACTIVATION_MAIL_VERIFIED: "Email verified successfully",
@@ -69,11 +71,22 @@ module.exports = Object.freeze({
         UNAUTHORIZED: "authorization denied.",
         NO_DATA: "No data available.",
         NOT_FOUND: "Not found.",
+        INVALID_ENDPOINT: "Invalid api endpoint!",
         FULL_NAME: "Full name can not be empty!",
         EMAIL: "Email can not be empty!",
-        PASSWORD: "Password name can not be empty!",
+        PASSWORD: "Password can not be empty!",
         NEW_PASSWORD: "New Password name can not be empty!",
         CONFIRM_PASSWORD: "Confirm Password name can not be empty!",
+        PASSWORD_MUST_SAME: "New password and confirm password must be same!",
+        NAME: "Name can not be empty!",
+        DESCRIPTION: "Description can not be empty!",
+        MONTHLY_PRICE: "Monthly Price can not be empty!",
+        YEARLY_PRICE: "Yearly Price can not be empty!",
+        MUST_NUMERIC: "Must be numeric!",
+        MUST_BOOLEAN: "Must be boolean!",
+        REQUIRED: "Is required!",
+        NOT_EMPTY: "Cannot be empty!",
+        INVALID_PASSWORD: "Invalid password!",
         ALLREADY_REGISTERED: "Already registered!",
         ALLREADY_VERIFIED: "Already Verified!",
         EMAIL_SENT_FAILED: "unable to send email!",
@@ -82,7 +95,6 @@ module.exports = Object.freeze({
         DEFAULT_ROLES_EXIST: "Roles already exist!",
         SUPER_ADMIN_EXIST: "Super Admin already exist!",
         TOKEN_EXPIRED: "OTP expired. Please request again!",
-        PASSWORD_MUST_SAME: "New password and confirm password must be same!",
     },
     VERIFY_REGISTER_EMAIL_TEMPLATE: (params) => {
         return `<div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">

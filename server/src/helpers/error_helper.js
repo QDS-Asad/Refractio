@@ -16,6 +16,7 @@ exports.successResp = (res, args) => {
 };
 // send error response
 exports.errorResp = (res, args = {}) => {
+    console.log(args);
     const { msg, code } = args;
     return res.status(HTTP_STATUS.BAD_REQUEST.CODE).send({
         success: false,
