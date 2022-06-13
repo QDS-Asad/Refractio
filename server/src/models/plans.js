@@ -13,103 +13,13 @@ const PlanSchema = new Schema({
     yearlyPriceId: {
         type: String,
         required: true,
-
+    },
+    active:{
+        type: Boolean,
+        default:true
     }
 
 }, { timestamps: true });
-
-// const PlanSchema = new Schema({
-//     plan: {
-//         id: {
-//             type: String,
-//             required: true,
-//         },
-//         name: {
-//             type: String,
-//             required: true,
-//         },
-//         description: {
-//             type: String,
-//             required: true,
-//         },
-//         tax_code: {
-//             type: String,
-//         },
-//         active: {
-//             type: Boolean,
-//             required: true,
-//         }
-//     },
-//     monthlyPrice: {
-//         id: {
-//             type: String,
-//             required: true,
-//         },
-//         product: {
-//             type: String,
-//             required: true,
-//         },
-//         currency: {
-//             type: String,
-//             required: true,
-//         },
-//         type: {
-//             type: String,
-//             required: true,
-//         },
-//         recurring: {
-//             type: Object,
-//             required: true,
-//         },
-//         tax_behavior: {
-//             type: String,
-//             required: true,
-//         },
-//         unit_amount: {
-//             type: String,
-//             required: true,
-//         },
-//         unit_amount_decimal: {
-//             type: String,
-//             required: true,
-//         },
-//     },
-//     yearlyPrice: {
-//         id: {
-//             type: String,
-//             required: true,
-//         },
-//         product: {
-//             type: String,
-//             required: true,
-//         },
-//         currency: {
-//             type: String,
-//             required: true,
-//         },
-//         type: {
-//             type: String,
-//             required: true,
-//         },
-//         recurring: {
-//             type: Object,
-//             required: true,
-//         },
-//         tax_behavior: {
-//             type: String,
-//             required: true,
-//         },
-//         unit_amount: {
-//             type: String,
-//             required: true,
-//         },
-//         unit_amount_decimal: {
-//             type: String,
-//             required: true,
-//         },
-//     }
-
-// }, { timestamps: true });
 
 PlanSchema.pre('save', function (next) {
     this.set('createdBy', 'createdby');

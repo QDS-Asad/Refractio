@@ -60,6 +60,10 @@ module.exports = Object.freeze({
         DEFAULT_ROLES: "Default Roles Created Successfully",
         SUPER_ADMIN_CREATED: "Super Admin Created Successfully",
         LOGIN_SUCCESS: "Login Successfully",
+        DATA_FETCHED: "Fetched Successfully",
+        CREATED: "Created Successfully",
+        UpDATED: "Updated Successfully",
+        DELETED: "Deleted Successfully",
 
     },
     ERROR_MESSAGE:{
