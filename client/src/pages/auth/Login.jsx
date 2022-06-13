@@ -27,13 +27,19 @@ const Login = () => {
   // fetch data from our store
   const { loading, error, userLogin } = useSelector(authLoginSelector);
 
-  const handleLogin = ({ email, password }) => {
-    dispatch(loginUser(email, password));
+  const handleLogin = ({ email, password, rememberMe }) => {
+    dispatch(loginUser(email, password, rememberMe));
   };
 
   const handleChange = (e) => {
     e.persist();
     setValue(e.target.name, e.target.value);
+    trigger(e.target.name);
+  };
+  
+  const handleChangeCheckBox = (e) => {
+    e.persist();
+    setValue(e.target.name, e.target.checked);
     trigger(e.target.name);
   };
 
@@ -54,11 +60,13 @@ const Login = () => {
           'Invalid password. Password length should be min 8 symbols. Password should contain numbers, letters, special characters.',
       },
     },
+    rememberMe:{}
   };
 
   useEffect(() => {
     register({ name: 'email' }, loginOptions.email);
     register({ name: 'password' }, loginOptions.password);
+    register({ name: 'rememberMe' }, loginOptions.rememberMe);
   }, []);
 
   useEffect(() => {
@@ -114,7 +122,7 @@ const Login = () => {
           )}
         </Form.Field>
         <Form.Field>
-          <Checkbox label='Remember me' tabIndex='3' />
+          <Checkbox label='Remember me' name='rememberMe' onBlur={handleChangeCheckBox} tabIndex='3' />
         </Form.Field>
         <Button type='submit' fluid primary className='mt-3 btn' tabIndex='4'>
           Log In

@@ -3,7 +3,7 @@ const RoleService = require('../services/role.service');
 const jwt = require('jsonwebtoken');
 const { crypto_encrypt, crypto_decrypt } = require('../helpers/encryption_helper');
 const { successResp, errorResp, serverError } = require('../helpers/error_helper');
-const { ERROR_MESSAGE, HTTP_STATUS, SUCCESS_MESSAGE, ROLES, SUPER_ADMIN_EMAIL, SUPER_ADMIN_PASSWORD, JWT_KEY, VERIFY_REGISTER_EMAIL_TEMPLATE, FORGOT_PASSWORD_EMAIL_TEMPLATE, CLIENT_HOST, EMAIL_TYPES, TOKEN_EXPIRY, JWT_EXPIRY } = require('../lib/constants');
+const { ERROR_MESSAGE, HTTP_STATUS, SUCCESS_MESSAGE, ROLES, SUPER_ADMIN_EMAIL, SUPER_ADMIN_PASSWORD, JWT_KEY, VERIFY_REGISTER_EMAIL_TEMPLATE, FORGOT_PASSWORD_EMAIL_TEMPLATE, CLIENT_HOST, EMAIL_TYPES, TOKEN_EXPIRY, JWT_EXPIRY, JWT_EXPIRY_REMEMBER_ME } = require('../lib/constants');
 
 // register admin user
 exports.register = async (req, res, next) => {
@@ -123,8 +123,9 @@ exports.login = async (req, res) => {
         return errorResp(res, { msg: ERROR_MESSAGE.INVALID_CREDS, code: HTTP_STATUS.BAD_REQUEST.CODE })
       }
       const role = await RoleService.getRoleById(user.roleId);
+      const expiry = req.body.rememberMe && JWT_EXPIRY_REMEMBER_ME || JWT_EXPIRY;
       const token = jwt.sign({ _id: user._id, email: user.email, roleId: role._id }, JWT_KEY, {
-        expiresIn: JWT_EXPIRY,
+        expiresIn: expiry,
       });
       let userData = {};
       if(user.isVerified){
