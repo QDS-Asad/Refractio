@@ -5,35 +5,6 @@ const { crypto_encrypt, crypto_decrypt } = require('../helpers/encryption_helper
 const { successResp, errorResp, serverError } = require('../helpers/error_helper');
 const { ERROR_MESSAGE, HTTP_STATUS, SUCCESS_MESSAGE, ROLES, SUPER_ADMIN_EMAIL, SUPER_ADMIN_PASSWORD, JWT_KEY, VERIFY_REGISTER_EMAIL_TEMPLATE, FORGOT_PASSWORD_EMAIL_TEMPLATE, CLIENT_HOST, EMAIL_TYPES, TOKEN_EXPIRY, JWT_EXPIRY } = require('../lib/constants');
 
-// creating super admin 
-exports.createSuperAdmin = async (req, res) => {
-  try {
-    const role = await RoleService.getRoleByRoleId(ROLES.SUPER_ADMIN);
-    const superAdmin = await UserService.getUserByRoleId(role._id);
-    if (!superAdmin) {
-      const adminData = {
-        roleId: role._id,
-        fullName: role.name,
-        email: SUPER_ADMIN_EMAIL,
-        password: crypto_encrypt(SUPER_ADMIN_PASSWORD),
-        status: "active",
-        isVerified: true,
-        canLogin: true,
-      };
-      const createdSuperAdmin = await UserService.register(adminData);
-      if (createdSuperAdmin) {
-        return successResp(res, { msg: SUCCESS_MESSAGE.SUPER_ADMIN_CREATED, code: HTTP_STATUS.SUCCESS.CODE })
-      } else {
-        return errorResp(res, { msg: ERROR_MESSAGE.SUPER_ADMIN_FAILED, code: HTTP_STATUS.BAD_REQUEST.CODE })
-      }
-    } else {
-      return errorResp(res, { msg: ERROR_MESSAGE.SUPER_ADMIN_EXIST, code: HTTP_STATUS.BAD_REQUEST.CODE })
-    }
-  } catch (error) {
-    serverError(res, error);
-  }
-}
-
 // register admin user
 exports.register = async (req, res, next) => {
   const { email, password } = req.body;
@@ -201,7 +172,7 @@ exports.resetPassword = async (req, res) => {
   try {
     const { token } = req.params;
     const { newPassword } = req.body;
-    await UserService.getUserByToken(token).then(async (user) => {
+    await UserService.getUserByToken(encodeURIComponent(token)).then(async (user) => {
       const { tokenExpiry } = user;
       if (tokenExpiry < Date.now()) {
         return errorResp(res, { msg: ERROR_MESSAGE.TOKEN_EXPIRED, code: HTTP_STATUS.BAD_REQUEST.CODE });
