@@ -61,12 +61,13 @@ export const authLoginSelector = (state) => state.authLogin;
 export default authLoginSlice.reducer;
 
 // login user
-export const loginUser = (email, password) => async (dispatch) => {
+export const loginUser = (email, password, rememberMe = false) => async (dispatch) => {
   try {
     dispatch(setLoading());
     let { data: response } = await authApi.post('/users/login', {
       email,
       password,
+      rememberMe
     });
     dispatch(setUserLogin(response.data));
     window.localStorage.setItem('userInfo', JSON.stringify(response.data));
