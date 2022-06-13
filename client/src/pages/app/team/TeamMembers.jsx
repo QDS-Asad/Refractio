@@ -1,12 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   Button,
   Dropdown,
   Grid,
   Header,
+  Message,
   Pagination,
+  Segment,
   Table,
 } from 'semantic-ui-react';
+import {
+  fetchTeamList,
+  teamListSelector,
+} from '../../../features/team/teamListSlice';
 import CancelInvitation from './CancelInvitation';
 import DeleteAccount from './DeleteAccount';
 import InviteTeamMember from './InviteTeamMember';
@@ -20,90 +27,23 @@ const TeamMembers = () => {
   const [resendInvitation, setResendInvitation] = useState(false);
   const [deleteAccount, setDeleteAccount] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
+
+  const dispatch = useDispatch();
+
+  // fetch data from our store
+  const { loading, error, members, page, totalPages } = useSelector(
+    teamListSelector
+  );
+
+  // hook to fetch items
+  useEffect(() => {
+    dispatch(fetchTeamList(page));
+  }, []);
+
   const roles = [
     { name: 'Administrator', id: 1 },
     { name: 'Organizer', id: 2 },
     { name: 'Participant', id: 3 },
-  ];
-
-  const users = [
-    {
-      id: 1,
-      name: 'Dominic Keller',
-      email: 'd.keller@gmail.com',
-      roleId: 1,
-      status: 'active',
-    },
-    {
-      id: 2,
-      name: 'Eric Butler',
-      email: 'd.keller@gmail.com',
-      roleId: 3,
-      status: 'active',
-    },
-    {
-      id: 3,
-      name: 'Eric Butler',
-      email: 'd.keller@gmail.com',
-      roleId: 2,
-      status: 'active',
-    },
-    {
-      id: 4,
-      name: 'Eric Butler',
-      email: 'd.keller@gmail.com',
-      roleId: 3,
-      status: 'active',
-    },
-    {
-      id: 5,
-      name: 'Eric Butler',
-      email: 'd.keller@gmail.com',
-      roleId: 2,
-      status: 'active',
-    },
-    {
-      id: 6,
-      name: 'Eric Butler',
-      email: 'd.keller@gmail.com',
-      roleId: 3,
-      status: 'active',
-    },
-    {
-      id: 7,
-      name: 'Eric Butler',
-      email: 'd.keller@gmail.com',
-      roleId: 2,
-      status: 'active',
-    },
-    {
-      id: 8,
-      name: '',
-      email: 'd.keller@gmail.com',
-      roleId: 2,
-      status: 'pending',
-    },
-    {
-      id: 9,
-      name: '',
-      email: 'd.keller@gmail.com',
-      roleId: 3,
-      status: 'pending',
-    },
-    {
-      id: 10,
-      name: '',
-      email: 'd.keller@gmail.com',
-      roleId: 2,
-      status: 'pending',
-    },
-    {
-      id: 11,
-      name: '',
-      email: 'd.keller@gmail.com',
-      roleId: 3,
-      status: 'pending',
-    },
   ];
 
   const removeTeamMemberHandler = (id) => {
@@ -125,6 +65,10 @@ const TeamMembers = () => {
   //   setSelectedMember(id);
   //   setDeleteAccount(true);
   // };
+
+  const onPageChange = (e, { activePage }) => {
+    dispatch(fetchTeamList(activePage));
+  };
 
   return (
     <>
@@ -171,91 +115,99 @@ const TeamMembers = () => {
       </Grid>
       <Grid>
         <Grid.Column>
-          <Table basic='very' className='table-striped'>
-            <Table.Header>
-              <Table.Row>
-                <Table.HeaderCell>Name</Table.HeaderCell>
-                <Table.HeaderCell>Email</Table.HeaderCell>
-                <Table.HeaderCell>Role</Table.HeaderCell>
-                <Table.HeaderCell></Table.HeaderCell>
-              </Table.Row>
-            </Table.Header>
-
-            <Table.Body>
-              {users.map((user) => (
-                <Table.Row key={user.id}>
-                  <Table.Cell>
-                    {user.status === 'active'
-                      ? user.name
-                      : 'Pending Invitation'}
-                  </Table.Cell>
-                  <Table.Cell>{user.email}</Table.Cell>
-                  <Table.Cell>
-                    <Dropdown
-                      fluid
-                      selection
-                      defaultValue={user.roleId}
-                      options={roles.map((role) => {
-                        return {
-                          key: role.id,
-                          text: role.name,
-                          value: role.id,
-                        };
-                      })}
-                    />
-                  </Table.Cell>
-                  <Table.Cell className='clearfix'>
-                    {user.status === 'active' ? (
-                      <Button
-                        className='btn-link'
-                        floated='right'
-                        onClick={() => removeTeamMemberHandler(user.id)}
-                      >
-                        Remove
-                      </Button>
-                    ) : (
-                      <>
-                        <Button
-                          className='btn-link'
-                          floated='right'
-                          onClick={() => resendInvitationHandler(user.id)}
-                        >
-                          Resend invitation
-                        </Button>
-                        <Button
-                          className='btn-link'
-                          floated='right'
-                          onClick={() => cancelInvitationHandler(user.id)}
-                        >
-                          Cancel invitation
-                        </Button>
-                      </>
-                    )}
-                  </Table.Cell>
+          <Segment loading={loading}>
+            {error && (
+              <Message color='red' className='error-message mb-3'>
+                {error}
+              </Message>
+            )}
+            <Table basic='very' className='table-striped'>
+              <Table.Header>
+                <Table.Row>
+                  <Table.HeaderCell>Name</Table.HeaderCell>
+                  <Table.HeaderCell>Email</Table.HeaderCell>
+                  <Table.HeaderCell>Role</Table.HeaderCell>
+                  <Table.HeaderCell></Table.HeaderCell>
                 </Table.Row>
-              ))}
-            </Table.Body>
+              </Table.Header>
 
-            <Table.Footer>
-              <Table.Row>
-                <Table.HeaderCell colSpan='4' className='clearfix'>
-                  <Pagination
-                    floated='right'
-                    boundaryRange={0}
-                    defaultActivePage={1}
-                    ellipsisItem={null}
-                    firstItem={null}
-                    lastItem={null}
-                    siblingRange={2}
-                    totalPages={10}
-                    secondary
-                    prevItem={null}
-                    nextItem={null}
-                  />
-                </Table.HeaderCell>
-              </Table.Row>
-            </Table.Footer>
-          </Table>
+              <Table.Body>
+                {members.map((user) => (
+                  <Table.Row key={user.id}>
+                    <Table.Cell>
+                      {user.status === 'active'
+                        ? user.name
+                        : 'Pending Invitation'}
+                    </Table.Cell>
+                    <Table.Cell>{user.email}</Table.Cell>
+                    <Table.Cell>
+                      <Dropdown
+                        fluid
+                        selection
+                        defaultValue={user.roleId}
+                        options={roles.map((role) => {
+                          return {
+                            key: role.id,
+                            text: role.name,
+                            value: role.id,
+                          };
+                        })}
+                      />
+                    </Table.Cell>
+                    <Table.Cell className='clearfix'>
+                      {user.status === 'active' ? (
+                        <Button
+                          className='btn-link'
+                          floated='right'
+                          onClick={() => removeTeamMemberHandler(user.id)}
+                        >
+                          Remove
+                        </Button>
+                      ) : (
+                        <>
+                          <Button
+                            className='btn-link'
+                            floated='right'
+                            onClick={() => resendInvitationHandler(user.id)}
+                          >
+                            Resend invitation
+                          </Button>
+                          <Button
+                            className='btn-link'
+                            floated='right'
+                            onClick={() => cancelInvitationHandler(user.id)}
+                          >
+                            Cancel invitation
+                          </Button>
+                        </>
+                      )}
+                    </Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
+
+              <Table.Footer>
+                <Table.Row>
+                  <Table.HeaderCell colSpan='4' className='clearfix'>
+                    <Pagination
+                      floated='right'
+                      boundaryRange={0}
+                      defaultActivePage={page}
+                      ellipsisItem={null}
+                      firstItem={null}
+                      lastItem={null}
+                      siblingRange={2}
+                      totalPages={totalPages}
+                      secondary
+                      prevItem={null}
+                      nextItem={null}
+                      onPageChange={onPageChange}
+                    />
+                  </Table.HeaderCell>
+                </Table.Row>
+              </Table.Footer>
+            </Table>
+          </Segment>
         </Grid.Column>
       </Grid>
     </>

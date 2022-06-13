@@ -1,26 +1,18 @@
 const mongoose = require("mongoose");
+const { USER_STATUS, SUBSCRIPTION_STATUS } = require("../lib/constants");
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
-    role: {
-        _id:{
-            type: Schema.Types.ObjectId
-        },
-        roleId: {
-            type: Number
-        },
-        key: {
-            type: String
-        },
-        name:{
-            type: String
-        }
+    roleId: {
+        type: Schema.Types.ObjectId,
+        required: true,
     },
     fullName: {
         type: String,
     },
     email: {
         type: String,
+        required: true,
     },
     password: {
         type: String,
@@ -45,8 +37,8 @@ const UserSchema = new Schema({
     },
     status: {
         type: String,
-        enum: ['active', 'invite_sent', 'verification_pending', 'subscription_pending', 'disabled'],
-        default: 'subscription_pending'
+        enum: [USER_STATUS.ACTIVE,USER_STATUS.INVITE_SENT, USER_STATUS.SUBSCRIPTION_PENDING, USER_STATUS.DISABLED],
+        default: USER_STATUS.DISABLED
     },
     teamIds: [
         {
@@ -62,7 +54,7 @@ const UserSchema = new Schema({
         paymentMethod: {
             paymentMethodId: {
                 type: String,
-                default:''
+                default: ''
             },
             type: {
                 type: String,
@@ -112,8 +104,7 @@ const UserSchema = new Schema({
             },
             status: {
                 type: String,
-                enum: ['success', 'failed', ''],
-                default: ''
+                enum: [SUBSCRIPTION_STATUS.SUCCESS, SUBSCRIPTION_STATUS.FAILED],
             },
         }
     },

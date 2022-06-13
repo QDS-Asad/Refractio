@@ -25,7 +25,7 @@ const NewPassword = () => {
   const { loading, error, newPassword } = useSelector(authNewPasswordSelector);
 
   const handlePasChange = (data) => {
-    dispatch(userNewPassword(token, data));
+    dispatch(userNewPassword(encodeURIComponent(token), data));
   };
   const handleChange = (e) => {
     e.persist();

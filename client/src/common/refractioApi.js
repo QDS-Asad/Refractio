@@ -20,3 +20,12 @@ export const authApi = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+export function authHeader() {
+  const user = JSON.parse(localStorage.getItem('userInfo'));
+  if (user && user.token) {
+    return { Authorization: `Bearer ${user.accessToken}` };
+  } else {
+    return {};
+  }
+}

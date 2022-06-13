@@ -64,9 +64,12 @@ export default authLoginSlice.reducer;
 export const loginUser = (email, password) => async (dispatch) => {
   try {
     dispatch(setLoading());
-    let { data } = await authApi.post('/users/login', { email, password });
-    dispatch(setUserLogin(data));
-    window.localStorage.setItem('userInfo', JSON.stringify(data));
+    let { data: response } = await authApi.post('/users/login', {
+      email,
+      password,
+    });
+    dispatch(setUserLogin(response.data));
+    window.localStorage.setItem('userInfo', JSON.stringify(response.data));
   } catch (error) {
     const errorMessage =
       error.response && error.response.data

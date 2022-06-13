@@ -7,6 +7,8 @@ import authVerifyCodeSlice from './auth/authVerifyCodeSlice';
 import opportunityCreateSlice from './opportunities/opportunityCreateSlice';
 import opportunityDetailSlice from './opportunities/opportunityDetailSlice';
 import opportunityListSlice from './opportunities/opportunityListSlice';
+import inviteMemberSlice from './team/inviteMemberSlice';
+import teamListSlice from './team/teamListSlice';
 
 export default configureStore({
   reducer: {
@@ -18,5 +20,7 @@ export default configureStore({
     opportunityList: opportunityListSlice,
     opportunityDetail: opportunityDetailSlice,
     opportunityCreate: opportunityCreateSlice,
+    teamList: teamListSlice,
+    inviteMember: inviteMemberSlice,
   },
 });

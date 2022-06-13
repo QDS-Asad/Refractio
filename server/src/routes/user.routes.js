@@ -4,70 +4,70 @@ const User = require('../controllers/user.controller');
 const { validateRegister } = require('../middlewares/register');
 const { validateResetPassword } = require('../middlewares/resetPassword');
 
-/**
- * @swagger
- *   /api/users/create-super-admin:
- *   post:
- *     description: Create Super Admin
- *     tags: [Super Admin]
- *     responses:
- *        '200':
- *           description: Success
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   success:
- *                     type: string
- *                   code:
- *                     type: integer
- *                   message:
- *                     type: string
- *                   data:
- *                     type: object
- *                 example:
- *                   success: true
- *                   code: 200
- *                   message: Operation successfull.
- *        '404':
- *           description: Operation Failed
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   success:
- *                     type: string
- *                   code:
- *                     type: integer
- *                   message:
- *                     type: string
- *                   data:
- *                     type: object
- *                 example:
- *                    {"success": false,"code": 404,"message": "Operation Failed."}
- *
- *        '422':
- *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   success:
- *                     type: string
- *                   code:
- *                     type: integer
- *                   message:
- *                     type: string
- *                   data:
- *                     type: object
- *                 example:
- *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
- * 
- */
-router.post('/create-super-admin', User.createSuperAdmin);
+// /**
+//  * @swagger
+//  *   /api/users/create-super-admin:
+//  *   post:
+//  *     description: Create Super Admin
+//  *     tags: [Super Admin]
+//  *     responses:
+//  *        '200':
+//  *           description: Success
+//  *           content:
+//  *             application/json:
+//  *               schema:
+//  *                 type: object
+//  *                 properties:
+//  *                   success:
+//  *                     type: string
+//  *                   code:
+//  *                     type: integer
+//  *                   message:
+//  *                     type: string
+//  *                   data:
+//  *                     type: object
+//  *                 example:
+//  *                   success: true
+//  *                   code: 200
+//  *                   message: Operation successfull.
+//  *        '404':
+//  *           description: Operation Failed
+//  *           content:
+//  *             application/json:
+//  *               schema:
+//  *                 type: object
+//  *                 properties:
+//  *                   success:
+//  *                     type: string
+//  *                   code:
+//  *                     type: integer
+//  *                   message:
+//  *                     type: string
+//  *                   data:
+//  *                     type: object
+//  *                 example:
+//  *                    {"success": false,"code": 404,"message": "Operation Failed."}
+//  *
+//  *        '422':
+//  *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
+//  *           content:
+//  *             application/json:
+//  *               schema:
+//  *                 type: object
+//  *                 properties:
+//  *                   success:
+//  *                     type: string
+//  *                   code:
+//  *                     type: integer
+//  *                   message:
+//  *                     type: string
+//  *                   data:
+//  *                     type: object
+//  *                 example:
+//  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
+//  * 
+//  */
+// router.post('/create-super-admin', User.createSuperAdmin);
 
 /**
  * @swagger
@@ -237,6 +237,88 @@ router.post('/register', validateRegister, User.register);
  *        type: string
  */
  router.post('/verify-register', User.verifyToken);
+/**
+ * @swagger
+ *   /api/users/resend-verify-code:
+ *   post:
+ *     description: resend verify code
+ *     tags: [User]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ReVerify'
+ *     responses:
+ *        '200':
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                   success: true
+ *                   code: 200
+ *                   message: Operation successfull.
+ *        '404':
+ *           description: Operation Failed
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 404,"message": "Operation Failed."}
+ *
+ *        '422':
+ *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
+ * 
+ * components:
+ *  schemas:
+ *   ReVerify:
+ *    type: object
+ *    required:
+ *      - userId
+ *      - email
+ *    properties:
+ *      userId:
+ *        type: string
+ *      email:
+ *        type: string
+ */
+ router.post('/resend-verify-code', User.resendToken);
 
 /**
  * @swagger

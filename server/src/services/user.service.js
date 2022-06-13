@@ -17,12 +17,8 @@ exports.getUserById = async (userId) => {
    })
 }
 
-exports.getUserByRoleId = async (RoleId) => {
-   return await User.aggregate([
-      { "$match" : 
-        { "role._id" : RoleId } 
-      }
-   ])
+exports.getUserByRoleId = async (roleId) => {
+   return await User.findOne({roleId})
 }
 
 exports.getUserByToken = async (token) => {
@@ -35,6 +31,10 @@ exports.updateUserById = async (userId, user) => {
    return await User.findOneAndUpdate({
       _id: ObjectId(userId)
    }, user)
+}
+
+exports.deleteUserByRoleId = async (roleId) => {
+   return await User.deleteOne({roleId})
 }
 
 exports.register = async (user) => {

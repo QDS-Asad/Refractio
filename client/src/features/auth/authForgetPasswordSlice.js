@@ -53,8 +53,7 @@ export const userForgetPassword = (email) => async (dispatch) => {
     let { data: response } = await authApi.post('/users/forget-password', {
       email,
     });
-    let { data } = response;
-    dispatch(setForgetPassword(data));
+    dispatch(setForgetPassword(response.success));
   } catch (error) {
     const errorMessage =
       error.response && error.response.data
