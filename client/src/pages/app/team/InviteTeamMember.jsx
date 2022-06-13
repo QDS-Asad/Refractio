@@ -1,6 +1,11 @@
 import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { Button, Form, Message, Modal } from 'semantic-ui-react';
+import {
+  inviteMemberSelector,
+  inviteMember,
+} from '../../../features/team/inviteMemberSlice';
 
 const InviteTeamMember = ({ inviteTeamMember, setInviteTeamMember }) => {
   const { register, setValue, handleSubmit, errors, trigger } = useForm({
@@ -12,14 +17,15 @@ const InviteTeamMember = ({ inviteTeamMember, setInviteTeamMember }) => {
   });
 
   // set up dispatch
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
   // fetch data from our store
-  const { loading, error, success } = {};
+  const { loading, error, success } = useSelector(inviteMemberSelector);
 
   const handleCreate = (data) => {
     console.log(data);
     // dispatch team invite;
+    dispatch(inviteMember(data));
   };
 
   const roles = [

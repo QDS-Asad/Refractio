@@ -43,7 +43,7 @@ const SideBar = () => {
           <Image src='/images/opportunities.svg' verticalAlign='middle' />
           <span className='ps-2'>Opportunities</span>
         </Menu.Item>
-        <Menu.Item as='a'>
+        <Menu.Item as={NavLink} to='/team'>
           <Image src='/images/team.svg' verticalAlign='middle' />
           <span className='ps-2'>Team</span>
         </Menu.Item>

@@ -60,14 +60,14 @@ export default authRegisterSlice.reducer;
 export const registerUser = (fullName, email, password) => async (dispatch) => {
   try {
     dispatch(setLoading());
-    let { data } = await authApi.post('/users/register', {
+    let { data: response } = await authApi.post('/users/register', {
       fullName,
       email,
       password,
     });
-    let { result } = data;
-    dispatch(setUserRegister(result.data));
-    window.localStorage.setItem('userRegister', JSON.stringify(result.data));
+    let { data } = response;
+    dispatch(setUserRegister(data));
+    window.localStorage.setItem('userRegister', JSON.stringify(data));
   } catch (error) {
     const errorMessage =
       error.response && error.response.data

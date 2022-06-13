@@ -9,7 +9,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 
 const PasswordRecover = () => {
-  const { register, setValue, handleSubmit, errors, trigger } = useForm({
+  const { register, setValue, watch, handleSubmit, errors, trigger } = useForm({
     mode: 'onBlur',
   });
   const navigate = useNavigate();
@@ -103,9 +103,9 @@ const PasswordRecover = () => {
             Please check your Email
           </Header>
           <p className='text-center'>
-            A email has been send to <strong>{forgetPassword.email}</strong>.{' '}
-            <br /> Please check for an email from company and click on the
-            included link to reset your password.
+            A email has been send to <strong>{watch('email')}</strong>. <br />{' '}
+            Please check for an email from company and click on the included
+            link to reset your password.
           </p>
 
           <Button
