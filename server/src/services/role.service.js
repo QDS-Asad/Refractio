@@ -16,6 +16,10 @@ exports.getRoleByRoleId = (roleId) =>{
    return Role.findOne({roleId});
 }
 
+exports.getRolesByRoleIds = (roleIds) =>{
+   return Role.find({roleId: roleIds}).select({"_id": 1});
+}
+
 exports.deleteDefaultRoles = () =>{
    return Role.deleteMany({});
 }

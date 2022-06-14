@@ -16,8 +16,12 @@ module.exports = Object.freeze({
     MAIL_SERVICE: `${process.env.MAIL_SERVICE}`,
     SUPER_ADMIN_EMAIL: `${process.env.SUPER_ADMIN_EMAIL}`,
     SUPER_ADMIN_PASSWORD: `${process.env.SUPER_ADMIN_PASSWORD}`,
+    DEFAULT_PAGE_NO: 0,
+    DEFAULT_PAGE_SIZE: 10,
+    TOTAL_TEAM_MEMBERS: 24,
     EMAIL_TYPES: {
         VERIFY_REGISTER: "verify-register",
+        INVITE_USER: "invite-user",
         FORGOT_PASSWORD: "forgot-password",
     },
     ROLES: {
@@ -93,12 +97,14 @@ module.exports = Object.freeze({
         INVALID_PASSWORD: "Invalid password!",
         ALLREADY_REGISTERED: "Already registered!",
         ALLREADY_VERIFIED: "Already Verified!",
+        ALLREADY_INVITED: "Already Invited!",
         EMAIL_SENT_FAILED: "unable to send email!",
         DEFAULT_ROLES_FAILED: "Error in creating Default Roles!",
         SUPER_ADMIN_FAILED: "Error in creating Super Admin!",
         DEFAULT_ROLES_EXIST: "Roles already exist!",
         SUPER_ADMIN_EXIST: "Super Admin already exist!",
         TOKEN_EXPIRED: "OTP expired. Please request again!",
+        TEAM_LIMIT_EXCEED:"Team limit reached!"
     },
     VERIFY_REGISTER_EMAIL_TEMPLATE: (params) => {
         return `<div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
@@ -128,6 +134,25 @@ module.exports = Object.freeze({
           <p style="font-size:1.1em">Hi,</p>
           <p>Please use this link to reset your password</p>
           <h2 style="background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;"><a href="${params.link}" style="color:#ffff;text-decoration:none;">Reset Your Password</a></h2>
+          <p style="font-size:0.9em;">Regards,<br />Refractio</p>
+          <hr style="border:none;border-top:1px solid #eee" />
+          <div style="float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300">
+            <p>Refractio Inc</p>
+            <p>Address</p>
+            <p>City</p>
+          </div>
+        </div>
+      </div>`
+    },
+    INVTE_USER_EMAIL_TEMPLATE: (params) => {
+        return `<div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
+        <div style="margin:50px auto;width:70%;padding:20px 0">
+          <div style="border-bottom:1px solid #eee">
+            <a href="" style="font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600">Refractio</a>
+          </div>
+          <p style="font-size:1.1em">Hi,</p>
+          <p>Please accept this invite link to join your team</p>
+          <h2 style="background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;"><a href="${params.invite}" style="color:#ffff;text-decoration:none;">Accept Invite</a></h2>
           <p style="font-size:0.9em;">Regards,<br />Refractio</p>
           <hr style="border:none;border-top:1px solid #eee" />
           <div style="float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300">

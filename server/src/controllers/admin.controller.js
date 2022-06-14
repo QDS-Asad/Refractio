@@ -13,7 +13,6 @@ const {
 // create plan in stripe and db
 exports.createPlan = async (req, res, next) => {
   try {
-    // console.log(req.originalUrl);return false;
     await AdminService.createStripePlan(req.body)
       .then(async (stripeRes) => {
         const data = {
@@ -34,7 +33,6 @@ exports.createPlan = async (req, res, next) => {
           });
       })
       .catch((error) => {
-        console.log(error);
         serverError(res, error);
       });
   } catch (error) {
@@ -55,7 +53,6 @@ exports.updatePlan = async (req, res, next) => {
         };
         await AdminService.updateStripePlan(planData)
           .then((stripeRes) => {
-            console.log(stripeRes);
             return successResp(res, {
               msg: SUCCESS_MESSAGE.UpDATED,
               code: HTTP_STATUS.SUCCESS.CODE,
@@ -67,7 +64,6 @@ exports.updatePlan = async (req, res, next) => {
           });
       })
       .catch((error) => {
-        console.log(error);
         serverError(res, error);
       });
   } catch (error) {
@@ -79,7 +75,6 @@ exports.getAllPlans = async (req, res, next) => {
   try {
     await AdminService.getAllStripePlans()
       .then((stripeRes) => {
-        console.log(stripeRes);
         return successResp(res, {
           msg: SUCCESS_MESSAGE.DATA_FETCHED,
           code: HTTP_STATUS.SUCCESS.CODE,
@@ -87,7 +82,6 @@ exports.getAllPlans = async (req, res, next) => {
         });
       })
       .catch((error) => {
-        console.log(error);
         serverError(res, error);
       });
   } catch (error) {
@@ -100,7 +94,6 @@ exports.getPlanByPlanId = async (req, res, next) => {
     const { planId } = req.params;
     await AdminService.getPlanByPlanId(planId)
       .then(async (planRes) => {
-        console.log(planRes);
         const planData = {
           planId: planRes.planId,
           monthlyPriceId: planRes.monthlyPriceId,
@@ -108,7 +101,6 @@ exports.getPlanByPlanId = async (req, res, next) => {
         };
         await AdminService.getStripePlanById(planData)
           .then((stripeRes) => {
-            console.log(stripeRes);
             return successResp(res, {
               msg: SUCCESS_MESSAGE.DATA_FETCHED,
               code: HTTP_STATUS.SUCCESS.CODE,
@@ -120,7 +112,6 @@ exports.getPlanByPlanId = async (req, res, next) => {
           });
       })
       .catch((error) => {
-        console.log(error);
         serverError(res, error);
       });
   } catch (error) {
@@ -134,7 +125,6 @@ exports.getPricesByPlanId = async (req, res, next) => {
     const { planId } = req.params;
     await AdminService.getAllStripePricesByPlanId(planId)
       .then((stripeRes) => {
-        console.log(stripeRes);
         return successResp(res, {
           msg: SUCCESS_MESSAGE.DATA_FETCHED,
           code: HTTP_STATUS.SUCCESS.CODE,
@@ -154,7 +144,6 @@ exports.deletePlan = async (req, res, next) => {
   try {
     const { planId } = req.params;
     const planPrices = await AdminService.getAllStripePricesByPlanId(planId);
-    console.log(planPrices);
     await AdminService.deleteStripePlanById(planId, planPrices.data)
       .then(async (stripeRes) => {
           await AdminService.deletePlanByPlanId(planId)
@@ -170,7 +159,6 @@ exports.deletePlan = async (req, res, next) => {
             });
       })
       .catch((error) => {
-        console.log(error);
         serverError(res, error);
       });
   } catch (error) {

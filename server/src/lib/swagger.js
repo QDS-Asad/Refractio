@@ -18,6 +18,16 @@ const options = {
           description: "Refractio API Documentation",
         },
       ],
+      components: {
+        securitySchemes: {
+          bearerAuth: {
+            type: "http",
+            name: "Authorization",
+            scheme: "bearer",
+            in: "header",
+          },
+        },
+      },
     },
     apis: ["./server/src/routes/*.js"],
   };
