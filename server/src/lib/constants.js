@@ -57,7 +57,6 @@ module.exports = Object.freeze({
         ACTIVATION_MAIL_SENT: "Activation email is sent successfully",
         ACTIVATION_MAIL_VERIFIED: "Email verified successfully",
         USER_REGISTERED: "User Registered Successfully",
-        VERIFY_EMAIL_SUBJECT: "Verify Your Email",
         EMAIL_SENT: "Email sent successfully.",
         PASSWORD_RESET_SUCCESS: "Password reset successfully.",
         DB_CONNECTED: "Connected to the Database",
@@ -68,6 +67,7 @@ module.exports = Object.freeze({
         CREATED: "Created Successfully",
         UpDATED: "Updated Successfully",
         DELETED: "Deleted Successfully",
+        CANCELED: "Canceled Successfully",
 
     },
     ERROR_MESSAGE:{
@@ -106,6 +106,7 @@ module.exports = Object.freeze({
         TOKEN_EXPIRED: "OTP expired. Please request again!",
         TEAM_LIMIT_EXCEED:"Team limit reached!"
     },
+    VERIFY_REGISTER_EMAIL_SUBJECT: "Verify your email",
     VERIFY_REGISTER_EMAIL_TEMPLATE: (params) => {
         return `<div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
         <div style="margin:50px auto;width:70%;padding:20px 0">
@@ -125,6 +126,7 @@ module.exports = Object.freeze({
         </div>
       </div>`
     },
+    FORGOT_PASSWORD_EMAIL_SUBJECT: "Reset your password",
     FORGOT_PASSWORD_EMAIL_TEMPLATE: (params) => {
         return `<div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
         <div style="margin:50px auto;width:70%;padding:20px 0">
@@ -144,6 +146,7 @@ module.exports = Object.freeze({
         </div>
       </div>`
     },
+    INVTE_USER_EMAIL_SUBJECT: "Join your Team at Refractio",
     INVTE_USER_EMAIL_TEMPLATE: (params) => {
         return `<div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
         <div style="margin:50px auto;width:70%;padding:20px 0">
@@ -151,8 +154,11 @@ module.exports = Object.freeze({
             <a href="" style="font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600">Refractio</a>
           </div>
           <p style="font-size:1.1em">Hi,</p>
-          <p>Please accept this invite link to join your team</p>
-          <h2 style="background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;"><a href="${params.invite}" style="color:#ffff;text-decoration:none;">Accept Invite</a></h2>
+          <p>You are invited to join your Team at Refractio</p>
+          <h2 style="background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;"><a href="${params.link}" style="color:#ffff;text-decoration:none;">Accept Invite</a></h2>
+          <p style="font-size:0.9em;">Your team values your thoughts and ideas; Refractio is software to help your team overcome communication constraints and more efficiently and effectively achieve your goals.</p>
+          <br />
+          <p style="font-size:0.9em;">This invitation is sent to ${params.recipientEmail} from ${params.senderEmail} from Refractio.</p>
           <p style="font-size:0.9em;">Regards,<br />Refractio</p>
           <hr style="border:none;border-top:1px solid #eee" />
           <div style="float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300">

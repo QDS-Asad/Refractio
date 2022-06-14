@@ -47,6 +47,6 @@ exports.login = async (user) => {
    });
 }
 
-exports.tokenVerificationEmail = async ({ email, html }) => {
-   return await sendEmail({ email, subject: SUCCESS_MESSAGE.VERIFY_EMAIL_SUBJECT, html })
+exports.tokenVerificationEmail = async ({ email, subject, html }) => {
+   return await sendEmail({ email, subject, html })
 }

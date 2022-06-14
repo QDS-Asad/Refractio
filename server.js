@@ -43,26 +43,14 @@ app.use('/api/admin', admin);
 
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swagger));
 
-
 app.use('/', express.static(path.join(__dirname, '/client/build')));
 app.use('*', (req, res) => {
-  console.log(req.headers);
   errorResp(res, {code: HTTP_STATUS.NOT_FOUND.CODE,msg: `${ERROR_MESSAGE.INVALID_ENDPOINT} ${req.originalUrl}`})
 });
+
 app.get('*', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
-  // res.status(HTTP_STATUS.NOT_FOUND.CODE).send({msg: ERROR_MESSAGE.NOT_FOUND})
 });
-// app.post('*', (req, res) => {
-//   errorResp(res, {code: HTTP_STATUS.NOT_FOUND.CODE,msg: ERROR_MESSAGE.INVALID_ENDPOINT})
-// });
-// app.put('*', (req, res) => {
-//   errorResp(res, {code: HTTP_STATUS.NOT_FOUND.CODE,msg: ERROR_MESSAGE.INVALID_ENDPOINT})
-// });
-// app.delete('*', (req, res) => {
-//   errorResp(res, {code: HTTP_STATUS.NOT_FOUND.CODE,msg: ERROR_MESSAGE.INVALID_ENDPOINT})
-// });
-
 
 const PORT = constants.PORT || 4001;
 app.listen(

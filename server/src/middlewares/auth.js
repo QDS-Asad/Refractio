@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { errorResp, serverError } = require("../helpers/error_helper");
+const { errorResp } = require("../helpers/error_helper");
 const { HTTP_STATUS, ERROR_MESSAGE, JWT_KEY } = require("../lib/constants");
 
 

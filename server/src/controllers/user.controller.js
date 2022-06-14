@@ -16,19 +16,20 @@ const {
   HTTP_STATUS,
   SUCCESS_MESSAGE,
   ROLES,
-  SUPER_ADMIN_EMAIL,
-  SUPER_ADMIN_PASSWORD,
   JWT_KEY,
   VERIFY_REGISTER_EMAIL_TEMPLATE,
   FORGOT_PASSWORD_EMAIL_TEMPLATE,
+  INVTE_USER_EMAIL_TEMPLATE,
   CLIENT_HOST,
   EMAIL_TYPES,
   TOKEN_EXPIRY,
   JWT_EXPIRY,
   JWT_EXPIRY_REMEMBER_ME,
   TOTAL_TEAM_MEMBERS,
-  INVTE_USER_EMAIL_TEMPLATE,
   USER_STATUS,
+  FORGOT_PASSWORD_EMAIL_SUBJECT,
+  VERIFY_REGISTER_EMAIL_SUBJECT,
+  INVTE_USER_EMAIL_SUBJECT,
 } = require("../lib/constants");
 
 // register admin user
@@ -45,7 +46,7 @@ exports.register = async (req, res, next) => {
               code: HTTP_STATUS.BAD_REQUEST.CODE,
             });
           } else {
-            tokenVerificationEmail(EMAIL_TYPES.VERIFY_REGISTER, user, res);
+            tokenVerificationEmail(res, EMAIL_TYPES.VERIFY_REGISTER, user);
           }
         } else {
           const role = await RoleService.getRoleByRoleId(ROLES.ADMIN);
@@ -64,7 +65,7 @@ exports.register = async (req, res, next) => {
                 .catch((error) => {
                   serverError(res, error);
                 });
-              tokenVerificationEmail(EMAIL_TYPES.VERIFY_REGISTER, result, res);
+              tokenVerificationEmail(res, EMAIL_TYPES.VERIFY_REGISTER, result);
             })
             .catch((error) => {
               serverError(res, error);
@@ -98,7 +99,11 @@ exports.inviteUser = async (req, res, next) => {
           }
         } else {
           const role = await RoleService.getRoleByRoleId(roleId);
-          await UserService.register({ ...req.body, roleId: role._id, status: USER_STATUS.INVITE_SENT })
+          await UserService.register({
+            ...req.body,
+            roleId: role._id,
+            status: USER_STATUS.INVITE_SENT,
+          })
             .then(async (result) => {
               const admin = await UserService.getUserById(user._id);
               const team = await TeamService.getTeamById(admin.teamId);
@@ -114,7 +119,7 @@ exports.inviteUser = async (req, res, next) => {
                   await UserService.updateUserById(result._id, {
                     teamId: team._id,
                   });
-                  tokenVerificationEmail(EMAIL_TYPES.INVITE_USER, result, res);
+                  tokenVerificationEmail(res, EMAIL_TYPES.INVITE_USER, result, user);
                 })
                 .catch((error) => {
                   serverError(res, error);
@@ -134,10 +139,10 @@ exports.inviteUser = async (req, res, next) => {
 };
 
 // generic email for register and forgot password
-const tokenVerificationEmail = async (type, user, res) => {
+const tokenVerificationEmail = async (res, type, user, sender) => {
   user.token = crypto_encrypt(`${Math.floor(1000 + Math.random() * 9000)}`);
   const tokenExpiry = Date.now() + TOKEN_EXPIRY;
-  user.html = getEmailTemplate({ type, token: user.token });
+  user = getEmailTemplate({ type, token: user.token, user, senderEmail: sender.email });
   await UserService.tokenVerificationEmail(user)
     .then(async (result) => {
       if (!result) {
@@ -168,6 +173,7 @@ const tokenVerificationEmail = async (type, user, res) => {
     });
 };
 
+//resend user token
 exports.resendToken = async (req, res) => {
   const { userId } = req.body;
   try {
@@ -180,7 +186,7 @@ exports.resendToken = async (req, res) => {
               code: HTTP_STATUS.BAD_REQUEST.CODE,
             });
           } else {
-            tokenVerificationEmail(EMAIL_TYPES.VERIFY_REGISTER, user, res);
+            tokenVerificationEmail(res, EMAIL_TYPES.VERIFY_REGISTER, user);
           }
         } else {
           return errorResp(res, {
@@ -199,19 +205,20 @@ exports.resendToken = async (req, res) => {
 
 // email templates
 const getEmailTemplate = (obj) => {
+  let link;
   switch (obj.type) {
     case EMAIL_TYPES.VERIFY_REGISTER:
-      return VERIFY_REGISTER_EMAIL_TEMPLATE({
+      return {subject:VERIFY_REGISTER_EMAIL_SUBJECT, html: VERIFY_REGISTER_EMAIL_TEMPLATE({
         token: crypto_decrypt(obj.token),
-      });
+      })};
       break;
     case EMAIL_TYPES.INVITE_USER:
-      const invite = `${CLIENT_HOST}/auth/invite-account/${obj.token}`;
-      return INVTE_USER_EMAIL_TEMPLATE({ invite });
+      link = `${CLIENT_HOST}/auth/invite-account/${obj.token}`;
+      return {subject: INVTE_USER_EMAIL_SUBJECT, html: INVTE_USER_EMAIL_TEMPLATE({ link, senderEmail: obj.senderEmail, recipientEmail: user.email })};
       break;
     case EMAIL_TYPES.FORGOT_PASSWORD:
-      const link = `${CLIENT_HOST}/auth/new-password/${obj.token}`;
-      return FORGOT_PASSWORD_EMAIL_TEMPLATE({ link });
+      link = `${CLIENT_HOST}/auth/new-password/${obj.token}`;
+      return {subject: FORGOT_PASSWORD_EMAIL_SUBJECT, html: FORGOT_PASSWORD_EMAIL_TEMPLATE({ link })};
       break;
   }
 };
@@ -238,7 +245,7 @@ exports.verifyToken = async (req, res) => {
         await UserService.updateUserById(userId, {
           isVerified: true,
           canLogin: true,
-          status: "subscription_pending",
+          status: USER_STATUS.SUBSCRIPTION_PENDING,
           token: "",
           tokenExpiry: null,
         }).then(() => {
@@ -259,7 +266,7 @@ exports.verifyToken = async (req, res) => {
   }
 };
 
-// verify register token
+// verify invite token
 exports.verifyEmailInvite = async (req, res) => {
   try {
     const { token } = req.params;
@@ -380,7 +387,7 @@ exports.login = async (req, res) => {
             data: userData,
           });
         } else {
-          tokenVerificationEmail(EMAIL_TYPES.VERIFY_REGISTER, user, res);
+          tokenVerificationEmail(res, EMAIL_TYPES.VERIFY_REGISTER, user);
         }
       })
       .catch((error) => {
@@ -405,7 +412,7 @@ exports.forgetPassword = async (req, res) => {
             code: HTTP_STATUS.BAD_REQUEST.CODE,
           });
         } else {
-          tokenVerificationEmail(EMAIL_TYPES.FORGOT_PASSWORD, user, res);
+          tokenVerificationEmail(res, EMAIL_TYPES.FORGOT_PASSWORD, user);
         }
       })
       .catch((error) => {
@@ -456,6 +463,7 @@ exports.resetPassword = async (req, res) => {
   }
 };
 
+//get team list with pagination
 exports.getTeam = async (req, res, next) => {
   try {
     const { user } = req.body;
@@ -487,6 +495,7 @@ exports.getTeam = async (req, res, next) => {
   }
 };
 
+// get team according to the user role
 const getTeamByRole = async (obj) => {
   let roles;
   let roleIds = [];
@@ -500,4 +509,58 @@ const getTeamByRole = async (obj) => {
     ...obj,
     roleIds,
   });
+};
+
+//resend invite email
+exports.resendInvite = async (req, res) => {
+  const { userId } = req.body;
+  try {
+    await UserService.getUserById(userId)
+      .then(async (user) => {
+        if (user) {
+          if (user.isVerified) {
+            return errorResp(res, {
+              msg: ERROR_MESSAGE.ALLREADY_REGISTERED,
+              code: HTTP_STATUS.BAD_REQUEST.CODE,
+            });
+          } else {
+            tokenVerificationEmail(res, EMAIL_TYPES.INVITE_USER, user);
+          }
+        } else {
+          return errorResp(res, {
+            msg: ERROR_MESSAGE.NOT_FOUND,
+            code: HTTP_STATUS.NOT_FOUND.CODE,
+          });
+        }
+      })
+      .catch((error) => {
+        serverError(res, error);
+      });
+  } catch (error) {
+    serverError(res, error);
+  }
+};
+
+//cancel/delete/remove user by admin and super admin
+exports.disableUser = async (req, res, next) => {
+  const { userId } = req.params;
+  const userData = {
+    status: USER_STATUS.DISABLED,
+    canLogin: false,
+    isVerified: false,
+  };
+  await UserService.updateUserById(userId, userData)
+    .then(() => {
+      return successResp(res, {
+        msg: SUCCESS_MESSAGE.DELETED,
+        code: HTTP_STATUS.SUCCESS.CODE,
+        data: teamRes,
+      });
+    })
+    .catch((error) => {
+      errorResp(res, {
+        msg: ERROR_MESSAGE.NOT_FOUND,
+        code: HTTP_STATUS.NOT_FOUND.CODE,
+      });
+    });
 };

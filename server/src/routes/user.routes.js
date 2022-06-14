@@ -517,10 +517,82 @@ router.put('/reset-password/:token', validateResetPassword , User.resetPassword)
 
 /**
  * @swagger
+ *   /api/users/delete/{userId}:
+ *   delete:
+ *     description: cancel invited user
+ *     tags: [User]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *     schema:
+ *        type: integer
+ *     responses:
+ *        '200':
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                   success: true
+ *                   code: 200
+ *                   message: Operation successfull.
+ *        '404':
+ *           description: Operation Failed
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 404,"message": "Operation Failed."}
+ *
+ *        '422':
+ *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
+ */
+ router.delete('/delete/:userId', Auth, User.disableUser);
+
+
+//Team specific user routes
+
+/**
+ * @swagger
  *   /api/users/invite-account:
  *   post:
  *     description: invite new user
- *     tags: [User]
+ *     tags: [Team]
  *     requestBody:
  *       required: true
  *       content:
@@ -600,10 +672,10 @@ router.put('/reset-password/:token', validateResetPassword , User.resetPassword)
 
 /**
  * @swagger
- *   /api/users/invite-account/{token}:
+ *   /api/users/verify-invite-account/{token}:
  *   get:
  *     description: get invited user info
- *     tags: [User]
+ *     tags: [Team]
  *     parameters:
  *       - in: path
  *         name: token
@@ -666,14 +738,14 @@ router.put('/reset-password/:token', validateResetPassword , User.resetPassword)
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
  * 
  */
- router.get('/invite-account/:token', User.verifyEmailInvite)
+ router.get('/verify-invite-account/:token', User.verifyEmailInvite)
 
  /**
  * @swagger
- *   /api/users/accept-invite/{userId}:
+ *   /api/users/register-invite-account/{userId}:
  *   put:
  *     description: accept user invite and register
- *     tags: [User]
+ *     tags: [Team]
  *     parameters:
  *       - in: path
  *         name: userId
@@ -760,14 +832,153 @@ router.put('/reset-password/:token', validateResetPassword , User.resetPassword)
  *      confirmPassword:
  *        type: string
  */
-router.put('/accept-invite/:userId', validateAcceptInvite , User.inviteRegister);
+router.put('/register-invite-account/:userId', validateAcceptInvite , User.inviteRegister);
+
+/**
+ * @swagger
+ *   /api/users/resend-invite-account/{userId}:
+ *   put:
+ *     description: accept user invite and register
+ *     tags: [Team]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *     schema:
+ *        type: integer
+ *     responses:
+ *        '200':
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                   success: true
+ *                   code: 200
+ *                   message: Operation successfull.
+ *        '404':
+ *           description: Operation Failed
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 404,"message": "Operation Failed."}
+ *
+ *        '422':
+ *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
+ */
+ router.put('/resend-invite-account/:userId', User.resendInvite);
+
+ 
+/**
+ * @swagger
+ *   /api/users/cancel-invite-account/{userId}:
+ *   delete:
+ *     description: cancel invited user
+ *     tags: [Team]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *     schema:
+ *        type: integer
+ *     responses:
+ *        '200':
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                   success: true
+ *                   code: 200
+ *                   message: Operation successfull.
+ *        '404':
+ *           description: Operation Failed
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 404,"message": "Operation Failed."}
+ *
+ *        '422':
+ *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
+ */
+router.delete('/cancel-invite-account/:userId', Auth, User.disableUser);
 
 /**
  * @swagger
  *   /api/users/team:
  *   post:
  *     description: get team
- *     tags: [User]
+ *     tags: [Team]
  *     requestBody:
  *       content:
  *         application/json:
