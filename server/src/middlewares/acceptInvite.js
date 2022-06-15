@@ -2,8 +2,13 @@ const { check, validationResult } = require('express-validator');
 const { errorResp } = require("../helpers/error_helper");
 const { HTTP_STATUS, ERROR_MESSAGE, REGEX_PATTERN } = require("../lib/constants");
 
-module.exports.validateResetPassword = [
-    
+module.exports.validateAcceptInvite = [
+    check('email')
+    .exists().bail().withMessage(ERROR_MESSAGE.REQUIRED)
+    .notEmpty().bail().withMessage(ERROR_MESSAGE.NOT_EMPTY),
+    check('fullName')
+    .exists().bail().withMessage(ERROR_MESSAGE.REQUIRED)
+    .notEmpty().bail().withMessage(ERROR_MESSAGE.NOT_EMPTY),
     check('newPassword')
     .exists().bail().withMessage(ERROR_MESSAGE.REQUIRED)
     .notEmpty().bail().withMessage(ERROR_MESSAGE.NOT_EMPTY)

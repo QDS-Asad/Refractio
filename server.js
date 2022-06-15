@@ -7,8 +7,11 @@ const bodyParser = require('body-parser');
 const swaggerUI = require('swagger-ui-express');
 const constants = require('./server/src/lib/constants');
 const swagger = require('./server/src/lib/swagger');
+const admin = require('./server/src/routes/admin.routes');
 const users = require('./server/src/routes/user.routes');
 const roles = require('./server/src/routes/role.routes');
+const { HTTP_STATUS, ERROR_MESSAGE } = require('./server/src/lib/constants');
+const { errorResp } = require('./server/src/helpers/error_helper');
 require('./server/src/config/config');
 app.use(
   session({
@@ -36,15 +39,18 @@ app.get('/api/status', (req, res) => {
 
 app.use('/api/users', users);
 app.use('/api/roles', roles);
+app.use('/api/admin', admin);
 
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swagger));
 
-
 app.use('/', express.static(path.join(__dirname, '/client/build')));
+app.use('*', (req, res) => {
+  errorResp(res, {code: HTTP_STATUS.NOT_FOUND.CODE,msg: `${ERROR_MESSAGE.INVALID_ENDPOINT} ${req.originalUrl}`})
+});
+
 app.get('*', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
 });
-
 
 const PORT = constants.PORT || 4001;
 app.listen(

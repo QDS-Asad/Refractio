@@ -10,6 +10,7 @@ import {
   Segment,
   Table,
 } from 'semantic-ui-react';
+import { fetchRoles, roleListSelector } from '../../../features/roles/roleList';
 import {
   fetchTeamList,
   teamListSelector,
@@ -35,16 +36,13 @@ const TeamMembers = () => {
     teamListSelector
   );
 
+  const { roles } = useSelector(roleListSelector);
+
   // hook to fetch items
   useEffect(() => {
+    dispatch(fetchRoles());
     dispatch(fetchTeamList(page));
   }, []);
-
-  const roles = [
-    { name: 'Administrator', id: 1 },
-    { name: 'Organizer', id: 2 },
-    { name: 'Participant', id: 3 },
-  ];
 
   const removeTeamMemberHandler = (id) => {
     setSelectedMember(id);
@@ -133,7 +131,7 @@ const TeamMembers = () => {
 
               <Table.Body>
                 {members.map((user) => (
-                  <Table.Row key={user.id}>
+                  <Table.Row key={user._id}>
                     <Table.Cell>
                       {user.status === 'active'
                         ? user.name
@@ -144,12 +142,12 @@ const TeamMembers = () => {
                       <Dropdown
                         fluid
                         selection
-                        defaultValue={user.roleId}
+                        defaultValue={user.role.roleId}
                         options={roles.map((role) => {
                           return {
-                            key: role.id,
+                            key: role.roleId,
                             text: role.name,
-                            value: role.id,
+                            value: role.roleId,
                           };
                         })}
                       />
@@ -159,7 +157,7 @@ const TeamMembers = () => {
                         <Button
                           className='btn-link'
                           floated='right'
-                          onClick={() => removeTeamMemberHandler(user.id)}
+                          onClick={() => removeTeamMemberHandler(user._id)}
                         >
                           Remove
                         </Button>
@@ -168,14 +166,14 @@ const TeamMembers = () => {
                           <Button
                             className='btn-link'
                             floated='right'
-                            onClick={() => resendInvitationHandler(user.id)}
+                            onClick={() => resendInvitationHandler(user._id)}
                           >
                             Resend invitation
                           </Button>
                           <Button
                             className='btn-link'
                             floated='right'
-                            onClick={() => cancelInvitationHandler(user.id)}
+                            onClick={() => cancelInvitationHandler(user._id)}
                           >
                             Cancel invitation
                           </Button>
