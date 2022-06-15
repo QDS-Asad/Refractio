@@ -214,7 +214,7 @@ const getEmailTemplate = (obj) => {
       break;
     case EMAIL_TYPES.INVITE_USER:
       link = `${CLIENT_HOST}/auth/invite-account/${obj.token}`;
-      return {email: obj.user.email, subject: INVTE_USER_EMAIL_SUBJECT, html: INVTE_USER_EMAIL_TEMPLATE({ link, senderEmail: obj.senderEmail, recipientEmail: user.email })};
+      return {email: obj.user.email, subject: INVTE_USER_EMAIL_SUBJECT, html: INVTE_USER_EMAIL_TEMPLATE({ link, senderEmail: obj.senderEmail, recipientEmail: obj.user.email })};
       break;
     case EMAIL_TYPES.FORGOT_PASSWORD:
       link = `${CLIENT_HOST}/auth/new-password/${obj.token}`;
