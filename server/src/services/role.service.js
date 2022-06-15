@@ -5,7 +5,7 @@ exports.createDefaultRoles = async (roles) => {
 }
 
 exports.getRoles = () =>{
-   return Role.find({roleId: {$nin: 1}});
+   return Role.find({roleId: {$nin: 1}}).sort('roleId');
 }
 
 exports.getRoleById = (id) =>{
