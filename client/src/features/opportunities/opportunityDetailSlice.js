@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import refractioApi from '../../common/refractioApi';
+import { localAPI } from '../../common/refractioApi';
 
 // initial state
 export const initialState = {
@@ -44,7 +44,7 @@ export default opportunityDetailSlice.reducer;
 export const fetchOpportunity = (id) => async (dispatch) => {
   try {
     dispatch(setLoading());
-    let { data } = await refractioApi.get('/opportunities.json');
+    let { data } = await localAPI.get('/opportunities.json');
     let opportunity = data.find((o) => o._id === id);
     if (opportunity) {
       setTimeout(() => {

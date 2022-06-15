@@ -5,7 +5,7 @@ if (process.env.REACT_APP_NODE_ENV === 'production') {
   baseURL = '';
 }
 
-export default axios.create({
+export const localAPI = axios.create({
   baseURL: `${baseURL}/data`,
   headers: {
     Accept: 'application/json',
@@ -13,7 +13,7 @@ export default axios.create({
   },
 });
 
-export const authApi = axios.create({
+export default axios.create({
   baseURL: `${baseURL}/api`,
   headers: {
     Accept: 'application/json',

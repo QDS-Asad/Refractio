@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import refractioApi from '../../common/refractioApi';
+import { localAPI } from '../../common/refractioApi';
 
 // initial state
 export const initialState = {
@@ -50,7 +50,7 @@ export default inviteMemberSlice.reducer;
 export const inviteMember = (body) => async (dispatch) => {
   try {
     dispatch(setLoading());
-    await refractioApi.get('/teamMembers.json');
+    await localAPI.get('/teamMembers.json');
     setTimeout(() => {
       dispatch(setSuccess(true));
     }, 1500);

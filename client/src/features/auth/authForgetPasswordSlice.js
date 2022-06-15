@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { authApi } from '../../common/refractioApi';
+import refractioApi from '../../common/refractioApi';
 
 // initial state
 export const initialState = {
@@ -50,7 +50,7 @@ export default authForgetPasswordSlice.reducer;
 export const userForgetPassword = (email) => async (dispatch) => {
   try {
     dispatch(setLoading());
-    let { data: response } = await authApi.post('/users/forget-password', {
+    let { data: response } = await refractioApi.post('/users/forget-password', {
       email,
     });
     dispatch(setForgetPassword(response.success));

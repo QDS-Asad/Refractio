@@ -36,14 +36,12 @@ export const roleListSelector = (state) => state.roleList;
 // export the default reducer
 export default roleListSlice.reducer;
 
-// fetch all opportunities
+// fetch all roles
 export const fetchRoles = () => async (dispatch) => {
   try {
     dispatch(setLoading());
-    let { data } = await refractioApi.get('/users/login');
-    setTimeout(() => {
-      dispatch(setRoleList(data));
-    }, 1500);
+    let { data: response } = await refractioApi.get('/roles');
+    dispatch(setRoleList(response.data));
   } catch (error) {
     dispatch(setError(error.message));
   }

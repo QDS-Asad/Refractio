@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { authApi } from '../../common/refractioApi';
+import refractioApi from '../../common/refractioApi';
 
 let userInfoFromStorage = window.localStorage.getItem('userInfo')
   ? window.localStorage.getItem('userInfo')
@@ -61,13 +61,15 @@ export const authLoginSelector = (state) => state.authLogin;
 export default authLoginSlice.reducer;
 
 // login user
-export const loginUser = (email, password, rememberMe = false) => async (dispatch) => {
+export const loginUser = (email, password, rememberMe = false) => async (
+  dispatch
+) => {
   try {
     dispatch(setLoading());
-    let { data: response } = await authApi.post('/users/login', {
+    let { data: response } = await refractioApi.post('/users/login', {
       email,
       password,
-      rememberMe
+      rememberMe,
     });
     dispatch(setUserLogin(response.data));
     window.localStorage.setItem('userInfo', JSON.stringify(response.data));

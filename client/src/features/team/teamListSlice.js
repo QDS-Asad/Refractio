@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import refractioApi from '../../common/refractioApi';
+import { localAPI } from '../../common/refractioApi';
 
 // initial state
 export const initialState = {
@@ -44,7 +44,7 @@ export default teamListSlice.reducer;
 export const fetchTeamList = (pageNumber) => async (dispatch, getState) => {
   try {
     dispatch(setLoading());
-    let { data } = await refractioApi.get('/teamMembers.json');
+    let { data } = await localAPI.get('/teamMembers.json');
     setTimeout(() => {
       dispatch(setTeamList(data));
     }, 1500);
