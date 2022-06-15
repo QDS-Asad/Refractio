@@ -142,8 +142,9 @@ exports.inviteUser = async (req, res, next) => {
 const tokenVerificationEmail = async (res, type, user, sender) => {
   user.token = crypto_encrypt(`${Math.floor(1000 + Math.random() * 9000)}`);
   const tokenExpiry = Date.now() + TOKEN_EXPIRY;
-  user = getEmailTemplate({ type, token: user.token, user, senderEmail: sender.email });
-  await UserService.tokenVerificationEmail(user)
+  console.log(user)
+  const newUser = getEmailTemplate({ type, token: user.token, user, senderEmail: sender?.email });
+  await UserService.tokenVerificationEmail(newUser)
     .then(async (result) => {
       if (!result) {
         return errorResp(res, {
@@ -208,17 +209,17 @@ const getEmailTemplate = (obj) => {
   let link;
   switch (obj.type) {
     case EMAIL_TYPES.VERIFY_REGISTER:
-      return {subject:VERIFY_REGISTER_EMAIL_SUBJECT, html: VERIFY_REGISTER_EMAIL_TEMPLATE({
+      return {email: obj.user.email, subject:VERIFY_REGISTER_EMAIL_SUBJECT, html: VERIFY_REGISTER_EMAIL_TEMPLATE({
         token: crypto_decrypt(obj.token),
       })};
       break;
     case EMAIL_TYPES.INVITE_USER:
       link = `${CLIENT_HOST}/auth/invite-account/${obj.token}`;
-      return {subject: INVTE_USER_EMAIL_SUBJECT, html: INVTE_USER_EMAIL_TEMPLATE({ link, senderEmail: obj.senderEmail, recipientEmail: user.email })};
+      return {email: obj.user.email, subject: INVTE_USER_EMAIL_SUBJECT, html: INVTE_USER_EMAIL_TEMPLATE({ link, senderEmail: obj.senderEmail, recipientEmail: user.email })};
       break;
     case EMAIL_TYPES.FORGOT_PASSWORD:
       link = `${CLIENT_HOST}/auth/new-password/${obj.token}`;
-      return {subject: FORGOT_PASSWORD_EMAIL_SUBJECT, html: FORGOT_PASSWORD_EMAIL_TEMPLATE({ link })};
+      return {email: obj.user.email, subject: FORGOT_PASSWORD_EMAIL_SUBJECT, html: FORGOT_PASSWORD_EMAIL_TEMPLATE({ link })};
       break;
   }
 };
