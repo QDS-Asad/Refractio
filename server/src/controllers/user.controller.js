@@ -139,10 +139,10 @@ exports.inviteUser = async (req, res, next) => {
 };
 
 // generic email for register and forgot password
-const tokenVerificationEmail = async (res, type, user, sender) => {
+const tokenVerificationEmail = async (res, type, user, sender = {}) => {
   user.token = crypto_encrypt(`${Math.floor(1000 + Math.random() * 9000)}`);
   const tokenExpiry = Date.now() + TOKEN_EXPIRY;
-  const newUser = getEmailTemplate({ type, token: user.token, user, senderEmail: sender?.email });
+  const newUser = getEmailTemplate({ type, token: user.token, user, senderEmail: sender.email });
   await UserService.tokenVerificationEmail(newUser)
     .then(async (result) => {
       if (!result) {

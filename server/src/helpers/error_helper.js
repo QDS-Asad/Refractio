@@ -29,6 +29,6 @@ exports.serverError = (res, err = null) => {
     return res.status(HTTP_STATUS.INTERNAL_SERVER.CODE).json({
         success: false,
         code: HTTP_STATUS.INTERNAL_SERVER.CODE,
-        message: err?.message || HTTP_STATUS.INTERNAL_SERVER.TEXT,
+        message: err && err.message || HTTP_STATUS.INTERNAL_SERVER.TEXT,
     });
 };
