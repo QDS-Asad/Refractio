@@ -99,14 +99,14 @@ exports.inviteUser = async (req, res, next) => {
           }
         } else {
           const role = await RoleService.getRoleByRoleId(roleId);
+          const admin = await UserService.getUserById(user._id);
+          const team = await TeamService.getTeamById(admin.teamId);
           await UserService.register({
             ...req.body,
             roleId: role._id,
             status: USER_STATUS.INVITE_SENT,
           })
             .then(async (result) => {
-              const admin = await UserService.getUserById(user._id);
-              const team = await TeamService.getTeamById(admin.teamId);
               if (team.members.length == TOTAL_TEAM_MEMBERS) {
                 return errorResp(res, {
                   msg: ERROR_MESSAGE.TEAM_LIMIT_EXCEED,
