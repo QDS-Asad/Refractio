@@ -1,7 +1,11 @@
 import React from 'react';
 import { Button, Message, Modal } from 'semantic-ui-react';
 
-const RemoveTeamMember = ({ removeTeamMember, setRemoveTeamMember }) => {
+const RemoveTeamMember = ({
+  removeTeamMember,
+  setRemoveTeamMember,
+  member,
+}) => {
   const error = null;
   return (
     <Modal
@@ -24,8 +28,12 @@ const RemoveTeamMember = ({ removeTeamMember, setRemoveTeamMember }) => {
         </Modal.Description>
       </Modal.Content>
       <Modal.Actions>
-        <Button content='Cancel' />
-        <Button content='Remove' className='btn-danger' />
+        <Button content='Cancel' onClick={() => setRemoveTeamMember(false)} />
+        <Button
+          content='Remove'
+          className='btn-danger'
+          onClick={() => setRemoveTeamMember(false)}
+        />
       </Modal.Actions>
     </Modal>
   );

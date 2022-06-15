@@ -1,6 +1,12 @@
 import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { Button, Form, Message, Modal } from 'semantic-ui-react';
+import {
+  inviteMemberSelector,
+  inviteMember,
+} from '../../../features/team/inviteMemberSlice';
+import { fetchRoles, roleListSelector } from '../../../features/roles/roleList';
 
 const InviteTeamMember = ({ inviteTeamMember, setInviteTeamMember }) => {
   const { register, setValue, handleSubmit, errors, trigger } = useForm({
@@ -12,21 +18,18 @@ const InviteTeamMember = ({ inviteTeamMember, setInviteTeamMember }) => {
   });
 
   // set up dispatch
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
   // fetch data from our store
-  const { loading, error, success } = {};
+  const { loading, error, success } = useSelector(inviteMemberSelector);
 
   const handleCreate = (data) => {
     console.log(data);
     // dispatch team invite;
+    dispatch(inviteMember(data));
   };
 
-  const roles = [
-    { name: 'Administrator', id: 1 },
-    { name: 'Organizer', id: 2 },
-    { name: 'Participant', id: 3 },
-  ];
+  const { roles } = useSelector(roleListSelector);
 
   const handleChange = (e) => {
     e.persist();
@@ -48,6 +51,7 @@ const InviteTeamMember = ({ inviteTeamMember, setInviteTeamMember }) => {
   };
 
   useEffect(() => {
+    dispatch(fetchRoles());
     register({ name: 'email' }, createOptions.email);
     register({ name: 'role' }, createOptions.role);
   }, []);
@@ -102,9 +106,9 @@ const InviteTeamMember = ({ inviteTeamMember, setInviteTeamMember }) => {
                 selection
                 options={roles.map((role) => {
                   return {
-                    key: role.id,
+                    key: role.roleId,
                     text: role.name,
-                    value: role.id,
+                    value: role.roleId,
                   };
                 })}
                 name='role'

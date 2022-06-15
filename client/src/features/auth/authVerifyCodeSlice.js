@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { authApi } from '../../common/refractioApi';
+import refractioApi from '../../common/refractioApi';
 
 // initial state
 export const initialState = {
@@ -61,8 +61,11 @@ export default authVerifyCodeSlice.reducer;
 export const codeVerification = (userId, otp) => async (dispatch) => {
   try {
     dispatch(setLoading());
-    let { data } = await authApi.post('/users/verify-login', { userId, otp });
-    dispatch(setVerifyCode(data));
+    let { data: response } = await refractioApi.post('/users/verify-register', {
+      userId,
+      otp,
+    });
+    dispatch(setVerifyCode(response.success));
   } catch (error) {
     const errorMessage =
       error.response && error.response.data
@@ -76,9 +79,15 @@ export const codeVerification = (userId, otp) => async (dispatch) => {
 export const resendVerifyCode = (userId, email) => async (dispatch) => {
   try {
     dispatch(setLoading());
-    let { data } = await authApi.post('/users/resend-otp', { userId, email });
-    let { result } = data;
-    dispatch(setResendCode(result.data));
+    let { data: response } = await refractioApi.post(
+      '/users/resend-verify-code',
+      {
+        userId,
+        email,
+      }
+    );
+    let { data } = response;
+    dispatch(setResendCode(data));
   } catch (error) {
     const errorMessage =
       error.response && error.response.data

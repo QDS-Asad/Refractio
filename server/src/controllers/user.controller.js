@@ -1,353 +1,566 @@
-const UserService = require('../services/user.service');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
-const dotenv = require('dotenv');
-dotenv.config();
-const generalRegisterValidation = require('../middlewares/generalRegister');
-const { validationResult } = require('express-validator');
-const userOtpVerification = require('../models/userOtpVerification');
-const { User } = require('../models/user');
-const { UserOTPVerification } = require('../models/userOtpVerification');
+const UserService = require("../services/user.service");
+const RoleService = require("../services/role.service");
+const TeamService = require("../services/team.service");
+const jwt = require("jsonwebtoken");
+const {
+  crypto_encrypt,
+  crypto_decrypt,
+} = require("../helpers/encryption_helper");
+const {
+  successResp,
+  errorResp,
+  serverError,
+} = require("../helpers/error_helper");
+const {
+  ERROR_MESSAGE,
+  HTTP_STATUS,
+  SUCCESS_MESSAGE,
+  ROLES,
+  JWT_KEY,
+  VERIFY_REGISTER_EMAIL_TEMPLATE,
+  FORGOT_PASSWORD_EMAIL_TEMPLATE,
+  INVTE_USER_EMAIL_TEMPLATE,
+  CLIENT_HOST,
+  EMAIL_TYPES,
+  TOKEN_EXPIRY,
+  JWT_EXPIRY,
+  JWT_EXPIRY_REMEMBER_ME,
+  TOTAL_TEAM_MEMBERS,
+  USER_STATUS,
+  FORGOT_PASSWORD_EMAIL_SUBJECT,
+  VERIFY_REGISTER_EMAIL_SUBJECT,
+  INVTE_USER_EMAIL_SUBJECT,
+} = require("../lib/constants");
 
+// register admin user
 exports.register = async (req, res, next) => {
-  const { fullName, email, password, roles } = req.body;
-  const passwordhash = await bcrypt.hash(password, 10);
-  try {
-    await UserService.getUserByEmail(email).then(async (user) => {
-      if (user) {
-        if (user.verified) {
-          res.status(400).send({
-            message: 'You already registered!',
-          });
-        } else {
-          sendOTPVerficationEmail({ id: user.id, email: email }, res).then(
-            (result) => {
-              console.log('email send result', result, 'alerady register');
-              res.status(200).send({
-                result,
-              });
-            }
-          );
-        }
-      } else {
-        await UserService.signUp(fullName, email, passwordhash, roles)
-          .then((result) => {
-            let email = result.email;
-            let id = result.id;
-            sendOTPVerficationEmail({ id, email }, res).then((result) => {
-              console.log('email send result', result);
-              res.status(200).send({
-                result,
-              });
-            });
-            // return res.status(200).send({
-            //     status:"User created successfully"
-            // })
-          })
-          .catch((error) => {
-            res.status(500).send({
-              status: 'error',
-              message: error.message,
-            });
-          });
-      }
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).send({
-      status: 'error',
-      message: 'Something went wrong',
-      data: null,
-      description: error,
-    });
-  }
-};
-
-exports.login = async (req, res) => {
   const { email, password } = req.body;
-
+  req.body.password = crypto_encrypt(password);
   try {
-    let user = await UserService.login(email, password);
-    if (!user) {
-      res.status(401).send({
-        message: 'User does not exists',
-      });
-    }
-    if (user && (await bcrypt.compare(password, user.password))) {
-      const token = jwt.sign({ _id: user._id, email }, process.env.TOKEN_KEY, {
-        expiresIn: '2h',
-      });
-      user.token = token;
-      let userData = {
-        id: user._id,
-        fullName: user.fullName,
-        email: user.email,
-        roles: user.roles,
-        verified: user.verified,
-        token: token,
-      };
-      res.status(200).send(userData);
-    }
-    if (user && !(await bcrypt.compare(password, user.password))) {
-      res.status(401).send({
-        status: 'Unauthorized',
-        message: 'Invalid credentials',
-      });
-    }
-  } catch (error) {
-    return res.status(500).send({
-      status: 'error',
-      message: 'Something went wrong',
-      data: null,
-      description: error,
-    });
-  }
-};
-
-//transporter for nodemailer
-let transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.MAIL_USERNAME,
-    pass: process.env.MAIL_PASSWORD,
-  },
-});
-
-transporter.verify((error, success) => {
-  if (error) {
-    console.log(error);
-  } else {
-    console.log('Ready for messages');
-    console.log(success);
-  }
-});
-
-//send otp verification email
-const sendOTPVerficationEmail = async ({ id, email }, res) => {
-  try {
-    const otp = `${Math.floor(1000 + Math.random() * 9000)}`;
-
-    //mail options
-    const mailOptions = {
-      from: process.env.MAIL_USERNAME,
-      to: email,
-      subject: 'Verify Your Email',
-      html: `<div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
-            <div style="margin:50px auto;width:70%;padding:20px 0">
-              <div style="border-bottom:1px solid #eee">
-                <a href="" style="font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600">Refractio</a>
-              </div>
-              <p style="font-size:1.1em">Hi,</p>
-              <p>Thank you for choosing Refractio. Use the following OTP to complete your Sign Up procedures. OTP is valid for 1 hour.</p>
-              <h2 style="background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;">${otp}</h2>
-              <p style="font-size:0.9em;">Regards,<br />Refractio</p>
-              <hr style="border:none;border-top:1px solid #eee" />
-              <div style="float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300">
-                <p>Refractio Inc</p>
-                <p>Address</p>
-                <p>City</p>
-              </div>
-            </div>
-          </div>`,
-    };
-
-    //hash the otp
-    const saltRounds = 10;
-    const hashedOTP = await bcrypt.hash(otp, saltRounds);
-
-    let userId = id;
-    let hashotp = hashedOTP;
-    let createdAt = Date.now();
-    let expiresAt = Date.now() + 3600000;
-
-    //saving data for otpverification
-    await UserService.userOtpVerification(
-      userId,
-      hashotp,
-      createdAt,
-      expiresAt
-    );
-
-    await transporter.sendMail(mailOptions);
-    return {
-      status: 'PENDING',
-      message: 'Verification otp email sent.',
-      data: {
-        userId: id,
-        email,
-      },
-    };
-  } catch (error) {
-    res.status(500).send({
-      status: 'error',
-      message: 'Something went wrong',
-      data: null,
-      description: error,
-    });
-  }
-};
-
-exports.verifyOtp = async (req, res) => {
-  try {
-    let { userId, otp } = req.body;
-    console.log
-    if (!userId || !otp) {
-      throw Error('Empty otp details are not allowed');
-    }
-    const hashedOTP = otp;
-    let userOtpRecords = await UserService.verfiyOtp(userId);
-    if (!userOtpRecords) {
-      // no record found
-      throw new Error(
-        "Account record doesn't exists or has been verfied already. Please sign up or log in."
-      );
-    } else {
-      const { expiresAt, otp } = userOtpRecords;
-      if (expiresAt < Date.now()) {
-        //user otp record has expired
-        await UserService.deleteExpiredOtp(userId);
-        throw new Error('Code has expired. Please request again.');
-      } else {
-        const validOtp = await bcrypt.compare(hashedOTP.toString(), otp);
-        if (!validOtp) {
-          throw new Error('Invalid code passed. Check your inbox.');
+    await UserService.getUserByEmail(email)
+      .then(async (user) => {
+        if (user) {
+          if (user.isVerified) {
+            return errorResp(res, {
+              msg: ERROR_MESSAGE.ALLREADY_REGISTERED,
+              code: HTTP_STATUS.BAD_REQUEST.CODE,
+            });
+          } else {
+            tokenVerificationEmail(res, EMAIL_TYPES.VERIFY_REGISTER, user);
+          }
         } else {
-          await User.updateOne({ _id: userId }, { verified: true });
-          await UserOTPVerification.deleteMany({ userId });
+          const role = await RoleService.getRoleByRoleId(ROLES.ADMIN);
+          await UserService.register({ ...req.body, roleId: role._id })
+            .then(async (result) => {
+              const teamData = {
+                createdById: result._id,
+                members: [result._id],
+              };
+              await TeamService.createTeam(teamData)
+                .then(async (teamRes) => {
+                  await UserService.updateUserById(result._id, {
+                    teamId: teamRes._id,
+                  });
+                })
+                .catch((error) => {
+                  serverError(res, error);
+                });
+              tokenVerificationEmail(res, EMAIL_TYPES.VERIFY_REGISTER, result);
+            })
+            .catch((error) => {
+              serverError(res, error);
+            });
+        }
+      })
+      .catch((error) => {
+        serverError(res, error);
+      });
+  } catch (error) {
+    serverError(res, error);
+  }
+};
 
-          res.status(200).send({
-            status: 'Verified',
-            message: 'User email verified successfully.',
+exports.inviteUser = async (req, res, next) => {
+  const { email, roleId, user } = req.body;
+  try {
+    await UserService.getUserByEmail(email)
+      .then(async (userRes) => {
+        if (userRes) {
+          if (userRes.isVerified) {
+            return errorResp(res, {
+              msg: ERROR_MESSAGE.ALLREADY_REGISTERED,
+              code: HTTP_STATUS.BAD_REQUEST.CODE,
+            });
+          } else {
+            return errorResp(res, {
+              msg: ERROR_MESSAGE.ALLREADY_INVITED,
+              code: HTTP_STATUS.BAD_REQUEST.CODE,
+            });
+          }
+        } else {
+          const role = await RoleService.getRoleByRoleId(roleId);
+          const admin = await UserService.getUserById(user._id);
+          const team = await TeamService.getTeamById(admin.teamId);
+          await UserService.register({
+            ...req.body,
+            roleId: role._id,
+            status: USER_STATUS.INVITE_SENT,
+          })
+            .then(async (result) => {
+              if (team.members.length == TOTAL_TEAM_MEMBERS) {
+                return errorResp(res, {
+                  msg: ERROR_MESSAGE.TEAM_LIMIT_EXCEED,
+                  code: HTTP_STATUS.BAD_REQUEST,
+                });
+              }
+              const members = [...team.members, result._id];
+              await TeamService.updateTeamMembers(team._id, { members })
+                .then(async (teamRes) => {
+                  await UserService.updateUserById(result._id, {
+                    teamId: team._id,
+                  });
+                  tokenVerificationEmail(res, EMAIL_TYPES.INVITE_USER, result, user);
+                })
+                .catch((error) => {
+                  serverError(res, error);
+                });
+            })
+            .catch((error) => {
+              serverError(res, error);
+            });
+        }
+      })
+      .catch((error) => {
+        serverError(res, error);
+      });
+  } catch (error) {
+    serverError(res, error);
+  }
+};
+
+// generic email for register and forgot password
+const tokenVerificationEmail = async (res, type, user, sender) => {
+  user.token = crypto_encrypt(`${Math.floor(1000 + Math.random() * 9000)}`);
+  const tokenExpiry = Date.now() + TOKEN_EXPIRY;
+  const newUser = getEmailTemplate({ type, token: user.token, user, senderEmail: sender?.email });
+  await UserService.tokenVerificationEmail(newUser)
+    .then(async (result) => {
+      if (!result) {
+        return errorResp(res, {
+          msg: ERROR_MESSAGE.EMAIL_SENT_FAILED,
+          code: HTTP_STATUS.BAD_REQUEST.CODE,
+        });
+      }
+      await UserService.updateUserById(user._id, {
+        token: user.token,
+        tokenExpiry,
+      });
+      let data =
+        (type == EMAIL_TYPES.VERIFY_REGISTER && {
+          userId: user._id,
+          email: user.email,
+          isVerified: user.isVerified,
+        }) ||
+        undefined;
+      return successResp(res, {
+        msg: SUCCESS_MESSAGE.EMAIL_SENT,
+        code: HTTP_STATUS.SUCCESS.CODE,
+        data,
+      });
+    })
+    .catch((error) => {
+      serverError(res, error);
+    });
+};
+
+//resend user token
+exports.resendToken = async (req, res) => {
+  const { userId } = req.body;
+  try {
+    await UserService.getUserById(userId)
+      .then(async (user) => {
+        if (user) {
+          if (user.isVerified) {
+            return errorResp(res, {
+              msg: ERROR_MESSAGE.ALLREADY_VERIFIED,
+              code: HTTP_STATUS.BAD_REQUEST.CODE,
+            });
+          } else {
+            tokenVerificationEmail(res, EMAIL_TYPES.VERIFY_REGISTER, user);
+          }
+        } else {
+          return errorResp(res, {
+            msg: ERROR_MESSAGE.NOT_FOUND,
+            code: HTTP_STATUS.NOT_FOUND.CODE,
           });
         }
-      }
-    }
+      })
+      .catch((error) => {
+        serverError(res, error);
+      });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({
-      status: 'Failed',
-      message: error.message,
-      data: null,
-      description: error,
-    });
+    serverError(res, error);
   }
 };
 
+// email templates
+const getEmailTemplate = (obj) => {
+  let link;
+  switch (obj.type) {
+    case EMAIL_TYPES.VERIFY_REGISTER:
+      return {email: obj.user.email, subject:VERIFY_REGISTER_EMAIL_SUBJECT, html: VERIFY_REGISTER_EMAIL_TEMPLATE({
+        token: crypto_decrypt(obj.token),
+      })};
+      break;
+    case EMAIL_TYPES.INVITE_USER:
+      link = `${CLIENT_HOST}/auth/invite-account/${obj.token}`;
+      return {email: obj.user.email, subject: INVTE_USER_EMAIL_SUBJECT, html: INVTE_USER_EMAIL_TEMPLATE({ link, senderEmail: obj.senderEmail, recipientEmail: obj.user.email })};
+      break;
+    case EMAIL_TYPES.FORGOT_PASSWORD:
+      link = `${CLIENT_HOST}/auth/new-password/${obj.token}`;
+      return {email: obj.user.email, subject: FORGOT_PASSWORD_EMAIL_SUBJECT, html: FORGOT_PASSWORD_EMAIL_TEMPLATE({ link })};
+      break;
+  }
+};
+
+// verify register token
+exports.verifyToken = async (req, res) => {
+  try {
+    const { userId, otp } = req.body;
+    await UserService.getUserById(userId)
+      .then(async (user) => {
+        const { token, tokenExpiry } = user;
+        if (tokenExpiry < Date.now()) {
+          return errorResp(res, {
+            msg: ERROR_MESSAGE.TOKEN_EXPIRED,
+            code: HTTP_STATUS.BAD_REQUEST.CODE,
+          });
+        }
+        if (otp !== crypto_decrypt(token)) {
+          return errorResp(res, {
+            msg: ERROR_MESSAGE.INVALID_TOKEN,
+            code: HTTP_STATUS.BAD_REQUEST.CODE,
+          });
+        }
+        await UserService.updateUserById(userId, {
+          isVerified: true,
+          canLogin: true,
+          status: USER_STATUS.SUBSCRIPTION_PENDING,
+          token: "",
+          tokenExpiry: null,
+        }).then(() => {
+          return successResp(res, {
+            msg: SUCCESS_MESSAGE.ACTIVATION_MAIL_VERIFIED,
+            code: HTTP_STATUS.SUCCESS.CODE,
+          });
+        });
+      })
+      .catch((error) => {
+        errorResp(res, {
+          msg: ERROR_MESSAGE.NOT_FOUND,
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+        });
+      });
+  } catch (error) {
+    serverError(res, error);
+  }
+};
+
+// verify invite token
+exports.verifyEmailInvite = async (req, res) => {
+  try {
+    const { token } = req.params;
+    await UserService.getUserByToken(encodeURIComponent(token))
+      .then(async (user) => {
+        const { tokenExpiry } = user;
+        if (tokenExpiry < Date.now()) {
+          return errorResp(res, {
+            msg: ERROR_MESSAGE.TOKEN_EXPIRED,
+            code: HTTP_STATUS.BAD_REQUEST.CODE,
+          });
+        }
+        const userData = {
+          email: user.email,
+          userId: user._id,
+        };
+        return successResp(res, {
+          msg: SUCCESS_MESSAGE.DATA_FETCHED,
+          code: HTTP_STATUS.SUCCESS.CODE,
+          data: userData,
+        });
+      })
+      .catch((error) => {
+        errorResp(res, {
+          msg: ERROR_MESSAGE.NOT_FOUND,
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+        });
+      });
+  } catch (error) {
+    serverError(res, error);
+  }
+};
+
+// reset user password
+exports.inviteRegister = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { fullName, newPassword } = req.body;
+    await UserService.getUserById(userId)
+      .then(async (user) => {
+        const { tokenExpiry } = user;
+        if (tokenExpiry < Date.now()) {
+          return errorResp(res, {
+            msg: ERROR_MESSAGE.TOKEN_EXPIRED,
+            code: HTTP_STATUS.BAD_REQUEST.CODE,
+          });
+        }
+        const password = crypto_encrypt(newPassword);
+        const userData = {
+          fullName,
+          password,
+          isVerified: true,
+          canLogin: true,
+          status: USER_STATUS.ACTIVE,
+          token: "",
+          tokenExpiry: null,
+        };
+        await UserService.updateUserById(userId, userData).then(() => {
+          return successResp(res, {
+            msg: SUCCESS_MESSAGE.USER_REGISTERED,
+            code: HTTP_STATUS.SUCCESS.CODE,
+          });
+        });
+      })
+      .catch((error) => {
+        errorResp(res, {
+          msg: ERROR_MESSAGE.NOT_FOUND,
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+        });
+      });
+  } catch (error) {
+    serverError(res, error);
+  }
+};
+
+// login user
+exports.login = async (req, res) => {
+  try {
+    await UserService.login(req.body)
+      .then(async (user) => {
+        if (!user) {
+          return errorResp(res, {
+            msg: ERROR_MESSAGE.INVALID_CREDS,
+            code: HTTP_STATUS.BAD_REQUEST.CODE,
+          });
+        }
+        if (req.body.password !== crypto_decrypt(user.password)) {
+          return errorResp(res, {
+            msg: ERROR_MESSAGE.INVALID_CREDS,
+            code: HTTP_STATUS.BAD_REQUEST.CODE,
+          });
+        }
+        const role = await RoleService.getRoleById(user.roleId);
+        const expiry =
+          (req.body.rememberMe && JWT_EXPIRY_REMEMBER_ME) || JWT_EXPIRY;
+        const token = jwt.sign(
+          { _id: user._id, email: user.email, roleId: role._id },
+          JWT_KEY,
+          {
+            expiresIn: expiry,
+          }
+        );
+        let userData = {};
+        if (user.isVerified) {
+          userData = {
+            id: user._id,
+            fullName: user.fullName,
+            email: user.email,
+            role: { roleId: role.roleId, name: role.name },
+            isVerified: user.isVerified,
+            canLogin: user.canLogin,
+            status: user.status,
+            token: token,
+          };
+          return successResp(res, {
+            msg: SUCCESS_MESSAGE.LOGIN_SUCCESS,
+            code: HTTP_STATUS.SUCCESS.CODE,
+            data: userData,
+          });
+        } else {
+          tokenVerificationEmail(res, EMAIL_TYPES.VERIFY_REGISTER, user);
+        }
+      })
+      .catch((error) => {
+        errorResp(res, {
+          msg: ERROR_MESSAGE.NOT_FOUND,
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+        });
+      });
+  } catch (error) {
+    serverError(res, error);
+  }
+};
+
+// forgot user password
 exports.forgetPassword = async (req, res) => {
   try {
-    const { email } = req.body;
-    let user = await UserService.getUserByEmail(email);
-    if (!user) {
-      res.status(400).send({
-        status: 'Error',
-        message: 'Email does not exists.',
+    await UserService.getUserByEmail(req.body.email)
+      .then(async (user) => {
+        if (!user) {
+          return errorResp(res, {
+            msg: ERROR_MESSAGE.INVALID_EMAIL,
+            code: HTTP_STATUS.BAD_REQUEST.CODE,
+          });
+        } else {
+          tokenVerificationEmail(res, EMAIL_TYPES.FORGOT_PASSWORD, user);
+        }
+      })
+      .catch((error) => {
+        return errorResp(res, {
+          msg: ERROR_MESSAGE.NOT_FOUND,
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+        });
       });
-    }
-    if (email !== user.email) {
-      res.status(400).send({
-        status: 'Error',
-        message: 'User not registered',
-      });
-    }
-
-    //User exists and now create a One time link valid for 15 mins
-
-    const secret = process.env.TOKEN_KEY + user.password;
-
-    const payload = {
-      email: user.email,
-      id: user.id,
-    };
-    let id = user.id;
-    let createdAt = Date.now();
-    let expiresAt = Date.now() + 3600000;
-    const token = jwt.sign(payload, secret, { expiresIn: '15m' });
-    let result = await UserService.userToken(id, token, createdAt, expiresAt);
-
-    //Send Frontend URL Here
-    const link = `http://54.185.166.224/auth/new-password/${token}`;
-
-    //mail options
-    const mailOptions = {
-      from: process.env.MAIL_USERNAME,
-      to: email,
-      subject: 'Refractio password reset link',
-      html: `<div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
-            <div style="margin:50px auto;width:70%;padding:20px 0">
-              <div style="border-bottom:1px solid #eee">
-                <a href="" style="font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600">Refractio</a>
-              </div>
-              <p style="font-size:1.1em">Hi,</p>
-              <p>Please use this link to reset your password</p>
-              <h2 style="background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;"><a href="${link}" style="color:#ffff;text-decoration:none;">Reset Your Password</a></h2>
-              <p style="font-size:0.9em;">Regards,<br />Refractio</p>
-              <hr style="border:none;border-top:1px solid #eee" />
-              <div style="float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300">
-                <p>Refractio Inc</p>
-                <p>Address</p>
-                <p>City</p>
-              </div>
-            </div>
-          </div>`,
-    };
-
-    await transporter.sendMail(mailOptions);
-    res.status(200).send({
-      status: 'Success',
-      message: 'Password reset link sent to your mail.',
-      data: {
-        userId: id,
-        email,
-      },
-    });
   } catch (error) {
-    console.log(error);
-    res.status(500).send({
-      status: 'Failed',
-      message: error.message,
-      data: null,
-      description: error,
-    });
+    serverError(res, error);
   }
 };
 
+// reset user password
 exports.resetPassword = async (req, res) => {
-  const { token } = req.params;
-  const { newPassword, confirmPassword } = req.body;
-  let usertoken = await UserService.getUserByToken(token);
-  if (!usertoken) {
-    res.status(400).send({
-      status: 'Error',
-      message: 'Token is Invalid.',
-    });
-  }
-  if (usertoken) {
-    let { userId } = usertoken;
-    let user = await UserService.getUserById(userId);
-    if (newPassword !== confirmPassword) {
-      res.status(400).send({
-        status: 'error',
-        message: 'Password does not match.',
+  try {
+    const { token } = req.params;
+    const { newPassword } = req.body;
+    await UserService.getUserByToken(encodeURIComponent(token))
+      .then(async (user) => {
+        const { tokenExpiry } = user;
+        if (tokenExpiry < Date.now()) {
+          return errorResp(res, {
+            msg: ERROR_MESSAGE.TOKEN_EXPIRED,
+            code: HTTP_STATUS.BAD_REQUEST.CODE,
+          });
+        }
+        const password = crypto_encrypt(newPassword);
+        await UserService.updateUserById(user._id, {
+          password,
+          token: "",
+          tokenExpiry: null,
+        }).then(() => {
+          return successResp(res, {
+            msg: SUCCESS_MESSAGE.PASSWORD_RESET_SUCCESS,
+            code: HTTP_STATUS.SUCCESS.CODE,
+          });
+        });
+      })
+      .catch((error) => {
+        errorResp(res, {
+          msg: ERROR_MESSAGE.NOT_FOUND,
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+        });
       });
-    }
-    let newPasswordHash = await bcrypt.hash(newPassword, 10);
-    let result = await UserService.modifyUserPassword(userId, newPasswordHash);
-    if (result) {
-      res.status(200).send({
-        status: 'Success',
-        message: 'Password updated successfully.',
-      });
-    }
+  } catch (error) {
+    serverError(res, error);
   }
 };
 
-exports.resendOtp = async (req, res) => {
-  const {id, email} = req.body;
-  await UserOTPVerification.deleteMany({ id });
-  await sendOTPVerficationEmail({ id, email }, res).then((result) => {
-    res.status(200).send({
-      result,
+//get team list with pagination
+exports.getTeam = async (req, res, next) => {
+  try {
+    const { user } = req.body;
+    const role = await RoleService.getRoleById(user.roleId);
+    const userData = await UserService.getUserById(user._id);
+    const teamData = {
+      ...req.body,
+      page: req.body.page,
+      roleId: role.roleId,
+      teamId: userData.teamId,
+    };
+    const filterData = await getTeamByRole(teamData);
+    await TeamService.getTeam(filterData)
+      .then((teamRes) => {
+        return successResp(res, {
+          msg: SUCCESS_MESSAGE.DATA_FETCHED,
+          code: HTTP_STATUS.SUCCESS.CODE,
+          data: teamRes,
+        });
+      })
+      .catch((error) => {
+        errorResp(res, {
+          msg: ERROR_MESSAGE.NOT_FOUND,
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+        });
+      });
+  } catch (error) {
+    serverError(res, error);
+  }
+};
+
+// get team according to the user role
+const getTeamByRole = async (obj) => {
+  let roles;
+  let roleIds = [];
+  if (obj.roleId !== ROLES.ADMIN) {
+    roles = await RoleService.getRolesByRoleIds([ROLES.ADMIN]);
+    roles.map((role) => {
+      roleIds.push(role._id);
     });
+  }
+  return (obj = {
+    ...obj,
+    roleIds,
   });
+};
+
+//resend invite email
+exports.resendInvite = async (req, res) => {
+  const { userId } = req.body;
+  try {
+    await UserService.getUserById(userId)
+      .then(async (user) => {
+        if (user) {
+          if (user.isVerified) {
+            return errorResp(res, {
+              msg: ERROR_MESSAGE.ALLREADY_REGISTERED,
+              code: HTTP_STATUS.BAD_REQUEST.CODE,
+            });
+          } else {
+            tokenVerificationEmail(res, EMAIL_TYPES.INVITE_USER, user);
+          }
+        } else {
+          return errorResp(res, {
+            msg: ERROR_MESSAGE.NOT_FOUND,
+            code: HTTP_STATUS.NOT_FOUND.CODE,
+          });
+        }
+      })
+      .catch((error) => {
+        serverError(res, error);
+      });
+  } catch (error) {
+    serverError(res, error);
+  }
+};
+
+//cancel/delete/remove user by admin and super admin
+exports.disableUser = async (req, res, next) => {
+  const { userId } = req.params;
+  const userData = {
+    status: USER_STATUS.DISABLED,
+    canLogin: false,
+    isVerified: false,
+  };
+  await UserService.updateUserById(userId, userData)
+    .then(() => {
+      return successResp(res, {
+        msg: SUCCESS_MESSAGE.DELETED,
+        code: HTTP_STATUS.SUCCESS.CODE,
+        data: teamRes,
+      });
+    })
+    .catch((error) => {
+      errorResp(res, {
+        msg: ERROR_MESSAGE.NOT_FOUND,
+        code: HTTP_STATUS.NOT_FOUND.CODE,
+      });
+    });
 };

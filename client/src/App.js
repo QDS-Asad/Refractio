@@ -14,6 +14,7 @@ import OpportunityEdit from './pages/app/Opportunities/OpportunityEdit';
 import SubscriptionLayout from './layouts/SubscriptionLayout';
 import Subscription from './pages/subscription/Subscription';
 import TeamMembers from './pages/app/team/TeamMembers';
+import Billing from './pages/app/billing/Billing';
 const App = () => {
   return (
     <Routes>
@@ -38,6 +39,7 @@ const App = () => {
         <Route path='opportunities/:id' element={<OpportunityDetail />} />
         <Route path='opportunities/:id/edit' element={<OpportunityEdit />} />
         <Route path='team' element={<TeamMembers />} />
+        <Route path='billing' element={<Billing />} />
       </Route>
     </Routes>
   );

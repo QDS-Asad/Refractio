@@ -21,7 +21,6 @@ const PublishOpportunity = ({ viewPublish, setViewPublish }) => {
         <Button
           content='Cancel'
           onClick={() => setViewPublish(false)}
-          className='btn-secondary'
         />
         <Button
           content='Publish Now'

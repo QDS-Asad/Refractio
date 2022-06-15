@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { authApi } from '../../common/refractioApi';
+import refractioApi from '../../common/refractioApi';
 
 // initial state
 export const initialState = {
@@ -50,8 +50,11 @@ export default authNewPasswordSlice.reducer;
 export const userNewPassword = (token, body) => async (dispatch) => {
   try {
     dispatch(setLoading());
-    let { data } = await authApi.post(`/users/reset-password/${token}`, body);
-    dispatch(setNewPassword(data));
+    let { data: response } = await refractioApi.put(
+      `/users/reset-password/${token}`,
+      body
+    );
+    dispatch(setNewPassword(response.success));
   } catch (error) {
     const errorMessage =
       error.response && error.response.data

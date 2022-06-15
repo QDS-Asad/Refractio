@@ -1,84 +1,52 @@
-const User = require("../models/user").User
-const UserOTPVerification = require("../models/userOtpVerification").UserOTPVerification;
-const UserToken = require("../models/userToken").UserToken;
+const { User } = require("../models/users");
+const { ObjectId } = require('mongodb');
+const { sendEmail } = require("../helpers/email_helper");
+const { SUCCESS_MESSAGE, USER_STATUS } = require("../lib/constants");
+const { crypto_decrypt } = require("../helpers/encryption_helper");
+// const nodemailer = require('nodemailer');
 
-
-exports.signUp = async(fullName, email, password,roles)=>{
-   let user = await User.findOne({
-      email:email
-   })
-   if(user){
-      res.send({
-         message:"user email already exists"
-      })
-   }
-   return await User.create({
-      fullName:fullName,
-      email:email,
-      password:password,
-      roles:roles
-   })
-}
-
-exports.login = async(email, password)=>{
-   let user = await User.findOne({
-      email:email
-   });
-   return user;
-}
-
-exports.userOtpVerification = async(id, otp, createdAt, expiresAt)=>{
-   return await UserOTPVerification.create({
-      userId:id,
-      otp:otp,
-      createdAt:createdAt,
-      expiresAt:expiresAt
-   })
-}
-
-exports.verfiyOtp = async(userId)=>{
-   return await UserOTPVerification.findOne({
-      userId:userId
-   })
-}
-
-
-
-exports.deleteExpiredOtp = async(userId)=>{
-   let userOtp = await UserOTPVerification.deleteMany({
-      id:userId
-   });
-   return userOtp;
-}
-
-exports.getUserByEmail = async(email)=>{
+exports.getUserByEmail = async (email) => {
    return await User.findOne({
-      email:email
+      email: email
    })
 }
 
-exports.getUserById = async(userId)=>{
+exports.getUserById = async (userId) => {
    return await User.findOne({
-      id:userId
+      _id: ObjectId(userId)
    })
 }
 
-exports.userToken = async(userid, token, createdAt, expiresAt)=>{
-   return await UserToken.create({
-      userId:userid,
-      token:token,
-      createdAt:createdAt,
-      expiresAt:expiresAt
+exports.getUserByRoleId = async (roleId) => {
+   return await User.findOne({roleId})
+}
+
+exports.getUserByToken = async (token) => {
+   return await User.findOne({
+      token: token
    })
 }
 
-exports.getUserByToken = async(token)=>{
-   return await UserToken.findOne({
-      token:token
-   })
+exports.updateUserById = async (userId, user) => {
+   return await User.findOneAndUpdate({
+      _id: ObjectId(userId)
+   }, user)
 }
 
-exports.modifyUserPassword = async(userid, password)=>{
-  let result =  await User.findByIdAndUpdate(userid,{password});
-  return result;  
+exports.deleteUserByRoleId = async (roleId) => {
+   return await User.deleteOne({roleId})
+}
+
+exports.register = async (user) => {
+   return await User.create(user)
+}
+
+exports.login = async (user) => {
+   return await User.findOne({
+      email: user.email,
+   });
+}
+
+exports.tokenVerificationEmail = async ({ email, subject, html }) => {
+   return await sendEmail({ email, subject, html })
 }
