@@ -1,5 +1,5 @@
 const { ObjectId } = require('mongodb');
-const { DEFAULT_PAGE_SIZE, DEFAULT_PAGE_NO } = require('../lib/constants');
+const { DEFAULT_PAGE_SIZE, DEFAULT_PAGE_NO, USER_STATUS } = require('../lib/constants');
 const { Team } = require('../models/teams');
 const { User } = require('../models/users');
 
@@ -8,7 +8,7 @@ exports.createTeam = async (obj) => {
 }
 
 exports.updateTeamMembers = async (teamId, obj) => {
-   return await Team.updateOne({_id: teamId}, obj);
+   return await Team.findByIdAndUpdate({_id: teamId}, obj);
 }
 
 exports.getTeamById = async (teamId) => {
@@ -20,9 +20,9 @@ exports.getTeam = async (obj) => {
    const options = {
       page: page || DEFAULT_PAGE_NO,
       limit: page_size || DEFAULT_PAGE_SIZE,
-      collation: {
-        locale: 'en',
-      },
+      sort: {
+         createdAt: 1 //Sort by Date Added ASC
+       }
     };
-    return await User.paginate({teamId, roleId: {$nin: roleIds}}, options);
+    return await User.paginate({teamId, roleId: {$nin: roleIds}, status: {$nin: USER_STATUS.DISABLED}}, options);
 }

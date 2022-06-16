@@ -902,7 +902,6 @@ router.put('/register-invite-account/:userId', validateAcceptInvite , User.invit
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
  */
  router.put('/resend-invite-account/:userId', User.resendInvite);
-
  
 /**
  * @swagger
@@ -971,19 +970,23 @@ router.put('/register-invite-account/:userId', validateAcceptInvite , User.invit
  *                 example:
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
  */
-router.delete('/cancel-invite-account/:userId', Auth, User.disableUser);
+router.delete('/cancel-invite-account/:userId', Auth, User.cancelUserInvite);
 
 /**
  * @swagger
  *   /api/users/team:
- *   post:
+ *   get:
  *     description: get team
  *     tags: [Team]
- *     requestBody:
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Team'
+ *     parameters:
+ *        - in: query
+ *          name: page
+ *          schema:
+ *              type: integer 
+ *        - in: query
+ *          name: page_size
+ *          schema:
+ *              type: integer
  *     responses:
  *        '200':
  *           description: Success
@@ -1050,6 +1053,6 @@ router.delete('/cancel-invite-account/:userId', Auth, User.disableUser);
  *      page_size:
  *        type: number
  */
- router.post('/team', Auth, User.getTeam)
+ router.get('/team', Auth, User.getTeam)
 
 module.exports = router;

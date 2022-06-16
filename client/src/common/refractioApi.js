@@ -24,7 +24,7 @@ export default axios.create({
 export function authHeader() {
   const user = JSON.parse(localStorage.getItem('userInfo'));
   if (user && user.token) {
-    return { Authorization: `Bearer ${user.accessToken}` };
+    return { 'authorization': `Bearer ${user.token}` };
   } else {
     return {};
   }

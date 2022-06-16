@@ -7,7 +7,16 @@ const TeamSchema = new Schema(
       type: Schema.Types.ObjectId,
       required: true,
     },
-    members: [],
+    members: [
+      {
+        userId: {
+          type: Schema.Types.ObjectId,
+        },
+        roleId: {
+          type: Number,
+        },
+      },
+    ],
     createdBy: {
       type: String,
     },

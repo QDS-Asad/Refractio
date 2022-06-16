@@ -18,6 +18,8 @@ module.exports = Object.freeze({
     SUPER_ADMIN_PASSWORD: `${process.env.SUPER_ADMIN_PASSWORD}`,
     DEFAULT_PAGE_NO: 0,
     DEFAULT_PAGE_SIZE: 10,
+    TOTAL_TEAM_ADMIN: 3,
+    TOTAL_TEAM_ORGANIZER: 3,
     TOTAL_TEAM_MEMBERS: 24,
     EMAIL_TYPES: {
         VERIFY_REGISTER: "verify-register",
@@ -104,7 +106,9 @@ module.exports = Object.freeze({
         DEFAULT_ROLES_EXIST: "Roles already exist!",
         SUPER_ADMIN_EXIST: "Super Admin already exist!",
         TOKEN_EXPIRED: "OTP expired. Please request again!",
-        TEAM_LIMIT_EXCEED:"Team limit reached!"
+        TEAM_LIMIT_EXCEED:"Team limit reached. You can add only 24 team members!",
+        TEAM_ADMIN_LIMIT_EXCEED:"Team Administrator limit reached. A Team can have 3 Administrators only!",
+        TEAM_ORGANIZER_LIMIT_EXCEED:"Team Organizer limit reached. A Team can have 3 Organizers only!",
     },
     VERIFY_REGISTER_EMAIL_SUBJECT: "Verify your email",
     VERIFY_REGISTER_EMAIL_TEMPLATE: (params) => {

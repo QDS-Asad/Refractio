@@ -30,7 +30,10 @@ const {
   FORGOT_PASSWORD_EMAIL_SUBJECT,
   VERIFY_REGISTER_EMAIL_SUBJECT,
   INVTE_USER_EMAIL_SUBJECT,
+  TOTAL_TEAM_ADMIN,
+  TOTAL_TEAM_ORGANIZER,
 } = require("../lib/constants");
+const { ObjectId } = require("mongodb");
 
 // register admin user
 exports.register = async (req, res, next) => {
@@ -54,7 +57,7 @@ exports.register = async (req, res, next) => {
             .then(async (result) => {
               const teamData = {
                 createdById: result._id,
-                members: [result._id],
+                members: [{ userId: result._id, roleId: role.roleId }],
               };
               await TeamService.createTeam(teamData)
                 .then(async (teamRes) => {
@@ -99,27 +102,45 @@ exports.inviteUser = async (req, res, next) => {
           }
         } else {
           const role = await RoleService.getRoleByRoleId(roleId);
-          const admin = await UserService.getUserById(user._id);
-          const team = await TeamService.getTeamById(admin.teamId);
+          const inivteBy = await UserService.getUserById(user._id);
+          const team = await TeamService.getTeamById(inivteBy.teamId);
+          const teamInfo = getTeaminfo(team);
+          if (team.members.length === TOTAL_TEAM_MEMBERS) {
+            return errorResp(res, {
+              msg: ERROR_MESSAGE.TEAM_LIMIT_EXCEED,
+              code: HTTP_STATUS.BAD_REQUEST,
+            });
+          }
+          if (teamInfo.totalAdmin.length === TOTAL_TEAM_ADMIN) {
+            return errorResp(res, {
+              msg: ERROR_MESSAGE.TEAM_ADMIN_LIMIT_EXCEED,
+              code: HTTP_STATUS.BAD_REQUEST,
+            });
+          }
+          if (teamInfo.totalOrganizer.length === TOTAL_TEAM_ORGANIZER) {
+            return errorResp(res, {
+              msg: ERROR_MESSAGE.TEAM_ORGANIZER_LIMIT_EXCEED,
+              code: HTTP_STATUS.BAD_REQUEST,
+            });
+          }
           await UserService.register({
             ...req.body,
             roleId: role._id,
             status: USER_STATUS.INVITE_SENT,
           })
             .then(async (result) => {
-              if (team.members.length == TOTAL_TEAM_MEMBERS) {
-                return errorResp(res, {
-                  msg: ERROR_MESSAGE.TEAM_LIMIT_EXCEED,
-                  code: HTTP_STATUS.BAD_REQUEST,
-                });
-              }
-              const members = [...team.members, result._id];
+              const members = [...team.members, { userId: result._id, roleId }];
               await TeamService.updateTeamMembers(team._id, { members })
                 .then(async (teamRes) => {
                   await UserService.updateUserById(result._id, {
                     teamId: team._id,
                   });
-                  tokenVerificationEmail(res, EMAIL_TYPES.INVITE_USER, result, user);
+                  tokenVerificationEmail(
+                    res,
+                    EMAIL_TYPES.INVITE_USER,
+                    result,
+                    user
+                  );
                 })
                 .catch((error) => {
                   serverError(res, error);
@@ -138,11 +159,27 @@ exports.inviteUser = async (req, res, next) => {
   }
 };
 
+const getTeaminfo = (team) => {
+  const totalAdmin = team.members.filter((obj) => obj.roleId === ROLES.ADMIN);
+  const totalOrganizer = team.members.filter(
+    (obj) => obj.roleId === ROLES.ORGANIZER
+  );
+  const totalParticipant = team.members.filter(
+    (obj) => obj.roleId === ROLES.PARTICIPANT
+  );
+  return { totalAdmin, totalOrganizer, totalParticipant };
+};
+
 // generic email for register and forgot password
-const tokenVerificationEmail = async (res, type, user, sender) => {
+const tokenVerificationEmail = async (res, type, user, sender = {}) => {
   user.token = crypto_encrypt(`${Math.floor(1000 + Math.random() * 9000)}`);
   const tokenExpiry = Date.now() + TOKEN_EXPIRY;
-  const newUser = getEmailTemplate({ type, token: user.token, user, senderEmail: sender?.email });
+  const newUser = getEmailTemplate({
+    type,
+    token: user.token,
+    user,
+    senderEmail: sender.email,
+  });
   await UserService.tokenVerificationEmail(newUser)
     .then(async (result) => {
       if (!result) {
@@ -208,17 +245,33 @@ const getEmailTemplate = (obj) => {
   let link;
   switch (obj.type) {
     case EMAIL_TYPES.VERIFY_REGISTER:
-      return {email: obj.user.email, subject:VERIFY_REGISTER_EMAIL_SUBJECT, html: VERIFY_REGISTER_EMAIL_TEMPLATE({
-        token: crypto_decrypt(obj.token),
-      })};
+      return {
+        email: obj.user.email,
+        subject: VERIFY_REGISTER_EMAIL_SUBJECT,
+        html: VERIFY_REGISTER_EMAIL_TEMPLATE({
+          token: crypto_decrypt(obj.token),
+        }),
+      };
       break;
     case EMAIL_TYPES.INVITE_USER:
       link = `${CLIENT_HOST}/auth/invite-account/${obj.token}`;
-      return {email: obj.user.email, subject: INVTE_USER_EMAIL_SUBJECT, html: INVTE_USER_EMAIL_TEMPLATE({ link, senderEmail: obj.senderEmail, recipientEmail: obj.user.email })};
+      return {
+        email: obj.user.email,
+        subject: INVTE_USER_EMAIL_SUBJECT,
+        html: INVTE_USER_EMAIL_TEMPLATE({
+          link,
+          senderEmail: obj.senderEmail,
+          recipientEmail: obj.user.email,
+        }),
+      };
       break;
     case EMAIL_TYPES.FORGOT_PASSWORD:
       link = `${CLIENT_HOST}/auth/new-password/${obj.token}`;
-      return {email: obj.user.email, subject: FORGOT_PASSWORD_EMAIL_SUBJECT, html: FORGOT_PASSWORD_EMAIL_TEMPLATE({ link })};
+      return {
+        email: obj.user.email,
+        subject: FORGOT_PASSWORD_EMAIL_SUBJECT,
+        html: FORGOT_PASSWORD_EMAIL_TEMPLATE({ link }),
+      };
       break;
   }
 };
@@ -466,18 +519,32 @@ exports.resetPassword = async (req, res) => {
 //get team list with pagination
 exports.getTeam = async (req, res, next) => {
   try {
+    const { page, page_size } = req.query;
     const { user } = req.body;
     const role = await RoleService.getRoleById(user.roleId);
     const userData = await UserService.getUserById(user._id);
     const teamData = {
-      ...req.body,
-      page: req.body.page,
+      user,
+      page,
+      page_size,
       roleId: role.roleId,
       teamId: userData.teamId,
     };
     const filterData = await getTeamByRole(teamData);
     await TeamService.getTeam(filterData)
-      .then((teamRes) => {
+      .then(async (teamRes) => {
+        let docs = [];
+        await Promise.all(
+          teamRes.docs.map(async (team, key) => {
+            await RoleService.getRoleById(team.roleId).then((role) => {
+              docs[key] = { ...team._doc, role };
+            });
+          })
+        );
+        teamRes = {
+          ...teamRes,
+          docs,
+        };
         return successResp(res, {
           msg: SUCCESS_MESSAGE.DATA_FETCHED,
           code: HTTP_STATUS.SUCCESS.CODE,
@@ -542,6 +609,44 @@ exports.resendInvite = async (req, res) => {
 };
 
 //cancel/delete/remove user by admin and super admin
+exports.cancelUserInvite = async (req, res, next) => {
+  const { userId } = req.params;
+  const userData = {
+    status: USER_STATUS.DISABLED,
+    canLogin: false,
+    isVerified: false,
+  };
+  await UserService.updateUserById(userId, userData)
+    .then(async (user) => {
+      const team = await TeamService.getTeamById(user.teamId);
+      const filterTeamMembers = team.members.filter((obj) => {
+        return obj.userId.toString() !== userId;
+      });
+      await TeamService.updateTeamMembers(user.teamId, {
+        members: filterTeamMembers,
+      })
+        .then((teamRes) => {
+          return successResp(res, {
+            msg: SUCCESS_MESSAGE.DELETED,
+            code: HTTP_STATUS.SUCCESS.CODE,
+          });
+        })
+        .catch((error) => {
+          errorResp(res, {
+            msg: ERROR_MESSAGE.NOT_FOUND,
+            code: HTTP_STATUS.NOT_FOUND.CODE,
+          });
+        });
+    })
+    .catch((error) => {
+      errorResp(res, {
+        msg: ERROR_MESSAGE.NOT_FOUND,
+        code: HTTP_STATUS.NOT_FOUND.CODE,
+      });
+    });
+};
+
+//cancel/delete/remove user by admin and super admin
 exports.disableUser = async (req, res, next) => {
   const { userId } = req.params;
   const userData = {
@@ -554,7 +659,6 @@ exports.disableUser = async (req, res, next) => {
       return successResp(res, {
         msg: SUCCESS_MESSAGE.DELETED,
         code: HTTP_STATUS.SUCCESS.CODE,
-        data: teamRes,
       });
     })
     .catch((error) => {

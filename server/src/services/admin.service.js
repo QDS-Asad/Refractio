@@ -65,8 +65,8 @@ exports.getAllStripePricesByPlanId = async (planId) => {
     });
 };
 
-exports.deleteStripePlanById = async (planId, planPrices) => {
-   await planPrices?.map(async (price) => {
+exports.deleteStripePlanById = async (planId, planPrices = []) => {
+    planPrices.map(async (price) => {
       console.log(price);
       await stripe.prices.update(price.id, {
          active: false

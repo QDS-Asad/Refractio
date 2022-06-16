@@ -5,7 +5,7 @@ const { HTTP_STATUS, ERROR_MESSAGE, JWT_KEY } = require("../lib/constants");
 
 module.exports = async function (req, res, next) {
   // Get token from header
-  const token = req.header("authorization")?.split(' ')[1];
+  const token = req.header("authorization") && req.header("authorization").split(' ')[1];
   // Check if not token
   if (!token) {
     return errorResp(res, {code: HTTP_STATUS.UNAUTHORIZED.CODE, msg: ERROR_MESSAGE.UNAUTHORIZED})
