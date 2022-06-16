@@ -1,9 +1,6 @@
 const { User } = require("../models/users");
 const { ObjectId } = require('mongodb');
 const { sendEmail } = require("../helpers/email_helper");
-const { SUCCESS_MESSAGE, USER_STATUS } = require("../lib/constants");
-const { crypto_decrypt } = require("../helpers/encryption_helper");
-// const nodemailer = require('nodemailer');
 
 exports.getUserByEmail = async (email) => {
    return await User.findOne({
