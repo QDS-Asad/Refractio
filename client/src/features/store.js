@@ -10,6 +10,7 @@ import opportunityDetailSlice from './opportunities/opportunityDetailSlice';
 import opportunityListSlice from './opportunities/opportunityListSlice';
 import inviteMemberSlice from './team/inviteMemberSlice';
 import teamListSlice from './team/teamListSlice';
+import cancelMemberSlice from './team/cancelMemberSlice';
 
 export default configureStore({
   reducer: {
@@ -24,5 +25,6 @@ export default configureStore({
     opportunityCreate: opportunityCreateSlice,
     teamList: teamListSlice,
     inviteMember: inviteMemberSlice,
+    cancelMember: cancelMemberSlice
   },
 });
