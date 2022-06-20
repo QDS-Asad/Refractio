@@ -905,15 +905,17 @@ router.put('/register-invite-account/:userId', validateAcceptInvite , User.invit
 
  /**
  * @swagger
- *   /api/users/update-role/{userId}/{roleId}:
+ *   /api/users/update-user-role/{userId}/{roleId}:
  *   put:
  *     description: update user role
  *     tags: [Team]
  *     parameters:
  *       - in: path
  *         name: userId
+ *       - in: path
+ *         name: roleId
  *     schema:
- *        type: integer
+ *        type: stirng
  *     responses:
  *        '200':
  *           description: Success
