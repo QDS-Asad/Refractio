@@ -5,52 +5,56 @@ import refractioApi from "../../common/refractioApi";
 export const initialState = {
   loading: false,
   error: null,
-  members: [],
-  page: 1,
-  limit: 10,
-  totalPages: 1,
+  success: false,
 };
 
 // our slice
-const teamListSlice = createSlice({
-  name: "teamList",
+const resendInviteMemberSlice = createSlice({
+  name: "resendInviteMember",
   initialState,
   reducers: {
     setLoading: (state) => {
       state.loading = true;
     },
-    setTeamList: (state, { payload }) => {
+    setSuccess: (state, { payload }) => {
       state.loading = false;
       state.error = false;
-      state.members = payload.docs;
-      state.totalPages = payload.totalPages;
+      state.success = payload;
     },
     setError: (state, { payload }) => {
       state.loading = false;
       state.error = payload;
     },
+    reset: (state) => {
+      state.loading = false;
+      state.error = false;
+      state.success = false;
+    },
   },
 });
 // export the actions
-export const { setLoading, setTeamList, setError } = teamListSlice.actions;
+export const {
+  setLoading,
+  setSuccess,
+  setError,
+  reset,
+} = resendInviteMemberSlice.actions;
 
 // export the selector (".items" being same as in slices/index.js's "items: something")
-export const teamListSelector = (state) => state.teamList;
+export const resendInviteMemberSelector = (state) => {
+  return state.resendInviteMember;
+};
 
 // export the default reducer
-export default teamListSlice.reducer;
+export default resendInviteMemberSlice.reducer;
 
 // fetch all opportunities
-export const fetchTeamList = (pageNumber, pageSize) => async (
-  dispatch,
-  getState
-) => {
+export const resendInviteMember = (member) => async (dispatch) => {
   try {
     dispatch(setLoading());
-    let { data } = await refractioApi.get(
-      `/users/team?page=${pageNumber}&page_size=${pageSize}`
-    );
-    dispatch(setTeamList(data.data));
+    dispatch(setSuccess(false));
+    await refractioApi.put(`/users/resend-invite-account/${member}`);
+    dispatch(setSuccess(true));
   } catch (error) {
     dispatch(setError(error.message));
   }

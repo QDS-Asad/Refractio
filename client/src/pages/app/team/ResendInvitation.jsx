@@ -1,8 +1,24 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Button, Message, Modal } from 'semantic-ui-react';
+import {resendInviteMember, resendInviteMemberSelector} from '../../../features/team/resendInviteMemberSlice';
 
-const ResendInvitation = ({ resendInvitation, setResendInvitation }) => {
-  const error = null;
+const ResendInvitation = ({ resendInvitation, setResendInvitation, member }) => {
+  const dispatch = useDispatch();
+
+  const { loading, error, success } = useSelector(resendInviteMemberSelector);
+
+  const handleResend = (data) => {
+    // dispatch team cancel invite;
+    dispatch(resendInviteMember(data));
+  };
+
+  useEffect(() => {
+    console.log(success);
+    if (success) {
+      setResendInvitation(false);
+    }
+  }, [success]);
   return (
     <Modal
       onClose={() => setResendInvitation(false)}
@@ -28,7 +44,7 @@ const ResendInvitation = ({ resendInvitation, setResendInvitation }) => {
         <Button
           content='Yes'
           className='btn'
-          onClick={() => setResendInvitation(false)}
+          onClick={() => handleResend(member)}
         />
       </Modal.Actions>
     </Modal>

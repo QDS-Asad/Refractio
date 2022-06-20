@@ -24,7 +24,6 @@ const InviteTeamMember = ({ inviteTeamMember, setInviteTeamMember }) => {
   const { loading, error, success } = useSelector(inviteMemberSelector);
 
   const handleCreate = (data) => {
-    console.log(data);
     // dispatch team invite;
     dispatch(inviteMember(data));
   };

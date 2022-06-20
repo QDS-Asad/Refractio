@@ -32,7 +32,7 @@ const TeamMembers = () => {
   const dispatch = useDispatch();
 
   // fetch data from our store
-  const { loading, error, members, page, totalPages } = useSelector(
+  const { loading, error, members, page, limit, totalPages } = useSelector(
     teamListSelector
   );
 
@@ -40,8 +40,8 @@ const TeamMembers = () => {
 
   // hook to fetch items
   useEffect(() => {
-    !inviteTeamMember && !cancelInvitation && dispatch(fetchTeamList(page)) && dispatch(fetchRoles());
-  }, [inviteTeamMember, cancelInvitation]);
+    !inviteTeamMember && !cancelInvitation && !resendInvitation && dispatch(fetchTeamList(page, limit)) && dispatch(fetchRoles());
+  }, [inviteTeamMember, cancelInvitation, resendInvitation]);
 
   const removeTeamMemberHandler = (id) => {
     setSelectedMember(id);
@@ -64,7 +64,7 @@ const TeamMembers = () => {
   // };
 
   const onPageChange = (e, { activePage }) => {
-    dispatch(fetchTeamList(activePage));
+    dispatch(fetchTeamList(activePage, limit));
   };
 
   return (

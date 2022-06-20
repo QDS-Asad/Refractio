@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import refractioApi, { authHeader } from "../../common/refractioApi";
+import refractioApi from "../../common/refractioApi";
 
 // initial state
 export const initialState = {
@@ -50,11 +50,11 @@ export default inviteMemberSlice.reducer;
 export const inviteMember = (body) => async (dispatch) => {
   try {
     dispatch(setLoading());
-    await refractioApi.post(
-      "/users/invite-account",
-      { email: body.email, roleId: body.role },
-      { headers: authHeader() }
-    );
+    dispatch(setSuccess(false));
+    await refractioApi.post("/users/invite-account", {
+      email: body.email,
+      roleId: body.role,
+    });
     dispatch(setSuccess(true));
   } catch (error) {
     dispatch(setError(error.message));

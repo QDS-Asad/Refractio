@@ -13,13 +13,21 @@ export const localAPI = axios.create({
   },
 });
 
-export default axios.create({
+const http = axios.create({
   baseURL: `${baseURL}/api`,
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',
   },
 });
+
+http.interceptors.request.use(function (config) {
+  console.log(config);
+  config.headers = authHeader();
+  return config;
+});
+
+export default http;
 
 export function authHeader() {
   const user = JSON.parse(localStorage.getItem('userInfo'));
