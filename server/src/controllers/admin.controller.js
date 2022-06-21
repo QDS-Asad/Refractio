@@ -17,8 +17,7 @@ exports.createPlan = async (req, res, next) => {
       .then(async (stripeRes) => {
         const data = {
           planId: stripeRes.createdPlan.id,
-          monthlyPriceId: stripeRes.monthlyPrice.id,
-          yearlyPriceId: stripeRes.yearlyPrice.id,
+          prices: stripeRes.createdPrices,
         };
         await AdminService.createPlan(data)
           .then((planRes) => {
@@ -48,16 +47,25 @@ exports.updatePlan = async (req, res, next) => {
         const planData = {
           ...req.body,
           planId: planRes.planId,
-          monthlyPriceId: planRes.monthlyPriceId,
-          yearlyPriceId: planRes.yearlyPriceId,
+          priceIds: planRes.prices
         };
         await AdminService.updateStripePlan(planData)
-          .then((stripeRes) => {
+          .then(async (stripeRes) => {
+            const data = {
+              planId: stripeRes.updatedPlan.id,
+              prices: stripeRes.createdPrices,
+            };
+            await AdminService.updatePlan(stripeRes.updatedPlan.id, data)
+          .then((plansRes) => {
             return successResp(res, {
               msg: SUCCESS_MESSAGE.UpDATED,
               code: HTTP_STATUS.SUCCESS.CODE,
-              data: planRes,
+              data: plansRes,
             });
+          })
+          .catch((error) => {
+            serverError(res, error);
+          });
           })
           .catch((error) => {
             serverError(res, error);
@@ -94,10 +102,10 @@ exports.getPlanByPlanId = async (req, res, next) => {
     const { planId } = req.params;
     await AdminService.getPlanByPlanId(planId)
       .then(async (planRes) => {
+        console.log(planRes);
         const planData = {
           planId: planRes.planId,
-          monthlyPriceId: planRes.monthlyPriceId,
-          yearlyPriceId: planRes.yearlyPriceId,
+          prices: planRes.prices,
         };
         await AdminService.getStripePlanById(planData)
           .then((stripeRes) => {
@@ -108,13 +116,16 @@ exports.getPlanByPlanId = async (req, res, next) => {
             });
           })
           .catch((error) => {
+            console.log(error);
             serverError(res, error);
           });
       })
       .catch((error) => {
+        console.log(error);
         serverError(res, error);
       });
   } catch (error) {
+    console.log(error);
     serverError(res, error);
   }
 };
