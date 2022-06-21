@@ -21,8 +21,7 @@ const http = axios.create({
   },
 });
 
-http.interceptors.request.use(function (config) {
-  console.log(config);
+http.interceptors.request.use(function(config) {
   config.headers = authHeader();
   return config;
 });
@@ -32,7 +31,7 @@ export default http;
 export function authHeader() {
   const user = JSON.parse(localStorage.getItem('userInfo'));
   if (user && user.token) {
-    return { 'authorization': `Bearer ${user.token}` };
+    return { authorization: `Bearer ${user.token}` };
   } else {
     return {};
   }

@@ -40,7 +40,11 @@ const TeamMembers = () => {
 
   // hook to fetch items
   useEffect(() => {
-    !inviteTeamMember && !cancelInvitation && !resendInvitation && dispatch(fetchTeamList(page, limit)) && dispatch(fetchRoles());
+    !inviteTeamMember &&
+      !cancelInvitation &&
+      !resendInvitation &&
+      dispatch(fetchTeamList(page, limit)) &&
+      dispatch(fetchRoles());
   }, [inviteTeamMember, cancelInvitation, resendInvitation]);
 
   const removeTeamMemberHandler = (id) => {
@@ -132,8 +136,9 @@ const TeamMembers = () => {
                 {members.map((user) => (
                   <Table.Row key={user._id}>
                     <Table.Cell>
-                      {user.status === 'active' && user.fullName}
-                      {user.status === 'invite_sent' && 'Pending Invitation'}
+                      {user.status === 'invite_sent'
+                        ? 'Pending Invitation'
+                        : user.fullName}
                     </Table.Cell>
                     <Table.Cell>{user.email}</Table.Cell>
                     <Table.Cell>
@@ -160,7 +165,7 @@ const TeamMembers = () => {
                           Remove
                         </Button>
                       )}
-                      {user.status == "invite_sent" &&  (
+                      {user.status === 'invite_sent' && (
                         <>
                           <Button
                             className='btn-link'

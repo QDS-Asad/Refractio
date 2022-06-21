@@ -136,6 +136,7 @@ const InviteTeamMember = ({ inviteTeamMember, setInviteTeamMember }) => {
           form='invite-team-member'
           content='Add'
           className='btn'
+          loading={loading}
         />
       </Modal.Actions>
     </Modal>

@@ -12,6 +12,8 @@ import inviteMemberSlice from './team/inviteMemberSlice';
 import teamListSlice from './team/teamListSlice';
 import cancelMemberSlice from './team/cancelMemberSlice';
 import resendInviteMemberSlice from './team/resendInviteMemberSlice';
+import authVerifyMemberSlice from './auth/authVerifyMemberSlice';
+import authRegisterMemberSlice from './auth/authRegisterMemberSlice';
 
 export default configureStore({
   reducer: {
@@ -20,6 +22,8 @@ export default configureStore({
     authVerifyCode: authVerifyCodeSlice,
     authForgetPassword: authForgetPasswordSlice,
     authNewPassword: authNewPasswordSlice,
+    authVerifyMember: authVerifyMemberSlice,
+    authRegisterMember: authRegisterMemberSlice,
     roleList: roleListSlice,
     opportunityList: opportunityListSlice,
     opportunityDetail: opportunityDetailSlice,

@@ -5,55 +5,55 @@ import refractioApi from '../../common/refractioApi';
 export const initialState = {
   loading: false,
   error: null,
-  success: false,
+  verifyMember: null,
 };
 
 // our slice
-const resendInviteMemberSlice = createSlice({
-  name: 'resendInviteMember',
+const authVerifyMemberSlice = createSlice({
+  name: 'authVerifyMember',
   initialState,
   reducers: {
     setLoading: (state) => {
       state.loading = true;
     },
-    setSuccess: (state, { payload }) => {
+    setVerifyMember: (state, { payload }) => {
       state.loading = false;
-      state.error = false;
-      state.success = payload;
+      state.error = null;
+      state.verifyMember = payload;
     },
     setError: (state, { payload }) => {
       state.loading = false;
       state.error = payload;
+      state.verifyMember = null;
     },
     reset: (state) => {
       state.loading = false;
-      state.error = false;
-      state.success = false;
+      state.error = null;
+      state.verifyMember = null;
     },
   },
 });
 // export the actions
 export const {
   setLoading,
-  setSuccess,
+  setVerifyMember,
   setError,
   reset,
-} = resendInviteMemberSlice.actions;
+} = authVerifyMemberSlice.actions;
 
-// export the selector (".items" being same as in slices/index.js's "items: something")
-export const resendInviteMemberSelector = (state) => {
-  return state.resendInviteMember;
-};
+export const authVerifyMemberSelector = (state) => state.authVerifyMember;
 
 // export the default reducer
-export default resendInviteMemberSlice.reducer;
+export default authVerifyMemberSlice.reducer;
 
-// fetch all opportunities
-export const resendInviteMember = (member) => async (dispatch) => {
+// code Verification
+export const memberVerification = (token) => async (dispatch) => {
   try {
     dispatch(setLoading());
-    await refractioApi.put(`/users/resend-invite-account/${member}`);
-    dispatch(setSuccess(true));
+    let { data: response } = await refractioApi.get(
+      `/users/verify-invite-account/${token}`
+    );
+    dispatch(setVerifyMember(response.data));
   } catch (error) {
     const errorMessage =
       error.response && error.response.data
@@ -61,4 +61,8 @@ export const resendInviteMember = (member) => async (dispatch) => {
         : error.message;
     dispatch(setError(errorMessage));
   }
+};
+
+export const resetVerifiyMember = () => (dispatch) => {
+  dispatch(reset());
 };
