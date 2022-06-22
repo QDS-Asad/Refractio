@@ -14,6 +14,7 @@ import cancelMemberSlice from './team/cancelMemberSlice';
 import resendInviteMemberSlice from './team/resendInviteMemberSlice';
 import authVerifyMemberSlice from './auth/authVerifyMemberSlice';
 import authRegisterMemberSlice from './auth/authRegisterMemberSlice';
+import changeMemberRoleSlice from './team/changeMemberRoleSlice';
 
 export default configureStore({
   reducer: {
@@ -32,5 +33,6 @@ export default configureStore({
     inviteMember: inviteMemberSlice,
     cancelMember: cancelMemberSlice,
     resendInviteMember: resendInviteMemberSlice,
+    changeMemberRole: changeMemberRoleSlice,
   },
 });

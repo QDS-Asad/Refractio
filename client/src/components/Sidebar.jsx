@@ -1,11 +1,13 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, Outlet } from 'react-router-dom';
 import { Header, Menu, Segment, Sidebar, Image } from 'semantic-ui-react';
-import { logoutUser } from '../features/auth/authLoginSlice';
+import { authLoginSelector, logoutUser } from '../features/auth/authLoginSlice';
+import { ROLES } from '../common/constants';
 import NavBar from './Navbar';
 
 const SideBar = () => {
+  const { userLogin } = useSelector(authLoginSelector);
   const dispatch = useDispatch();
 
   const logoutHandler = () => {
@@ -39,23 +41,37 @@ const SideBar = () => {
             <Menu.Item name='Manage' className='fs-6 text-uppercase' />
           </Menu.Menu>
         </Menu.Item>
-        <Menu.Item as={NavLink} to='/opportunities'>
-          <Image src='/images/opportunities.svg' verticalAlign='middle' />
-          <span className='ps-2'>Opportunities</span>
-        </Menu.Item>
-        <Menu.Item as={NavLink} to='/team'>
-          <Image src='/images/team.svg' verticalAlign='middle' />
-          <span className='ps-2'>Team</span>
-        </Menu.Item>
+
+        {(userLogin.role.roleId === ROLES.ADMIN ||
+          userLogin.role.roleId === ROLES.ORGANIZER ||
+          userLogin.role.roleId === ROLES.PARTICIPANT) && (
+          <Menu.Item as={NavLink} to='/opportunities'>
+            <Image src='/images/opportunities.svg' verticalAlign='middle' />
+            <span className='ps-2'>Opportunities</span>
+          </Menu.Item>
+        )}
+
+        {(userLogin.role.roleId === ROLES.ADMIN ||
+          userLogin.role.roleId === ROLES.ORGANIZER ||
+          userLogin.role.roleId === ROLES.PARTICIPANT) && (
+          <Menu.Item as={NavLink} to='/team'>
+            <Image src='/images/team.svg' verticalAlign='middle' />
+            <span className='ps-2'>Team</span>
+          </Menu.Item>
+        )}
+
         <Menu.Item>
           <Menu.Menu>
             <Menu.Item name='Account' className='fs-6 text-uppercase' />
           </Menu.Menu>
         </Menu.Item>
-        <Menu.Item as='a'>
-          <Image src='/images/billing.svg' verticalAlign='middle' />
-          <span className='ps-2'>Billing</span>
-        </Menu.Item>
+        {userLogin.role.roleId === ROLES.ADMIN && (
+          <Menu.Item as={NavLink} to='/billing'>
+            <Image src='/images/billing.svg' verticalAlign='middle' />
+            <span className='ps-2'>Billing</span>
+          </Menu.Item>
+        )}
+
         <Menu.Item as='a' onClick={logoutHandler}>
           <Image src='/images/logout.svg' verticalAlign='middle' />
           <span className='ps-2'>Logout</span>

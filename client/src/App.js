@@ -15,6 +15,10 @@ import SubscriptionLayout from './layouts/SubscriptionLayout';
 import Subscription from './pages/subscription/Subscription';
 import TeamMembers from './pages/app/team/TeamMembers';
 import Billing from './pages/app/billing/Billing';
+import Forbidden from './pages/misc/Forbidden';
+import NotFound from './pages/misc/NotFound';
+import { ROLES } from './common/constants';
+import ProtectedRoute from './components/ProtectedRoute';
 const App = () => {
   return (
     <Routes>
@@ -35,12 +39,57 @@ const App = () => {
           path=''
           element={<Navigate replace to='opportunities' />}
         ></Route>
-        <Route path='opportunities' element={<Opportunities />} />
-        <Route path='opportunities/:id' element={<OpportunityDetail />} />
-        <Route path='opportunities/:id/edit' element={<OpportunityEdit />} />
-        <Route path='team' element={<TeamMembers />} />
-        <Route path='billing' element={<Billing />} />
+        <Route
+          path='opportunities'
+          element={
+            <ProtectedRoute
+              roles={[ROLES.ADMIN, ROLES.ORGANIZER, ROLES.PARTICIPANT]}
+            >
+              <Opportunities />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='opportunities/:id'
+          element={
+            <ProtectedRoute
+              roles={[ROLES.ADMIN, ROLES.ORGANIZER, ROLES.PARTICIPANT]}
+            >
+              <OpportunityDetail />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='opportunities/:id/edit'
+          element={
+            <ProtectedRoute
+              roles={[ROLES.ADMIN, ROLES.ORGANIZER, ROLES.PARTICIPANT]}
+            >
+              <OpportunityEdit />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='team'
+          element={
+            <ProtectedRoute
+              roles={[ROLES.ADMIN, ROLES.ORGANIZER, ROLES.PARTICIPANT]}
+            >
+              <TeamMembers />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='billing'
+          element={
+            <ProtectedRoute roles={[ROLES.ADMIN]}>
+              <Billing />
+            </ProtectedRoute>
+          }
+        />
       </Route>
+      <Route path='forbidden' element={<Forbidden />} />
+      <Route path='notfound' element={<NotFound />} />
     </Routes>
   );
 };
