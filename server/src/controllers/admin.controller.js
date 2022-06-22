@@ -58,7 +58,7 @@ exports.updatePlan = async (req, res, next) => {
             await AdminService.updatePlan(stripeRes.updatedPlan.id, data)
           .then((plansRes) => {
             return successResp(res, {
-              msg: SUCCESS_MESSAGE.UpDATED,
+              msg: SUCCESS_MESSAGE.UPDATED,
               code: HTTP_STATUS.SUCCESS.CODE,
               data: plansRes,
             });

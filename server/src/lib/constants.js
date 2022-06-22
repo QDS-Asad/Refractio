@@ -42,6 +42,14 @@ module.exports = Object.freeze({
       SUCCESS: "success",
       FAILED: "failed",
     },
+    PAYMENT_STATUS: {
+      SUCCESS: "Approved",
+      FAILED: "Failed",
+      CANCELED: 'Canceled'
+    },
+    PAYMENT_METHOD: {
+      CARD: 'card',
+    },
     HTTP_STATUS: {
         SUCCESS: {CODE: 200, TEXT: "Success"},
         BAD_REQUEST: {CODE: 400, TEXT: "Bad Request"},
@@ -66,8 +74,9 @@ module.exports = Object.freeze({
         SUPER_ADMIN_CREATED: "Super Admin Created Successfully",
         LOGIN_SUCCESS: "Login Successfully",
         DATA_FETCHED: "Fetched Successfully",
+        SUBSCRIBED: "Subscribed Successfully",
         CREATED: "Created Successfully",
-        UpDATED: "Updated Successfully",
+        UPDATED: "Updated Successfully",
         DELETED: "Deleted Successfully",
         CANCELED: "Canceled Successfully",
 
