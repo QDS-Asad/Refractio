@@ -139,7 +139,7 @@ exports.getPricesByPlanId = async (req, res, next) => {
         return successResp(res, {
           msg: SUCCESS_MESSAGE.DATA_FETCHED,
           code: HTTP_STATUS.SUCCESS.CODE,
-          data: stripeRes,
+          data: {plan: planId, prices: stripeRes.data},
         });
       })
       .catch((error) => {
@@ -154,6 +154,10 @@ exports.getPricesByPlanId = async (req, res, next) => {
 exports.deletePlan = async (req, res, next) => {
   try {
     const { planId } = req.params;
+    const planUsed = await AdminService.getUserPlanByPlanId(planId);
+    if(planUsed.length){
+      return errorResp(res, {msg: ERROR_MESSAGE.PLAN_USED, code: HTTP_STATUS.BAD_REQUEST.CODE})
+    }
     const planPrices = await AdminService.getAllStripePricesByPlanId(planId);
     await AdminService.deleteStripePlanById(planId, planPrices.data)
       .then(async (stripeRes) => {
