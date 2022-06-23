@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
 import SideBar from '../components/Sidebar';
 import { authLoginSelector } from '../features/auth/authLoginSlice';
-//import constants from '../common/constants';
 
 const AppLayout = () => {
   // const { ROLES, USER_STATUS } = constants;
