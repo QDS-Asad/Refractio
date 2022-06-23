@@ -14,6 +14,7 @@ import {
   loginUser,
 } from '../../features/auth/authLoginSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import { ROLES } from '../../common/constants';
 
 const Login = () => {
   const { register, setValue, handleSubmit, errors, trigger } = useForm({
@@ -36,7 +37,7 @@ const Login = () => {
     setValue(e.target.name, e.target.value);
     trigger(e.target.name);
   };
-  
+
   const handleChangeCheckBox = (e) => {
     e.persist();
     setValue(e.target.name, e.target.checked);
@@ -60,7 +61,7 @@ const Login = () => {
           'Invalid password. Password length should be min 8 symbols. Password should contain numbers, letters, special characters.',
       },
     },
-    rememberMe:{}
+    rememberMe: {},
   };
 
   useEffect(() => {
@@ -71,7 +72,11 @@ const Login = () => {
 
   useEffect(() => {
     if (userLogin) {
-      navigate('/');
+      if (userLogin.role.roleId === ROLES.SUPER_ADMIN) {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
     }
   }, [userLogin]);
 
@@ -122,7 +127,12 @@ const Login = () => {
           )}
         </Form.Field>
         <Form.Field>
-          <Checkbox label='Remember me' name='rememberMe' onBlur={handleChangeCheckBox} tabIndex='3' />
+          <Checkbox
+            label='Remember me'
+            name='rememberMe'
+            onBlur={handleChangeCheckBox}
+            tabIndex='3'
+          />
         </Form.Field>
         <Button type='submit' fluid primary className='mt-3 btn' tabIndex='4'>
           Log In

@@ -19,6 +19,11 @@ import Forbidden from './pages/misc/Forbidden';
 import NotFound from './pages/misc/NotFound';
 import { ROLES } from './common/constants';
 import ProtectedRoute from './components/ProtectedRoute';
+import ManageUsers from './pages/admin/manage-user/ManageUsers';
+import ManageOrders from './pages/admin/manage-orders/ManageOrders';
+import ManageSubscriptions from './pages/admin/manage-subscriptions/ManageSubscriptions';
+import ManageOpportunities from './pages/admin/manage-opportunities/ManageOpportunities';
+import ManageContent from './pages/admin/manage-content/ManageContent';
 const App = () => {
   return (
     <Routes>
@@ -84,6 +89,49 @@ const App = () => {
           element={
             <ProtectedRoute roles={[ROLES.ADMIN]}>
               <Billing />
+            </ProtectedRoute>
+          }
+        />
+      </Route>
+      <Route path='admin' element={<AppLayout />}>
+        <Route path='' element={<Navigate replace to='users' />} />
+        <Route
+          path='users'
+          element={
+            <ProtectedRoute roles={[ROLES.SUPER_ADMIN]}>
+              <ManageUsers />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='orders'
+          element={
+            <ProtectedRoute roles={[ROLES.SUPER_ADMIN]}>
+              <ManageOrders />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='subscriptions'
+          element={
+            <ProtectedRoute roles={[ROLES.SUPER_ADMIN]}>
+              <ManageSubscriptions />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='opportunities'
+          element={
+            <ProtectedRoute roles={[ROLES.SUPER_ADMIN]}>
+              <ManageOpportunities />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='content'
+          element={
+            <ProtectedRoute roles={[ROLES.SUPER_ADMIN]}>
+              <ManageContent />
             </ProtectedRoute>
           }
         />

@@ -60,6 +60,43 @@ const SideBar = () => {
           </Menu.Item>
         )}
 
+        {userLogin.role.roleId === ROLES.SUPER_ADMIN && (
+          <Menu.Item as={NavLink} to='/admin/users'>
+            <Image src='/images/team.svg' verticalAlign='middle' />
+            <span className='ps-2'>Users management</span>
+          </Menu.Item>
+        )}
+        {userLogin.role.roleId === ROLES.SUPER_ADMIN && (
+          <Menu.Item as={NavLink} to='/admin/orders'>
+            <Image src='/images/manage-orders.svg' verticalAlign='middle' />
+            <span className='ps-2'>Orders management</span>
+          </Menu.Item>
+        )}
+        {userLogin.role.roleId === ROLES.SUPER_ADMIN && (
+          <Menu.Item as={NavLink} to='/admin/subscriptions'>
+            <Image
+              src='/images/manage-subscription.svg'
+              verticalAlign='middle'
+            />
+            <span className='ps-2'>Subscription management</span>
+          </Menu.Item>
+        )}
+        {userLogin.role.roleId === ROLES.SUPER_ADMIN && (
+          <Menu.Item as={NavLink} to='/admin/opportunities'>
+            <Image
+              src='/images/manage-opportunities.svg'
+              verticalAlign='middle'
+            />
+            <span className='ps-2'>Opportunities management</span>
+          </Menu.Item>
+        )}
+        {userLogin.role.roleId === ROLES.SUPER_ADMIN && (
+          <Menu.Item as={NavLink} to='/admin/content'>
+            <Image src='/images/manage-content.svg' verticalAlign='middle' />
+            <span className='ps-2'>Content management (Landing)</span>
+          </Menu.Item>
+        )}
+
         <Menu.Item>
           <Menu.Menu>
             <Menu.Item name='Account' className='fs-6 text-uppercase' />
