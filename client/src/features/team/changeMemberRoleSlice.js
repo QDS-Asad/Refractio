@@ -9,8 +9,8 @@ export const initialState = {
 };
 
 // our slice
-const inviteMemberSlice = createSlice({
-  name: 'inviteMember',
+const changeMemberRoleSlice = createSlice({
+  name: 'changeMemberRole',
   initialState,
   reducers: {
     setLoading: (state) => {
@@ -24,10 +24,6 @@ const inviteMemberSlice = createSlice({
     setError: (state, { payload }) => {
       state.loading = false;
       state.error = payload;
-    },
-    reset: (state) => {
-      state.loading = false;
-      state.error = false;
       state.success = false;
     },
   },
@@ -37,23 +33,20 @@ export const {
   setLoading,
   setSuccess,
   setError,
-  reset,
-} = inviteMemberSlice.actions;
+} = changeMemberRoleSlice.actions;
 
 // export the selector (".items" being same as in slices/index.js's "items: something")
-export const inviteMemberSelector = (state) => state.inviteMember;
+export const changeMemberRoleSelector = (state) => {
+  return state.changeMemberRole;
+};
 
 // export the default reducer
-export default inviteMemberSlice.reducer;
+export default changeMemberRoleSlice.reducer;
 
-// fetch all opportunities
-export const inviteMember = (body) => async (dispatch) => {
+export const changeRole = (userId, roleId) => async (dispatch) => {
   try {
     dispatch(setLoading());
-    await refractioApi.post('/users/invite-account', {
-      email: body.email,
-      roleId: body.role,
-    });
+    await refractioApi.put(`/users/update-user-role/${userId}/${roleId}`);
     dispatch(setSuccess(true));
   } catch (error) {
     const errorMessage =
@@ -62,8 +55,4 @@ export const inviteMember = (body) => async (dispatch) => {
         : error.message;
     dispatch(setError(errorMessage));
   }
-};
-
-export const resetInviteTeamMember = () => async (dispatch) => {
-  dispatch(reset());
 };

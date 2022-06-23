@@ -94,6 +94,64 @@ exports.inviteUser = async (req, res, next) => {
               msg: ERROR_MESSAGE.ALLREADY_REGISTERED,
               code: HTTP_STATUS.BAD_REQUEST.CODE,
             });
+          } else if (userRes.status == USER_STATUS.DISABLED) {
+            const role = await RoleService.getRoleByRoleId(roleId);
+            const inivteBy = await UserService.getUserById(user._id);
+            const team = await TeamService.getTeamById(inivteBy.teamId);
+            const teamInfo = getTeaminfo(team);
+            if (team.members.length === TOTAL_TEAM_MEMBERS) {
+              return errorResp(res, {
+                msg: ERROR_MESSAGE.TEAM_LIMIT_EXCEED,
+                code: HTTP_STATUS.BAD_REQUEST,
+              });
+            }
+            if (
+              roleId == ROLES.ADMIN &&
+              teamInfo.totalAdmin.length === TOTAL_TEAM_ADMIN
+            ) {
+              return errorResp(res, {
+                msg: ERROR_MESSAGE.TEAM_ADMIN_LIMIT_EXCEED,
+                code: HTTP_STATUS.BAD_REQUEST,
+              });
+            }
+            if (
+              roleId == ROLES.ORGANIZER &&
+              teamInfo.totalOrganizer.length === TOTAL_TEAM_ORGANIZER
+            ) {
+              return errorResp(res, {
+                msg: ERROR_MESSAGE.TEAM_ORGANIZER_LIMIT_EXCEED,
+                code: HTTP_STATUS.BAD_REQUEST,
+              });
+            }
+            await UserService.updateUserById(userRes._id, {
+              ...req.body,
+              roleId: role._id,
+              status: USER_STATUS.INVITE_SENT,
+            })
+              .then(async (result) => {
+                const members = [
+                  ...team.members,
+                  { userId: result._id, roleId },
+                ];
+                await TeamService.updateTeamMembers(team._id, { members })
+                  .then(async (teamRes) => {
+                    await UserService.updateUserById(result._id, {
+                      teamId: team._id,
+                    });
+                    tokenVerificationEmail(
+                      res,
+                      EMAIL_TYPES.INVITE_USER,
+                      result,
+                      user
+                    );
+                  })
+                  .catch((error) => {
+                    serverError(res, error);
+                  });
+              })
+              .catch((error) => {
+                serverError(res, error);
+              });
           } else {
             return errorResp(res, {
               msg: ERROR_MESSAGE.ALLREADY_INVITED,
@@ -111,13 +169,19 @@ exports.inviteUser = async (req, res, next) => {
               code: HTTP_STATUS.BAD_REQUEST,
             });
           }
-          if (teamInfo.totalAdmin.length === TOTAL_TEAM_ADMIN) {
+          if (
+            roleId == ROLES.ADMIN &&
+            teamInfo.totalAdmin.length === TOTAL_TEAM_ADMIN
+          ) {
             return errorResp(res, {
               msg: ERROR_MESSAGE.TEAM_ADMIN_LIMIT_EXCEED,
               code: HTTP_STATUS.BAD_REQUEST,
             });
           }
-          if (teamInfo.totalOrganizer.length === TOTAL_TEAM_ORGANIZER) {
+          if (
+            roleId == ROLES.ORGANIZER &&
+            teamInfo.totalOrganizer.length === TOTAL_TEAM_ORGANIZER
+          ) {
             return errorResp(res, {
               msg: ERROR_MESSAGE.TEAM_ORGANIZER_LIMIT_EXCEED,
               code: HTTP_STATUS.BAD_REQUEST,
@@ -173,7 +237,8 @@ const getTeaminfo = (team) => {
 // generic email for register and forgot password
 const tokenVerificationEmail = async (res, type, user, sender = {}) => {
   user.token = crypto_encrypt(`${Math.floor(1000 + Math.random() * 9000)}`);
-  const tokenExpiry = Date.now() + TOKEN_EXPIRY;
+  const extendExpiry = type == EMAIL_TYPES.INVITE_USER ? 24 : 1;
+  const tokenExpiry = Date.now() + TOKEN_EXPIRY * extendExpiry;
   const newUser = getEmailTemplate({
     type,
     token: user.token,
@@ -552,6 +617,7 @@ exports.getTeam = async (req, res, next) => {
         });
       })
       .catch((error) => {
+        console.log(error);
         errorResp(res, {
           msg: ERROR_MESSAGE.NOT_FOUND,
           code: HTTP_STATUS.NOT_FOUND.CODE,
@@ -580,8 +646,8 @@ const getTeamByRole = async (obj) => {
 
 //resend invite email
 exports.resendInvite = async (req, res) => {
-  const { userId } = req.body;
   try {
+    const { userId } = req.params;
     await UserService.getUserById(userId)
       .then(async (user) => {
         if (user) {
@@ -648,23 +714,92 @@ exports.cancelUserInvite = async (req, res, next) => {
 
 //cancel/delete/remove user by admin and super admin
 exports.disableUser = async (req, res, next) => {
-  const { userId } = req.params;
-  const userData = {
-    status: USER_STATUS.DISABLED,
-    canLogin: false,
-    isVerified: false,
-  };
-  await UserService.updateUserById(userId, userData)
-    .then(() => {
-      return successResp(res, {
-        msg: SUCCESS_MESSAGE.DELETED,
-        code: HTTP_STATUS.SUCCESS.CODE,
+  try {
+    const { userId } = req.params;
+    const userData = {
+      status: USER_STATUS.DISABLED,
+      canLogin: false,
+      isVerified: false,
+    };
+    await UserService.updateUserById(userId, userData)
+      .then(() => {
+        return successResp(res, {
+          msg: SUCCESS_MESSAGE.DELETED,
+          code: HTTP_STATUS.SUCCESS.CODE,
+        });
+      })
+      .catch((error) => {
+        errorResp(res, {
+          msg: ERROR_MESSAGE.NOT_FOUND,
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+        });
       });
-    })
-    .catch((error) => {
-      errorResp(res, {
-        msg: ERROR_MESSAGE.NOT_FOUND,
-        code: HTTP_STATUS.NOT_FOUND.CODE,
+  } catch (error) {
+    serverError(res, error);
+  }
+};
+
+// update user role
+exports.updateUserRole = async (req, res, next) => {
+  try {
+    const { userId, roleId } = req.params;
+    const { user } = req.body;
+    const role = await RoleService.getRoleByRoleId(roleId);
+    const inviteBy = await UserService.getUserById(user._id);
+    const team = await TeamService.getTeamById(inviteBy.teamId);
+    const teamInfo = getTeaminfo(team);
+    if (
+      roleId == ROLES.ADMIN &&
+      teamInfo.totalAdmin.length === TOTAL_TEAM_ADMIN
+    ) {
+      return errorResp(res, {
+        msg: ERROR_MESSAGE.TEAM_ADMIN_LIMIT_EXCEED,
+        code: HTTP_STATUS.BAD_REQUEST,
       });
-    });
+    }
+    if (
+      roleId == ROLES.ORGANIZER &&
+      teamInfo.totalOrganizer.length === TOTAL_TEAM_ORGANIZER
+    ) {
+      return errorResp(res, {
+        msg: ERROR_MESSAGE.TEAM_ORGANIZER_LIMIT_EXCEED,
+        code: HTTP_STATUS.BAD_REQUEST,
+      });
+    }
+    await UserService.updateUserById(userId, { roleId: role._id })
+      .then(async (userRes) => {
+        const memberIndex = team.members.findIndex(
+          (obj) => obj.userId.toString() == userId
+        );
+        if (memberIndex >= 0) {
+          team.members[memberIndex] = {
+            userId,
+            roleId: role.roleId,
+          };
+          await TeamService.updateTeamMembers(team._id, {
+            members: team.members,
+          })
+            .then(async (teamRes) => {
+              return successResp(res, {
+                msg: SUCCESS_MESSAGE.UpDATED,
+                code: HTTP_STATUS.SUCCESS.CODE,
+              });
+            })
+            .catch((error) => {
+              errorResp(res, {
+                msg: ERROR_MESSAGE.NOT_FOUND,
+                code: HTTP_STATUS.NOT_FOUND.CODE,
+              });
+            });
+        }
+      })
+      .catch((error) => {
+        errorResp(res, {
+          msg: ERROR_MESSAGE.NOT_FOUND,
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+        });
+      });
+  } catch (error) {
+    serverError(res, error);
+  }
 };

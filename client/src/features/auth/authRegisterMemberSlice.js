@@ -5,56 +5,56 @@ import refractioApi from '../../common/refractioApi';
 export const initialState = {
   loading: false,
   error: null,
-  success: false,
+  registerMember: null,
 };
 
 // our slice
-const inviteMemberSlice = createSlice({
-  name: 'inviteMember',
+const authRegisterMemberSlice = createSlice({
+  name: 'authRegisterMember',
   initialState,
   reducers: {
     setLoading: (state) => {
       state.loading = true;
     },
-    setSuccess: (state, { payload }) => {
+    setRegisterMember: (state, { payload }) => {
       state.loading = false;
-      state.error = false;
-      state.success = payload;
+      state.error = null;
+      state.registerMember = payload;
     },
     setError: (state, { payload }) => {
       state.loading = false;
       state.error = payload;
+      state.registerMember = null;
     },
     reset: (state) => {
       state.loading = false;
-      state.error = false;
-      state.success = false;
+      state.error = null;
+      state.registerMember = null;
     },
   },
 });
 // export the actions
 export const {
   setLoading,
-  setSuccess,
+  setRegisterMember,
   setError,
   reset,
-} = inviteMemberSlice.actions;
+} = authRegisterMemberSlice.actions;
 
-// export the selector (".items" being same as in slices/index.js's "items: something")
-export const inviteMemberSelector = (state) => state.inviteMember;
+export const authRegisterMemberSelector = (state) => state.authRegisterMember;
 
 // export the default reducer
-export default inviteMemberSlice.reducer;
+export default authRegisterMemberSlice.reducer;
 
-// fetch all opportunities
-export const inviteMember = (body) => async (dispatch) => {
+// code Verification
+export const memberRegistration = (userId, body) => async (dispatch) => {
   try {
     dispatch(setLoading());
-    await refractioApi.post('/users/invite-account', {
-      email: body.email,
-      roleId: body.role,
-    });
-    dispatch(setSuccess(true));
+    let { data: response } = await refractioApi.put(
+      `/users/register-invite-account/${userId}`,
+      body
+    );
+    dispatch(setRegisterMember(response.message));
   } catch (error) {
     const errorMessage =
       error.response && error.response.data
@@ -64,6 +64,6 @@ export const inviteMember = (body) => async (dispatch) => {
   }
 };
 
-export const resetInviteTeamMember = () => async (dispatch) => {
+export const resetRegisterMember = () => (dispatch) => {
   dispatch(reset());
 };

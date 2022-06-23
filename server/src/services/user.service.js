@@ -27,7 +27,7 @@ exports.getUserByToken = async (token) => {
 exports.updateUserById = async (userId, user) => {
    return await User.findOneAndUpdate({
       _id: ObjectId(userId)
-   }, user)
+   }, user);
 }
 
 exports.deleteUserByRoleId = async (roleId) => {

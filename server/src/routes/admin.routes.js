@@ -7,10 +7,10 @@ const { validatePlan } = require('../middlewares/plan');
 
 /**
  * @swagger
- *   /api/admin/plans:
+ *   /api/plans:
  *   post:
  *     description: create new plan
- *     tags: [Super Admin]
+ *     tags: [Plans]
  *     requestBody:
  *       required: true
  *       content:
@@ -96,10 +96,10 @@ router.post('/plans', validatePlan, Admin.createPlan);
 
 /**
  * @swagger
- *   /api/admin/plans:
+ *   /api/plans:
  *   put:
  *     description: update plan
- *     tags: [Super Admin]
+ *     tags: [Plans]
  *     parameters:
  *       - in: path
  *         name: planId
@@ -186,14 +186,14 @@ router.post('/plans', validatePlan, Admin.createPlan);
  *      yearlyPrice:
  *        type: string
  */
-router.put('/plans', validatePlan, Admin.updatePlan);
+router.put('/plans/:planId', validatePlan, Admin.updatePlan);
 
 /**
  * @swagger
- *   /api/admin/plans:
+ *   /api/plans:
  *   get:
  *     description: get plans
- *     tags: [Super Admin]
+ *     tags: [Plans]
  *     responses:
  *        '200':
  *           description: Success
@@ -254,10 +254,10 @@ router.get('/plans', Admin.getAllPlans);
 
 /**
  * @swagger
- *   /api/admin/plans/{planId}:
+ *   /api/plans/{planId}:
  *   get:
  *     description: get plans by planId
- *     tags: [Super Admin]
+ *     tags: [Plans]
  *     parameters:
  *       - in: path
  *         name: planId
@@ -323,10 +323,10 @@ router.get('/plans/:planId', Admin.getPlanByPlanId);
 
 /**
  * @swagger
- *   /api/admin/plans/prices/{planId}:
+ *   /api/plans/prices/{planId}:
  *   get:
  *     description: get plans price by planId
- *     tags: [Super Admin]
+ *     tags: [Plans]
  *     parameters:
  *       - in: path
  *         name: planId
@@ -392,10 +392,10 @@ router.get('/plans/prices/:planId', Admin.getPricesByPlanId);
 
 /**
  * @swagger
- *   /api/admin/plans/{planId}:
+ *   /api/plans/{planId}:
  *   delete:
  *     description: delete plan by planId
- *     tags: [Super Admin]
+ *     tags: [Plans]
  *     parameters:
  *       - in: path
  *         name: planId

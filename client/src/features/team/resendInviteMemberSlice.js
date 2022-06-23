@@ -9,8 +9,8 @@ export const initialState = {
 };
 
 // our slice
-const inviteMemberSlice = createSlice({
-  name: 'inviteMember',
+const resendInviteMemberSlice = createSlice({
+  name: 'resendInviteMember',
   initialState,
   reducers: {
     setLoading: (state) => {
@@ -38,22 +38,21 @@ export const {
   setSuccess,
   setError,
   reset,
-} = inviteMemberSlice.actions;
+} = resendInviteMemberSlice.actions;
 
 // export the selector (".items" being same as in slices/index.js's "items: something")
-export const inviteMemberSelector = (state) => state.inviteMember;
+export const resendInviteMemberSelector = (state) => {
+  return state.resendInviteMember;
+};
 
 // export the default reducer
-export default inviteMemberSlice.reducer;
+export default resendInviteMemberSlice.reducer;
 
 // fetch all opportunities
-export const inviteMember = (body) => async (dispatch) => {
+export const resendInviteMember = (member) => async (dispatch) => {
   try {
     dispatch(setLoading());
-    await refractioApi.post('/users/invite-account', {
-      email: body.email,
-      roleId: body.role,
-    });
+    await refractioApi.put(`/users/resend-invite-account/${member}`);
     dispatch(setSuccess(true));
   } catch (error) {
     const errorMessage =
@@ -62,8 +61,4 @@ export const inviteMember = (body) => async (dispatch) => {
         : error.message;
     dispatch(setError(errorMessage));
   }
-};
-
-export const resetInviteTeamMember = () => async (dispatch) => {
-  dispatch(reset());
 };

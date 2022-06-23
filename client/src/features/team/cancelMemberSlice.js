@@ -1,5 +1,5 @@
-import { createSlice } from "@reduxjs/toolkit";
-import refractioApi, { authHeader } from "../../common/refractioApi";
+import { createSlice } from '@reduxjs/toolkit';
+import refractioApi from '../../common/refractioApi';
 
 // initial state
 export const initialState = {
@@ -10,7 +10,7 @@ export const initialState = {
 
 // our slice
 const cancelMemberSlice = createSlice({
-  name: "cancelMember",
+  name: 'cancelMember',
   initialState,
   reducers: {
     setLoading: (state) => {
@@ -41,7 +41,9 @@ export const {
 } = cancelMemberSlice.actions;
 
 // export the selector (".items" being same as in slices/index.js's "items: something")
-export const cancelMemberSelector = (state) => { return state.cancelMember};
+export const cancelMemberSelector = (state) => {
+  return state.cancelMember;
+};
 
 // export the default reducer
 export default cancelMemberSlice.reducer;
@@ -50,12 +52,13 @@ export default cancelMemberSlice.reducer;
 export const cancelMember = (member) => async (dispatch) => {
   try {
     dispatch(setLoading());
-    await refractioApi.delete(
-      `/users/cancel-invite-account/${member}`,
-      { headers: authHeader() }
-    );
+    await refractioApi.delete(`/users/cancel-invite-account/${member}`);
     dispatch(setSuccess(true));
   } catch (error) {
-    dispatch(setError(error.message));
+    const errorMessage =
+      error.response && error.response.data
+        ? error.response.data.message
+        : error.message;
+    dispatch(setError(errorMessage));
   }
 };

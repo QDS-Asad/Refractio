@@ -9,14 +9,9 @@ module.exports.validatePlan = [
     check('description')
     .exists().bail().withMessage(ERROR_MESSAGE.REQUIRED)
     .notEmpty().bail().withMessage(ERROR_MESSAGE.NOT_EMPTY),
-    check('monthlyPrice', ERROR_MESSAGE.MONTHLY_PRICE)
+    check('prices', ERROR_MESSAGE.MONTHLY_PRICE)
     .exists().bail().withMessage(ERROR_MESSAGE.REQUIRED)
-    .notEmpty().bail().withMessage(ERROR_MESSAGE.NOT_EMPTY)
-    .isNumeric().bail().withMessage(ERROR_MESSAGE.MUST_NUMERIC),
-    check('yearlyPrice')
-    .exists().bail().withMessage(ERROR_MESSAGE.REQUIRED)
-    .notEmpty().bail().withMessage(ERROR_MESSAGE.NOT_EMPTY)
-    .isNumeric().bail().withMessage(ERROR_MESSAGE.MUST_NUMERIC),
+    .isArray().bail().withMessage(ERROR_MESSAGE.NOT_EMPTY),
     (req, res, next) => {
         try {
             const errors = validationResult(req);

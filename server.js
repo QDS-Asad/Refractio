@@ -34,7 +34,7 @@ app.get('/api/status', (req, res) => {
 
 app.use('/api/users', users);
 app.use('/api/roles', roles);
-app.use('/api/admin', admin);
+app.use('/api', admin);
 
 app.use('/', express.static(path.join(__dirname, '/client/build')));
 // app.use('*', (req, res) => {

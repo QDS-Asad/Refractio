@@ -24,7 +24,6 @@ const InviteTeamMember = ({ inviteTeamMember, setInviteTeamMember }) => {
   const { loading, error, success } = useSelector(inviteMemberSelector);
 
   const handleCreate = (data) => {
-    console.log(data);
     // dispatch team invite;
     dispatch(inviteMember(data));
   };
@@ -137,6 +136,7 @@ const InviteTeamMember = ({ inviteTeamMember, setInviteTeamMember }) => {
           form='invite-team-member'
           content='Add'
           className='btn'
+          loading={loading}
         />
       </Modal.Actions>
     </Modal>
