@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { authHeader } from '../../common/refractioApi';
 import refractioApi from '../../common/refractioApi';
 
 // initial state
@@ -23,8 +22,8 @@ const teamListSlice = createSlice({
     setTeamList: (state, { payload }) => {
       state.loading = false;
       state.error = false;
-      state.members = payload;
-      state.totalPages = 3;
+      state.members = payload.docs;
+      state.totalPages = payload.totalPages;
     },
     setError: (state, { payload }) => {
       state.loading = false;
@@ -42,11 +41,13 @@ export const teamListSelector = (state) => state.teamList;
 export default teamListSlice.reducer;
 
 // fetch all opportunities
-export const fetchTeamList = (pageNumber, pageSize= 10) => async (dispatch, getState) => {
+export const fetchTeamList = (pageNumber, pageSize) => async (dispatch) => {
   try {
     dispatch(setLoading());
-    let { data } = await refractioApi.get(`/users/team?page=${pageNumber}&page_size=${pageSize}`, {headers: authHeader()});
-    dispatch(setTeamList(data.data.docs));
+    let { data } = await refractioApi.get(
+      `/users/team?page=${pageNumber}&page_size=${pageSize}`
+    );
+    dispatch(setTeamList(data.data));
   } catch (error) {
     dispatch(setError(error.message));
   }

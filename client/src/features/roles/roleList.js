@@ -43,6 +43,10 @@ export const fetchRoles = () => async (dispatch) => {
     let { data: response } = await refractioApi.get('/roles');
     dispatch(setRoleList(response.data));
   } catch (error) {
-    dispatch(setError(error.message));
+    const errorMessage =
+      error.response && error.response.data
+        ? error.response.data.message
+        : error.message;
+    dispatch(setError(errorMessage));
   }
 };

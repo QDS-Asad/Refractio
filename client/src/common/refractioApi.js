@@ -13,7 +13,7 @@ export const localAPI = axios.create({
   },
 });
 
-export default axios.create({
+const http = axios.create({
   baseURL: `${baseURL}/api`,
   headers: {
     Accept: 'application/json',
@@ -21,10 +21,17 @@ export default axios.create({
   },
 });
 
+http.interceptors.request.use(function(config) {
+  config.headers = authHeader();
+  return config;
+});
+
+export default http;
+
 export function authHeader() {
   const user = JSON.parse(localStorage.getItem('userInfo'));
   if (user && user.token) {
-    return { 'authorization': `Bearer ${user.token}` };
+    return { authorization: `Bearer ${user.token}` };
   } else {
     return {};
   }

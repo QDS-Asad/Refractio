@@ -1,12 +1,19 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Message, Modal } from 'semantic-ui-react';
-import { cancelMember, cancelMemberSelector } from '../../../features/team/cancelMemberSlice';
+import {
+  cancelMember,
+  cancelMemberSelector,
+} from '../../../features/team/cancelMemberSlice';
 
-const CancelInvitation = ({ cancelInvitation, setCancelInvitation, member }) => {
+const CancelInvitation = ({
+  cancelInvitation,
+  setCancelInvitation,
+  member,
+}) => {
   const dispatch = useDispatch();
 
-  const { loading, error, success } = useSelector(cancelMemberSelector)
+  const { loading, error, success } = useSelector(cancelMemberSelector);
 
   const handleCancel = (data) => {
     // dispatch team cancel invite;
@@ -45,6 +52,7 @@ const CancelInvitation = ({ cancelInvitation, setCancelInvitation, member }) => 
           content='Yes'
           className='btn-danger'
           onClick={() => handleCancel(member)}
+          loading={loading}
         />
       </Modal.Actions>
     </Modal>

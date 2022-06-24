@@ -24,10 +24,16 @@ exports.getUserByToken = async (token) => {
    })
 }
 
+exports.getUserByCustomerId = async (customerId) => {
+   return await User.findOne({
+      'stripeDetails.customerId': customerId
+   })
+}
+
 exports.updateUserById = async (userId, user) => {
    return await User.findOneAndUpdate({
       _id: ObjectId(userId)
-   }, user)
+   }, user);
 }
 
 exports.deleteUserByRoleId = async (roleId) => {

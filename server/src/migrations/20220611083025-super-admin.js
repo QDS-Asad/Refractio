@@ -10,9 +10,9 @@ module.exports = {
       if (!superAdmin) {
         const adminData = {
           roleId: role._id,
-          fullName: role.name,
-          email: "admin@gmail.com",
-          password: crypto_encrypt("admin123"),
+          fullName: "Refractio Super Admin",
+          email: "refractio@yopmail.com",
+          password: crypto_encrypt("Qwe123@@@"),
           status: USER_STATUS.ACTIVE,
           isVerified: true,
           canLogin: true,

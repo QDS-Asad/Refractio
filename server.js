@@ -7,7 +7,7 @@ const bodyParser = require('body-parser');
 const swaggerUI = require('swagger-ui-express');
 const constants = require('./server/src/lib/constants');
 const swagger = require('./server/src/lib/swagger');
-const admin = require('./server/src/routes/admin.routes');
+const plans = require('./server/src/routes/plan.routes');
 const users = require('./server/src/routes/user.routes');
 const roles = require('./server/src/routes/role.routes');
 const { HTTP_STATUS, ERROR_MESSAGE } = require('./server/src/lib/constants');
@@ -34,7 +34,7 @@ app.get('/api/status', (req, res) => {
 
 app.use('/api/users', users);
 app.use('/api/roles', roles);
-app.use('/api/admin', admin);
+app.use('/api', plans);
 
 app.use('/', express.static(path.join(__dirname, '/client/build')));
 // app.use('*', (req, res) => {

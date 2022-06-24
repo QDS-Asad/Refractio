@@ -16,10 +16,13 @@ import {
   teamListSelector,
 } from '../../../features/team/teamListSlice';
 import CancelInvitation from './CancelInvitation';
+import ChangeRole from './ChangeRole';
 import DeleteAccount from './DeleteAccount';
 import InviteTeamMember from './InviteTeamMember';
 import RemoveTeamMember from './RemoveTeamMember';
 import ResendInvitation from './ResendInvitation';
+import { ROLES, USER_STATUS } from '../../../common/constants';
+import { authLoginSelector } from '../../../features/auth/authLoginSlice';
 
 const TeamMembers = () => {
   const [inviteTeamMember, setInviteTeamMember] = useState(false);
@@ -27,21 +30,31 @@ const TeamMembers = () => {
   const [cancelInvitation, setCancelInvitation] = useState(false);
   const [resendInvitation, setResendInvitation] = useState(false);
   const [deleteAccount, setDeleteAccount] = useState(false);
+  const [changeMemberRole, setChangeMemberRole] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
+  const [selectedRole, setSelectedRole] = useState(0);
 
   const dispatch = useDispatch();
 
   // fetch data from our store
-  const { loading, error, members, page, totalPages } = useSelector(
+  const { loading, error, members, page, limit, totalPages } = useSelector(
     teamListSelector
   );
+
+  const { userLogin } = useSelector(authLoginSelector);
 
   const { roles } = useSelector(roleListSelector);
 
   // hook to fetch items
   useEffect(() => {
-    !inviteTeamMember && !cancelInvitation && dispatch(fetchTeamList(page)) && dispatch(fetchRoles());
-  }, [inviteTeamMember, cancelInvitation]);
+    !inviteTeamMember &&
+      !cancelInvitation &&
+      !resendInvitation &&
+      !changeMemberRole &&
+      !removeTeamMember &&
+      dispatch(fetchTeamList(page, limit)) &&
+      dispatch(fetchRoles());
+  }, [inviteTeamMember, cancelInvitation, resendInvitation, changeMemberRole, removeTeamMember]);
 
   const removeTeamMemberHandler = (id) => {
     setSelectedMember(id);
@@ -58,13 +71,19 @@ const TeamMembers = () => {
     setCancelInvitation(true);
   };
 
-  // const deleteAccountHandler = (id) => {
-  //   setSelectedMember(id);
-  //   setDeleteAccount(true);
-  // };
+  const deleteAccountHandler = (id) => {
+    setSelectedMember(id);
+    setDeleteAccount(true);
+  };
 
   const onPageChange = (e, { activePage }) => {
-    dispatch(fetchTeamList(activePage));
+    dispatch(fetchTeamList(activePage, limit));
+  };
+
+  const handleRoleChange = (newRoleId, userId) => {
+    setSelectedMember(userId);
+    setSelectedRole(newRoleId);
+    setChangeMemberRole(true);
   };
 
   return (
@@ -75,40 +94,49 @@ const TeamMembers = () => {
             Team
           </Header>
         </Grid.Column>
-        <Grid.Column width={8}>
-          <Button
-            primary
-            className='btn'
-            floated='right'
-            onClick={() => setInviteTeamMember(true)}
-          >
-            Add
-          </Button>
-          <InviteTeamMember
-            inviteTeamMember={inviteTeamMember}
-            setInviteTeamMember={setInviteTeamMember}
-          />
-          <RemoveTeamMember
-            removeTeamMember={removeTeamMember}
-            setRemoveTeamMember={setRemoveTeamMember}
-            member={selectedMember}
-          />
-          <CancelInvitation
-            cancelInvitation={cancelInvitation}
-            setCancelInvitation={setCancelInvitation}
-            member={selectedMember}
-          />
-          <ResendInvitation
-            resendInvitation={resendInvitation}
-            setResendInvitation={setResendInvitation}
-            member={selectedMember}
-          />
-          <DeleteAccount
-            deleteAccount={deleteAccount}
-            setDeleteAccount={setDeleteAccount}
-            member={selectedMember}
-          />
-        </Grid.Column>
+        {(userLogin.role.roleId === ROLES.ADMIN ||
+          userLogin.role.roleId === ROLES.ORGANIZER) && (
+          <Grid.Column width={8}>
+            <Button
+              primary
+              className='btn'
+              floated='right'
+              onClick={() => setInviteTeamMember(true)}
+            >
+              Add
+            </Button>
+            <InviteTeamMember
+              inviteTeamMember={inviteTeamMember}
+              setInviteTeamMember={setInviteTeamMember}
+            />
+            <RemoveTeamMember
+              removeTeamMember={removeTeamMember}
+              setRemoveTeamMember={setRemoveTeamMember}
+              member={selectedMember}
+            />
+            <CancelInvitation
+              cancelInvitation={cancelInvitation}
+              setCancelInvitation={setCancelInvitation}
+              member={selectedMember}
+            />
+            <ResendInvitation
+              resendInvitation={resendInvitation}
+              setResendInvitation={setResendInvitation}
+              member={selectedMember}
+            />
+            <DeleteAccount
+              deleteAccount={deleteAccount}
+              setDeleteAccount={setDeleteAccount}
+              member={selectedMember}
+            />
+            <ChangeRole
+              changeMemberRole={changeMemberRole}
+              setChangeMemberRole={setChangeMemberRole}
+              member={selectedMember}
+              roleId={selectedRole}
+            />
+          </Grid.Column>
+        )}
       </Grid>
       <Grid>
         <Grid.Column>
@@ -123,8 +151,13 @@ const TeamMembers = () => {
                 <Table.Row>
                   <Table.HeaderCell>Name</Table.HeaderCell>
                   <Table.HeaderCell>Email</Table.HeaderCell>
-                  <Table.HeaderCell>Role</Table.HeaderCell>
-                  <Table.HeaderCell></Table.HeaderCell>
+                  {(userLogin.role.roleId === ROLES.ADMIN ||
+                    userLogin.role.roleId === ROLES.ORGANIZER) && (
+                    <Table.HeaderCell>Role</Table.HeaderCell>
+                  )}
+                  {userLogin.role.roleId === ROLES.ADMIN && (
+                    <Table.HeaderCell></Table.HeaderCell>
+                  )}
                 </Table.Row>
               </Table.Header>
 
@@ -132,53 +165,73 @@ const TeamMembers = () => {
                 {members.map((user) => (
                   <Table.Row key={user._id}>
                     <Table.Cell>
-                      {user.status === 'active' && user.fullName}
-                      {user.status === 'invite_sent' && 'Pending Invitation'}
+                      {user.status === 'invite_sent'
+                        ? 'Pending Invitation'
+                        : user.fullName}
                     </Table.Cell>
                     <Table.Cell>{user.email}</Table.Cell>
-                    <Table.Cell>
-                      <Dropdown
-                        fluid
-                        selection
-                        defaultValue={user.role.roleId}
-                        options={roles.map((role) => {
-                          return {
-                            key: role.roleId,
-                            text: role.name,
-                            value: role.roleId,
-                          };
-                        })}
-                      />
-                    </Table.Cell>
-                    <Table.Cell className='clearfix'>
-                      {user.status === 'active' && (
-                        <Button
-                          className='btn-link'
-                          floated='right'
-                          onClick={() => removeTeamMemberHandler(user._id)}
-                        >
-                          Remove
-                        </Button>
-                      )}
-                      {user.status == "invite_sent" &&  (
-                        <>
+                    {(userLogin.role.roleId === ROLES.ADMIN ||
+                      userLogin.role.roleId === ROLES.ORGANIZER) && (
+                      <Table.Cell>
+                        <Dropdown
+                          onChange={(e, { value }) =>
+                            handleRoleChange(value, user._id)
+                          }
+                          fluid
+                          selection
+                          disabled={userLogin.id === user._id}
+                          defaultValue={user.role.roleId}
+                          options={roles.map((role) => {
+                            return {
+                              key: role.roleId,
+                              text: role.name,
+                              value: role.roleId,
+                            };
+                          })}
+                        />
+                      </Table.Cell>
+                    )}
+                    {userLogin.role.roleId === ROLES.ADMIN && (
+                      <Table.Cell className='clearfix'>
+                        {user.status === USER_STATUS.ACTIVE && (
                           <Button
                             className='btn-link'
                             floated='right'
-                            onClick={() => resendInvitationHandler(user._id)}
+                            onClick={() => removeTeamMemberHandler(user._id)}
                           >
-                            Resend invitation
+                            Remove
                           </Button>
-                          <Button
-                            className='btn-link'
-                            floated='right'
-                            onClick={() => cancelInvitationHandler(user._id)}
-                          >
-                            Cancel invitation
-                          </Button>
-                        </>
-                      )}
-                    </Table.Cell>
+                        )}
+                        {user.status === USER_STATUS.INVITE_SENT && (
+                          <>
+                            <Button
+                              className='btn-link'
+                              floated='right'
+                              onClick={() => resendInvitationHandler(user._id)}
+                            >
+                              Resend invitation
+                            </Button>
+                            <Button
+                              className='btn-link'
+                              floated='right'
+                              onClick={() => cancelInvitationHandler(user._id)}
+                            >
+                              Cancel invitation
+                            </Button>
+                          </>
+                        )}
+                        {userLogin.id === user._id &&
+                          user.role.roleId === ROLES.ADMIN && (
+                            <Button
+                              className='btn-link-danger'
+                              floated='right'
+                              onClick={() => deleteAccountHandler(user._id)}
+                            >
+                              Delete Account
+                            </Button>
+                          )}
+                      </Table.Cell>
+                    )}
                   </Table.Row>
                 ))}
               </Table.Body>

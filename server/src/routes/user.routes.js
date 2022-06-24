@@ -1,13 +1,13 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const User = require('../controllers/user.controller');
-const { validateAcceptInvite } = require('../middlewares/acceptInvite');
-const Auth = require('../middlewares/auth');
-const { validateInvite } = require('../middlewares/inviteUser');
-const { validateLogin } = require('../middlewares/login');
-const { validateRegister } = require('../middlewares/register');
-const { validateResetPassword } = require('../middlewares/resetPassword');
-
+const User = require("../controllers/user.controller");
+const { validateAcceptInvite } = require("../middlewares/acceptInvite");
+const Auth = require("../middlewares/auth");
+const { validateInvite } = require("../middlewares/inviteUser");
+const { validateLogin } = require("../middlewares/login");
+const { validateRegister } = require("../middlewares/register");
+const { validateResetPassword } = require("../middlewares/resetPassword");
+const { validateSubscribe } = require("../middlewares/subscribe");
 
 /**
  * @swagger
@@ -76,7 +76,7 @@ const { validateResetPassword } = require('../middlewares/resetPassword');
  *                     type: object
  *                 example:
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
- * 
+ *
  * components:
  *  schemas:
  *   Register:
@@ -93,7 +93,7 @@ const { validateResetPassword } = require('../middlewares/resetPassword');
  *      password:
  *        type: string
  */
-router.post('/register', validateRegister, User.register);
+router.post("/register", validateRegister, User.register);
 
 /**
  * @swagger
@@ -162,7 +162,7 @@ router.post('/register', validateRegister, User.register);
  *                     type: object
  *                 example:
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
- * 
+ *
  * components:
  *  schemas:
  *   VerifyRegister:
@@ -176,8 +176,8 @@ router.post('/register', validateRegister, User.register);
  *      otp:
  *        type: string
  */
- router.post('/verify-register', User.verifyToken);
- 
+router.post("/verify-register", User.verifyToken);
+
 /**
  * @swagger
  *   /api/users/resend-verify-code:
@@ -245,7 +245,7 @@ router.post('/register', validateRegister, User.register);
  *                     type: object
  *                 example:
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
- * 
+ *
  * components:
  *  schemas:
  *   ReVerify:
@@ -259,7 +259,7 @@ router.post('/register', validateRegister, User.register);
  *      email:
  *        type: string
  */
- router.post('/resend-verify-code', User.resendToken);
+router.post("/resend-verify-code", User.resendToken);
 
 /**
  * @swagger
@@ -328,7 +328,7 @@ router.post('/register', validateRegister, User.register);
  *                     type: object
  *                 example:
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
- * 
+ *
  * components:
  *  schemas:
  *   Login:
@@ -345,7 +345,7 @@ router.post('/register', validateRegister, User.register);
  *      rememberMe:
  *        type: boolen
  */
-router.post('/login', validateLogin, User.login);
+router.post("/login", validateLogin, User.login);
 
 /**
  * @swagger
@@ -414,7 +414,7 @@ router.post('/login', validateLogin, User.login);
  *                     type: object
  *                 example:
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
- * 
+ *
  * components:
  *  schemas:
  *   ForgotPassword:
@@ -425,7 +425,7 @@ router.post('/login', validateLogin, User.login);
  *      email:
  *        type: string
  */
-router.post('/forget-password', User.forgetPassword);
+router.post("/forget-password", User.forgetPassword);
 
 /**
  * @swagger
@@ -499,7 +499,7 @@ router.post('/forget-password', User.forgetPassword);
  *                     type: object
  *                 example:
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
- * 
+ *
  * components:
  *  schemas:
  *   ResetPassword:
@@ -513,7 +513,113 @@ router.post('/forget-password', User.forgetPassword);
  *      confirmPassword:
  *        type: string
  */
-router.put('/reset-password/:token', validateResetPassword , User.resetPassword);
+router.put("/reset-password/:token", validateResetPassword, User.resetPassword);
+
+/**
+ * @swagger
+ *   /api/users/subscribe/{userId}:
+ *   put:
+ *     description: subscribe user
+ *     tags: [User]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *     schema:
+ *        type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Subscribe'
+ *     responses:
+ *        '200':
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                   success: true
+ *                   code: 200
+ *                   message: Operation successfull.
+ *        '404':
+ *           description: Operation Failed
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 404,"message": "Operation Failed."}
+ *
+ *        '422':
+ *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
+ *
+ * components:
+ *  schemas:
+ *   Subscribe:
+ *    type: object
+ *    required:
+ *      - planId
+ *      - priceId
+ *      - nameOnCard
+ *      - cardNumber
+ *      - cardExpiry
+ *      - cardCvv
+ *      - autoRenew
+ *      - couponCode
+ *    properties:
+ *      planId:
+ *        type: string
+ *      priceId:
+ *         type: string
+ *      nameOnCard:
+ *         type: string
+ *      cardNumber:
+ *         type: string
+ *      cardExpiry:
+ *         type: string
+ *      cardCvv:
+ *         type: string
+ *      autoRenew:
+ *         type: string
+ *      couponCode:
+ *         type: string
+ */
+router.put("/subscribe/:userId", Auth, validateSubscribe, User.subscribe);
 
 /**
  * @swagger
@@ -582,8 +688,7 @@ router.put('/reset-password/:token', validateResetPassword , User.resetPassword)
  *                 example:
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
  */
- router.delete('/delete/:userId', Auth, User.disableUser);
-
+router.delete("/delete/:userId", Auth, User.disableUser);
 
 //Team specific user routes
 
@@ -654,7 +759,7 @@ router.put('/reset-password/:token', validateResetPassword , User.resetPassword)
  *                     type: object
  *                 example:
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
- * 
+ *
  * components:
  *  schemas:
  *   Invite:
@@ -668,7 +773,7 @@ router.put('/reset-password/:token', validateResetPassword , User.resetPassword)
  *      roleId:
  *        type: number
  */
- router.post('/invite-account', Auth, validateInvite, User.inviteUser);
+router.post("/invite-account", Auth, validateInvite, User.inviteUser);
 
 /**
  * @swagger
@@ -736,11 +841,11 @@ router.put('/reset-password/:token', validateResetPassword , User.resetPassword)
  *                     type: object
  *                 example:
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
- * 
+ *
  */
- router.get('/verify-invite-account/:token', User.verifyEmailInvite)
+router.get("/verify-invite-account/:token", User.verifyEmailInvite);
 
- /**
+/**
  * @swagger
  *   /api/users/register-invite-account/{userId}:
  *   put:
@@ -812,7 +917,7 @@ router.put('/reset-password/:token', validateResetPassword , User.resetPassword)
  *                     type: object
  *                 example:
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
- * 
+ *
  * components:
  *  schemas:
  *   AcceptUserInvite:
@@ -832,7 +937,7 @@ router.put('/reset-password/:token', validateResetPassword , User.resetPassword)
  *      confirmPassword:
  *        type: string
  */
-router.put('/register-invite-account/:userId', validateAcceptInvite , User.inviteRegister);
+router.put("/register-invite-account/:userId", validateAcceptInvite, User.inviteRegister);
 
 /**
  * @swagger
@@ -901,8 +1006,79 @@ router.put('/register-invite-account/:userId', validateAcceptInvite , User.invit
  *                 example:
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
  */
- router.put('/resend-invite-account/:userId', User.resendInvite);
- 
+router.put("/resend-invite-account/:userId", User.resendInvite);
+
+/**
+ * @swagger
+ *   /api/users/update-user-role/{userId}/{roleId}:
+ *   put:
+ *     description: update user role
+ *     tags: [Team]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *       - in: path
+ *         name: roleId
+ *     schema:
+ *        type: stirng
+ *     responses:
+ *        '200':
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                   success: true
+ *                   code: 200
+ *                   message: Operation successfull.
+ *        '404':
+ *           description: Operation Failed
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 404,"message": "Operation Failed."}
+ *
+ *        '422':
+ *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
+ */
+router.put("/update-user-role/:userId/:roleId", Auth, User.updateUserRole);
+
 /**
  * @swagger
  *   /api/users/cancel-invite-account/{userId}:
@@ -970,7 +1146,7 @@ router.put('/register-invite-account/:userId', validateAcceptInvite , User.invit
  *                 example:
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
  */
-router.delete('/cancel-invite-account/:userId', Auth, User.cancelUserInvite);
+router.delete("/cancel-invite-account/:userId", Auth, User.cancelUserInvite);
 
 /**
  * @swagger
@@ -982,7 +1158,7 @@ router.delete('/cancel-invite-account/:userId', Auth, User.cancelUserInvite);
  *        - in: query
  *          name: page
  *          schema:
- *              type: integer 
+ *              type: integer
  *        - in: query
  *          name: page_size
  *          schema:
@@ -1042,7 +1218,7 @@ router.delete('/cancel-invite-account/:userId', Auth, User.cancelUserInvite);
  *                     type: object
  *                 example:
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
- * 
+ *
  * components:
  *  schemas:
  *   Team:
@@ -1053,6 +1229,8 @@ router.delete('/cancel-invite-account/:userId', Auth, User.cancelUserInvite);
  *      page_size:
  *        type: number
  */
- router.get('/team', Auth, User.getTeam)
+router.get("/team", Auth, User.getTeam);
+
+router.post("/subscription-recurring-payment", User.subscriptionRecurringPayment);
 
 module.exports = router;
