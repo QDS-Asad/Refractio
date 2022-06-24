@@ -104,8 +104,9 @@ const Subscriptions = () => {
               <Card.Content>
                 <List>
                   <List.Item>{plan.description}</List.Item>
-                  <List.Item>${plan.pricePerMonth} / per month</List.Item>
-                  <List.Item>${plan.priceAnnually} / annually</List.Item>
+                  {plan.prices && plan.prices.map((price) => (
+                    <List.Item>${price.amount} / per {price.interval}</List.Item>
+                  ))}
                 </List>
               </Card.Content>
             </Card>

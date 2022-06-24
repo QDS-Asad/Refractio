@@ -48,16 +48,33 @@ exports.updateStripePlan = async (obj) => {
 };
 
 exports.getAllStripePlans = async () => {
-  const plans = await stripe.products.list({ active: true });
+  let plansList = [];
+  let plans = await stripe.products.list({ active: true });
+  plans.data.sort((a, b) => a.created - b.created);
   await Promise.all(
     plans.data.map(async (plan) => {
       let priceData = await stripe.prices.search({
         query: `product:'${plan.id}' AND active:'true'`,
       });
-      priceData && (plan.prices = priceData.data);
+      let prices = [];
+      priceData.data.map(async (price) => {
+        let filterPrices = {
+          id: price.id,
+          amount: convertDollerToCent(price.unit_amount),
+          interval: price.recurring.interval
+        }
+        prices.push(filterPrices);
+      })
+      let filterPlan = {
+        id: plan.id,
+        name: plan.name,
+        description: plan.description,
+        prices
+      }
+      plansList.push(filterPlan)
     })
   );
-  return plans.data;
+  return plansList;
 };
 
 exports.getStripePlanById = async (obj) => {
@@ -127,4 +144,8 @@ exports.getUserPlanByPlanId = async (planId) => {
 
 const convertCentToDoller = (price) => {
   return price * 100;
+};
+
+const convertDollerToCent = (price) => {
+  return price / 100;
 };

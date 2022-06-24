@@ -45,7 +45,9 @@ module.exports = Object.freeze({
     PAYMENT_STATUS: {
       SUCCESS: "Approved",
       FAILED: "Failed",
-      CANCELED: 'Canceled'
+      CANCELED: "Canceled",
+      TRIAL_END: "Subscription Trial End",
+      UNKNOWN: "Unknown"
     },
     PAYMENT_METHOD: {
       CARD: 'card',

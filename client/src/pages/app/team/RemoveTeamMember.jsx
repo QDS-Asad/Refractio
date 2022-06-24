@@ -1,12 +1,27 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Button, Message, Modal } from 'semantic-ui-react';
+import { removeMember, removeMemberSelector } from '../../../features/team/removeMemberSlice';
 
 const RemoveTeamMember = ({
   removeTeamMember,
   setRemoveTeamMember,
   member,
 }) => {
-  const error = null;
+  const dispatch = useDispatch();
+
+  const { loading, error, success } = useSelector(removeMemberSelector);
+
+  const handleRemove = (data) => {
+    // dispatch team cancel invite;
+    dispatch(removeMember(data));
+  };
+
+  useEffect(() => {
+    if (success) {
+      setRemoveTeamMember(false);
+    }
+  }, [success]);
   return (
     <Modal
       onClose={() => setRemoveTeamMember(false)}
@@ -32,7 +47,8 @@ const RemoveTeamMember = ({
         <Button
           content='Remove'
           className='btn-danger'
-          onClick={() => setRemoveTeamMember(false)}
+          onClick={() => handleRemove(member)}
+          loading={loading}
         />
       </Modal.Actions>
     </Modal>

@@ -474,6 +474,12 @@ exports.login = async (req, res) => {
             code: HTTP_STATUS.BAD_REQUEST.CODE,
           });
         }
+        if (!user.canLogin) {
+          return errorResp(res, {
+            msg: ERROR_MESSAGE.INVALID_CREDS,
+            code: HTTP_STATUS.BAD_REQUEST.CODE,
+          });
+        }
         if (req.body.password !== crypto_decrypt(user.password)) {
           return errorResp(res, {
             msg: ERROR_MESSAGE.INVALID_CREDS,
@@ -683,6 +689,8 @@ exports.cancelUserInvite = async (req, res, next) => {
     status: USER_STATUS.DISABLED,
     canLogin: false,
     isVerified: false,
+    token: "",
+    tokenExpiry: null,
   };
   await UserService.updateUserById(userId, userData)
     .then(async (user) => {
@@ -722,15 +730,27 @@ exports.disableUser = async (req, res, next) => {
       status: USER_STATUS.DISABLED,
       canLogin: false,
       isVerified: false,
+      token: "",
+      tokenExpiry: null,
     };
     await UserService.updateUserById(userId, userData)
-      .then(() => {
-        return successResp(res, {
-          msg: SUCCESS_MESSAGE.DELETED,
-          code: HTTP_STATUS.SUCCESS.CODE,
-        });
+      .then(async (user) => {
+        const team = await TeamService.getTeamById(user.teamId);
+      const filterTeamMembers = team.members.filter((obj) => {
+        return obj.userId.toString() !== userId;
+      });
+      await TeamService.updateTeamMembers(user.teamId, {
+        members: filterTeamMembers,
+      })
+        .then((teamRes) => {
+          return successResp(res, {
+            msg: SUCCESS_MESSAGE.DELETED,
+            code: HTTP_STATUS.SUCCESS.CODE,
+          });
+        })
       })
       .catch((error) => {
+        console.log(error);
         errorResp(res, {
           msg: ERROR_MESSAGE.NOT_FOUND,
           code: HTTP_STATUS.NOT_FOUND.CODE,
@@ -935,29 +955,53 @@ const createSubscription = async (res, userInfo, obj) => {
 exports.subscriptionRecurringPayment = async (req, res, next) => {
   try {
     const { type, data } = req.body;
-    if (type == "invoice.payment_succeeded") {
-      const userInfo = await UserService.getUserByEmail(
-        data.object.customer_email
-      );
-      const stripeDetails = {
-        ...userInfo.stripeDetails,
-        subscription: {
-          ...userInfo.stripeDetails.subscription,
-          startDate: data.object.lines.data[0].period.start,
-          endDate: data.object.lines.data[0].period.end,
-        },
-      };
-      await UserService.updateUserById(userInfo._id, { stripeDetails });
-      const requestBody = {
-        amount: data.object.amount_paid,
-        userId: userInfo._id,
-        description: data.object.description || "Subscription creation",
-      };
-      await billingHistory(requestBody);
-    }
+    // console.log(req.body);
+    // if (type == "invoice.payment_succeeded") {
+    const userInfo = await UserService.getUserByEmail(
+      data.object.customer_email
+    );
+    const stripeDetails = {
+      ...userInfo.stripeDetails,
+      subscription: {
+        ...userInfo.stripeDetails.subscription,
+        startDate: data.object.lines.data[0].period.start,
+        endDate: data.object.lines.data[0].period.end,
+      },
+    };
+    await UserService.updateUserById(userInfo._id, { stripeDetails });
+    const requestBody = {
+      status: getPaymentStatus(type),
+      amount: data.object.amount_paid,
+      userId: userInfo._id,
+      description: data.object.description || "Subscription creation",
+    };
+    await billingHistory(requestBody);
+    // }
   } catch (error) {
     serverError(res, error);
   }
+};
+
+const getPaymentStatus = (type) => {
+  let status;
+  switch (type) {
+    case "invoice.payment_succeeded":
+      status = PAYMENT_STATUS.SUCCESS;
+      break;
+    case "invoice.payment_failed":
+      status = PAYMENT_STATUS.FAILED;
+      break;
+    case "subscription_schedule.canceled":
+      status = PAYMENT_STATUS.CANCELED;
+      break;
+    case "customer.subscription.trial_will_end":
+      status = PAYMENT_STATUS.SUCCESS;
+      break;
+    default:
+      status = PAYMENT_STATUS.UNKNOWN;
+      break;
+  }
+  return status;
 };
 
 const billingHistory = async (obj) => {

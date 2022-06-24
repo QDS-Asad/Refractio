@@ -51,9 +51,10 @@ const TeamMembers = () => {
       !cancelInvitation &&
       !resendInvitation &&
       !changeMemberRole &&
+      !removeTeamMember &&
       dispatch(fetchTeamList(page, limit)) &&
       dispatch(fetchRoles());
-  }, [inviteTeamMember, cancelInvitation, resendInvitation, changeMemberRole]);
+  }, [inviteTeamMember, cancelInvitation, resendInvitation, changeMemberRole, removeTeamMember]);
 
   const removeTeamMemberHandler = (id) => {
     setSelectedMember(id);
@@ -178,6 +179,7 @@ const TeamMembers = () => {
                           }
                           fluid
                           selection
+                          disabled={userLogin.id === user._id}
                           defaultValue={user.role.roleId}
                           options={roles.map((role) => {
                             return {

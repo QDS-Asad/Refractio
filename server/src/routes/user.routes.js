@@ -601,6 +601,23 @@ router.put("/reset-password/:token", validateResetPassword, User.resetPassword);
  *      - cardCvv
  *      - autoRenew
  *      - couponCode
+ *    properties:
+ *      planId:
+ *        type: string
+ *      priceId:
+ *         type: string
+ *      nameOnCard:
+ *         type: string
+ *      cardNumber:
+ *         type: string
+ *      cardExpiry:
+ *         type: string
+ *      cardCvv:
+ *         type: string
+ *      autoRenew:
+ *         type: string
+ *      couponCode:
+ *         type: string
  */
 router.put("/subscribe/:userId", Auth, validateSubscribe, User.subscribe);
 
