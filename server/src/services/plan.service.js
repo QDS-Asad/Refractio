@@ -50,7 +50,7 @@ exports.updateStripePlan = async (obj) => {
 exports.getAllStripePlans = async () => {
   let plansList = [];
   let plans = await stripe.products.list({ active: true });
-  plans.data.sort((a, b) => a.created - b.created);
+  plans.data = plans.data.sort((a, b) => a.created - b.created);
   await Promise.all(
     plans.data.map(async (plan) => {
       let priceData = await stripe.prices.search({
