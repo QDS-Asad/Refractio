@@ -1,6 +1,7 @@
 const UserService = require("../services/user.service");
 const RoleService = require("../services/role.service");
 const TeamService = require("../services/team.service");
+const BillingService = require("../services/billing.service");
 const jwt = require("jsonwebtoken");
 const {
   crypto_encrypt,
@@ -32,8 +33,10 @@ const {
   INVTE_USER_EMAIL_SUBJECT,
   TOTAL_TEAM_ADMIN,
   TOTAL_TEAM_ORGANIZER,
+  PAYMENT_STATUS,
 } = require("../lib/constants");
 const { ObjectId } = require("mongodb");
+const { request } = require("express");
 
 // register admin user
 exports.register = async (req, res, next) => {
@@ -55,19 +58,19 @@ exports.register = async (req, res, next) => {
           const role = await RoleService.getRoleByRoleId(ROLES.ADMIN);
           await UserService.register({ ...req.body, roleId: role._id })
             .then(async (result) => {
-              const teamData = {
-                createdById: result._id,
-                members: [{ userId: result._id, roleId: role.roleId }],
-              };
-              await TeamService.createTeam(teamData)
-                .then(async (teamRes) => {
-                  await UserService.updateUserById(result._id, {
-                    teamId: teamRes._id,
-                  });
-                })
-                .catch((error) => {
-                  serverError(res, error);
-                });
+              // const teamData = {
+              //   createdById: result._id,
+              //   members: [{ userId: result._id, roleId: role.roleId }],
+              // };
+              // await TeamService.createTeam(teamData)
+              //   .then(async (teamRes) => {
+              //     await UserService.updateUserById(result._id, {
+              //       teamId: teamRes._id,
+              //     });
+              //   })
+              //   .catch((error) => {
+              //     serverError(res, error);
+              //   });
               tokenVerificationEmail(res, EMAIL_TYPES.VERIFY_REGISTER, result);
             })
             .catch((error) => {
@@ -471,6 +474,12 @@ exports.login = async (req, res) => {
             code: HTTP_STATUS.BAD_REQUEST.CODE,
           });
         }
+        if (!user.canLogin) {
+          return errorResp(res, {
+            msg: ERROR_MESSAGE.INVALID_CREDS,
+            code: HTTP_STATUS.BAD_REQUEST.CODE,
+          });
+        }
         if (req.body.password !== crypto_decrypt(user.password)) {
           return errorResp(res, {
             msg: ERROR_MESSAGE.INVALID_CREDS,
@@ -617,7 +626,6 @@ exports.getTeam = async (req, res, next) => {
         });
       })
       .catch((error) => {
-        console.log(error);
         errorResp(res, {
           msg: ERROR_MESSAGE.NOT_FOUND,
           code: HTTP_STATUS.NOT_FOUND.CODE,
@@ -681,6 +689,8 @@ exports.cancelUserInvite = async (req, res, next) => {
     status: USER_STATUS.DISABLED,
     canLogin: false,
     isVerified: false,
+    token: "",
+    tokenExpiry: null,
   };
   await UserService.updateUserById(userId, userData)
     .then(async (user) => {
@@ -720,15 +730,27 @@ exports.disableUser = async (req, res, next) => {
       status: USER_STATUS.DISABLED,
       canLogin: false,
       isVerified: false,
+      token: "",
+      tokenExpiry: null,
     };
     await UserService.updateUserById(userId, userData)
-      .then(() => {
-        return successResp(res, {
-          msg: SUCCESS_MESSAGE.DELETED,
-          code: HTTP_STATUS.SUCCESS.CODE,
-        });
+      .then(async (user) => {
+        const team = await TeamService.getTeamById(user.teamId);
+      const filterTeamMembers = team.members.filter((obj) => {
+        return obj.userId.toString() !== userId;
+      });
+      await TeamService.updateTeamMembers(user.teamId, {
+        members: filterTeamMembers,
+      })
+        .then((teamRes) => {
+          return successResp(res, {
+            msg: SUCCESS_MESSAGE.DELETED,
+            code: HTTP_STATUS.SUCCESS.CODE,
+          });
+        })
       })
       .catch((error) => {
+        console.log(error);
         errorResp(res, {
           msg: ERROR_MESSAGE.NOT_FOUND,
           code: HTTP_STATUS.NOT_FOUND.CODE,
@@ -781,7 +803,7 @@ exports.updateUserRole = async (req, res, next) => {
           })
             .then(async (teamRes) => {
               return successResp(res, {
-                msg: SUCCESS_MESSAGE.UpDATED,
+                msg: SUCCESS_MESSAGE.UPDATED,
                 code: HTTP_STATUS.SUCCESS.CODE,
               });
             })
@@ -802,4 +824,186 @@ exports.updateUserRole = async (req, res, next) => {
   } catch (error) {
     serverError(res, error);
   }
+};
+
+// subscribe user
+exports.subscribe = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const userInfo = await UserService.getUserById(userId);
+    if (userInfo.stripeDetails.paymentMethod.paymentMethodId) {
+    }
+    BillingService.paymentMethod(req.body)
+      .then(async (paymentMethodRes) => {
+        const paymentMethod = {
+          paymentMethodId: paymentMethodRes.id,
+          type: paymentMethodRes.type,
+          brand: paymentMethodRes.card.brand,
+          expMonth: paymentMethodRes.card.exp_month,
+          expYear: paymentMethodRes.card.exp_year,
+          last4Digits: paymentMethodRes.card.last4,
+        };
+        if (userInfo.stripeDetails.customerId) {
+          BillingService.updateStripeCustomer({
+            request: req.body,
+            paymentMethod: paymentMethodRes,
+            userInfo,
+          })
+            .then(async (stripeCustomerRes) => {
+              await createSubscription(res, userInfo, {
+                request: req.body,
+                paymentMethod,
+                customerId: stripeCustomerRes.id,
+              });
+            })
+            .catch((error) => {
+              errorResp(res, {
+                msg: error.message,
+                code: HTTP_STATUS.NOT_FOUND.CODE,
+              });
+            });
+        } else {
+          BillingService.createStripeCustomer({
+            request: req.body,
+            paymentMethod: paymentMethodRes,
+            userInfo,
+          })
+            .then(async (stripeCustomerRes) => {
+              const reqBody = {
+                stripeDetails: {
+                  customerId: stripeCustomerRes.customerId,
+                },
+              };
+              await UserService.updateUserById(userId, reqBody);
+              await createSubscription(res, userInfo, {
+                request: req.body,
+                paymentMethod,
+                customerId: stripeCustomerRes.id,
+              });
+            })
+            .catch((error) => {
+              errorResp(res, {
+                msg: error.message,
+                code: HTTP_STATUS.NOT_FOUND.CODE,
+              });
+            });
+        }
+      })
+      .catch((error) => {
+        errorResp(res, {
+          msg: error.message,
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+        });
+      });
+  } catch (error) {
+    serverError(res, error);
+  }
+};
+
+const createSubscription = async (res, userInfo, obj) => {
+  try {
+    const userId = userInfo._id;
+    await BillingService.createSubscription(obj)
+      .then(async (subscriptionRes) => {
+        const subscription = {
+          subscriptionId: subscriptionRes.id,
+          planId: obj.request.planId,
+          priceId: obj.request.priceId,
+          startDate: subscriptionRes.current_period_start,
+          endDate: subscriptionRes.current_period_end,
+          status: subscriptionRes.status,
+        };
+        const role = await RoleService.getRoleById(userInfo.roleId);
+        const teamData = {
+          createdById: userId,
+          members: [{ userId, roleId: role.roleId }],
+        };
+        await TeamService.createTeam(teamData)
+          .then(async (teamRes) => {
+            const reqBody = {
+              stripeDetails: {
+                paymentMethod: obj.paymentMethod,
+                customerId: obj.customerId,
+                subscription,
+              },
+              autoRenew: obj.request.autoRenew,
+              status: USER_STATUS.ACTIVE,
+              teamId: teamRes._id,
+            };
+            await UserService.updateUserById(userId, reqBody);
+            return successResp(res, {
+              msg: SUCCESS_MESSAGE.SUBSCRIBED,
+              code: HTTP_STATUS.SUCCESS.CODE,
+              data: subscriptionRes,
+            });
+          })
+          .catch((error) => {
+            serverError(res, error);
+          });
+      })
+      .catch((error) => {
+        errorResp(res, {
+          msg: error.message,
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+        });
+      });
+  } catch (error) {
+    serverError(res, error);
+  }
+};
+
+exports.subscriptionRecurringPayment = async (req, res, next) => {
+  try {
+    const { type, data } = req.body;
+    // console.log(req.body);
+    // if (type == "invoice.payment_succeeded") {
+    const userInfo = await UserService.getUserByEmail(
+      data.object.customer_email
+    );
+    const stripeDetails = {
+      ...userInfo.stripeDetails,
+      subscription: {
+        ...userInfo.stripeDetails.subscription,
+        startDate: data.object.lines.data[0].period.start,
+        endDate: data.object.lines.data[0].period.end,
+      },
+    };
+    await UserService.updateUserById(userInfo._id, { stripeDetails });
+    const requestBody = {
+      status: getPaymentStatus(type),
+      amount: data.object.amount_paid,
+      userId: userInfo._id,
+      description: data.object.description || "Subscription creation",
+    };
+    await billingHistory(requestBody);
+    // }
+  } catch (error) {
+    serverError(res, error);
+  }
+};
+
+const getPaymentStatus = (type) => {
+  let status;
+  switch (type) {
+    case "invoice.payment_succeeded":
+      status = PAYMENT_STATUS.SUCCESS;
+      break;
+    case "invoice.payment_failed":
+      status = PAYMENT_STATUS.FAILED;
+      break;
+    case "subscription_schedule.canceled":
+      status = PAYMENT_STATUS.CANCELED;
+      break;
+    case "customer.subscription.trial_will_end":
+      status = PAYMENT_STATUS.SUCCESS;
+      break;
+    default:
+      status = PAYMENT_STATUS.UNKNOWN;
+      break;
+  }
+  return status;
+};
+
+const billingHistory = async (obj) => {
+  return await BillingService.saveBillingHistory(obj);
 };

@@ -5,21 +5,22 @@ import refractioApi from '../../common/refractioApi';
 export const initialState = {
   loading: false,
   error: null,
-  roles: [],
+  plans: [],
 };
 
 // our slice
-const roleListSlice = createSlice({
-  name: 'roleList',
+const planListSlice = createSlice({
+  name: 'planList',
   initialState,
   reducers: {
     setLoading: (state) => {
       state.loading = true;
+      state.plans = [];
     },
-    setRoleList: (state, { payload }) => {
+    setPlanList: (state, { payload }) => {
       state.loading = false;
       state.error = false;
-      state.roles = payload;
+      state.plans = payload;
     },
     setError: (state, { payload }) => {
       state.loading = false;
@@ -28,20 +29,20 @@ const roleListSlice = createSlice({
   },
 });
 // export the actions
-export const { setLoading, setRoleList, setError } = roleListSlice.actions;
+export const { setLoading, setPlanList, setError } = planListSlice.actions;
 
 // export the selector (".items" being same as in slices/index.js's "items: something")
-export const roleListSelector = (state) => state.roleList;
+export const planListSelector = (state) => state.planList;
 
 // export the default reducer
-export default roleListSlice.reducer;
+export default planListSlice.reducer;
 
 // fetch all roles
-export const fetchRoles = () => async (dispatch) => {
+export const fetchPlans = () => async (dispatch) => {
   try {
     dispatch(setLoading());
-    let { data: response } = await refractioApi.get('/roles');
-    dispatch(setRoleList(response.data));
+    let { data: response } = await refractioApi.get('/plans');
+    dispatch(setPlanList(response.data));
   } catch (error) {
     const errorMessage =
       error.response && error.response.data

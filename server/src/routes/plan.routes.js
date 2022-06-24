@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Admin = require('../controllers/admin.controller');
+const Plan = require('../controllers/plan.controller');
 const Auth = require('../middlewares/auth');
 const { validatePlan } = require('../middlewares/plan');
 
@@ -87,12 +87,21 @@ const { validatePlan } = require('../middlewares/plan');
  *        type: string
  *      description:
  *        type: string
- *      monthlyPrice:
- *        type: string
- *      yearlyPrice:
+ *      prices:
+ *        type: array
+ *        items:
+ *          $ref: '#/definitions/PlanItems'
+ * 
+ * definitions:
+ *   PlanItems:
+ *    type: object
+ *    properties:
+ *      amount:
+ *        type: number
+ *      interval:
  *        type: string
  */
-router.post('/plans', validatePlan, Admin.createPlan);
+router.post('/plans', validatePlan, Plan.createPlan);
 
 /**
  * @swagger
@@ -181,12 +190,21 @@ router.post('/plans', validatePlan, Admin.createPlan);
  *        type: string
  *      description:
  *        type: string
- *      monthlyPrice:
- *        type: string
- *      yearlyPrice:
+ *      prices:
+ *        type: array
+ *        items:
+ *          $ref: '#/definitions/PlanItems'
+ * 
+ *  definitions:
+ *   PlanItems:
+ *    type: object
+ *    properties:
+ *      amount:
+ *        type: number
+ *      interval:
  *        type: string
  */
-router.put('/plans/:planId', validatePlan, Admin.updatePlan);
+router.put('/plans/:planId', validatePlan, Plan.updatePlan);
 
 /**
  * @swagger
@@ -250,7 +268,7 @@ router.put('/plans/:planId', validatePlan, Admin.updatePlan);
  *                 example:
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
  */
-router.get('/plans', Admin.getAllPlans);
+router.get('/plans', Plan.getAllPlans);
 
 /**
  * @swagger
@@ -319,7 +337,7 @@ router.get('/plans', Admin.getAllPlans);
  *                 example:
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
  */
-router.get('/plans/:planId', Admin.getPlanByPlanId);
+router.get('/plans/:planId', Plan.getPlanByPlanId);
 
 /**
  * @swagger
@@ -388,7 +406,7 @@ router.get('/plans/:planId', Admin.getPlanByPlanId);
  *                 example:
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
  */
-router.get('/plans/prices/:planId', Admin.getPricesByPlanId);
+router.get('/plans/prices/:planId', Plan.getPricesByPlanId);
 
 /**
  * @swagger
@@ -457,7 +475,7 @@ router.get('/plans/prices/:planId', Admin.getPricesByPlanId);
  *                 example:
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
  */
-router.delete('/plans/:planId', Admin.deletePlan);
+router.delete('/plans/:planId', Plan.deletePlan);
 
 
 module.exports = router;

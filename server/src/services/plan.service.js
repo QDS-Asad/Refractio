@@ -1,4 +1,5 @@
 const { Plan } = require("../models/plans");
+const { User } = require("../models/users");
 const { ObjectId } = require("mongodb");
 const { STRIPE_KEY } = require("../lib/constants");
 const stripe = require("stripe")(STRIPE_KEY);
@@ -47,7 +48,33 @@ exports.updateStripePlan = async (obj) => {
 };
 
 exports.getAllStripePlans = async () => {
-  return await stripe.products.list({ active: true });
+  let plansList = [];
+  let plans = await stripe.products.list({ active: true });
+  plans.data.sort((a, b) => a.created - b.created);
+  await Promise.all(
+    plans.data.map(async (plan) => {
+      let priceData = await stripe.prices.search({
+        query: `product:'${plan.id}' AND active:'true'`,
+      });
+      let prices = [];
+      priceData.data.map(async (price) => {
+        let filterPrices = {
+          id: price.id,
+          amount: convertDollerToCent(price.unit_amount),
+          interval: price.recurring.interval
+        }
+        prices.push(filterPrices);
+      })
+      let filterPlan = {
+        id: plan.id,
+        name: plan.name,
+        description: plan.description,
+        prices
+      }
+      plansList.push(filterPlan)
+    })
+  );
+  return plansList;
 };
 
 exports.getStripePlanById = async (obj) => {
@@ -59,7 +86,7 @@ exports.getStripePlanById = async (obj) => {
       priceData && prices.push(priceData);
     })
   );
-  return { plan, prices };
+  return { ...plan, prices };
 };
 
 exports.getAllStripePricesByPlanId = async (planId) => {
@@ -109,6 +136,16 @@ exports.deletePlanByPlanId = async (planId) => {
   return await Plan.updateOne({ planId: planId }, { active: false });
 };
 
+exports.getUserPlanByPlanId = async (planId) => {
+  return await User.find({
+     'stripeDetails.subscription.planId': planId
+  })
+}
+
 const convertCentToDoller = (price) => {
   return price * 100;
+};
+
+const convertDollerToCent = (price) => {
+  return price / 100;
 };

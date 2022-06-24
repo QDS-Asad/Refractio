@@ -51,9 +51,10 @@ const TeamMembers = () => {
       !cancelInvitation &&
       !resendInvitation &&
       !changeMemberRole &&
+      !removeTeamMember &&
       dispatch(fetchTeamList(page, limit)) &&
       dispatch(fetchRoles());
-  }, [inviteTeamMember, cancelInvitation, resendInvitation, changeMemberRole]);
+  }, [inviteTeamMember, cancelInvitation, resendInvitation, changeMemberRole, removeTeamMember]);
 
   const removeTeamMemberHandler = (id) => {
     setSelectedMember(id);
@@ -93,46 +94,49 @@ const TeamMembers = () => {
             Team
           </Header>
         </Grid.Column>
-        <Grid.Column width={8}>
-          <Button
-            primary
-            className='btn'
-            floated='right'
-            onClick={() => setInviteTeamMember(true)}
-          >
-            Add
-          </Button>
-          <InviteTeamMember
-            inviteTeamMember={inviteTeamMember}
-            setInviteTeamMember={setInviteTeamMember}
-          />
-          <RemoveTeamMember
-            removeTeamMember={removeTeamMember}
-            setRemoveTeamMember={setRemoveTeamMember}
-            member={selectedMember}
-          />
-          <CancelInvitation
-            cancelInvitation={cancelInvitation}
-            setCancelInvitation={setCancelInvitation}
-            member={selectedMember}
-          />
-          <ResendInvitation
-            resendInvitation={resendInvitation}
-            setResendInvitation={setResendInvitation}
-            member={selectedMember}
-          />
-          <DeleteAccount
-            deleteAccount={deleteAccount}
-            setDeleteAccount={setDeleteAccount}
-            member={selectedMember}
-          />
-          <ChangeRole
-            changeMemberRole={changeMemberRole}
-            setChangeMemberRole={setChangeMemberRole}
-            member={selectedMember}
-            roleId={selectedRole}
-          />
-        </Grid.Column>
+        {(userLogin.role.roleId === ROLES.ADMIN ||
+          userLogin.role.roleId === ROLES.ORGANIZER) && (
+          <Grid.Column width={8}>
+            <Button
+              primary
+              className='btn'
+              floated='right'
+              onClick={() => setInviteTeamMember(true)}
+            >
+              Add
+            </Button>
+            <InviteTeamMember
+              inviteTeamMember={inviteTeamMember}
+              setInviteTeamMember={setInviteTeamMember}
+            />
+            <RemoveTeamMember
+              removeTeamMember={removeTeamMember}
+              setRemoveTeamMember={setRemoveTeamMember}
+              member={selectedMember}
+            />
+            <CancelInvitation
+              cancelInvitation={cancelInvitation}
+              setCancelInvitation={setCancelInvitation}
+              member={selectedMember}
+            />
+            <ResendInvitation
+              resendInvitation={resendInvitation}
+              setResendInvitation={setResendInvitation}
+              member={selectedMember}
+            />
+            <DeleteAccount
+              deleteAccount={deleteAccount}
+              setDeleteAccount={setDeleteAccount}
+              member={selectedMember}
+            />
+            <ChangeRole
+              changeMemberRole={changeMemberRole}
+              setChangeMemberRole={setChangeMemberRole}
+              member={selectedMember}
+              roleId={selectedRole}
+            />
+          </Grid.Column>
+        )}
       </Grid>
       <Grid>
         <Grid.Column>
@@ -175,6 +179,7 @@ const TeamMembers = () => {
                           }
                           fluid
                           selection
+                          disabled={userLogin.id === user._id}
                           defaultValue={user.role.roleId}
                           options={roles.map((role) => {
                             return {
