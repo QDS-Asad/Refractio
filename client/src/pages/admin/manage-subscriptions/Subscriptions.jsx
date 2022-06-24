@@ -1,23 +1,39 @@
-import React, { useState } from 'react';
-import { Grid, Header, Button, Card, Dropdown, List } from 'semantic-ui-react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  Grid,
+  Header,
+  Button,
+  Card,
+  Dropdown,
+  List,
+  Loader,
+  Message,
+} from 'semantic-ui-react';
+import {
+  fetchPlans,
+  planListSelector,
+} from '../../../features/plans/planListSlice';
 import AddSubscriptionPlan from './AddSubscriptionPlan';
+import EditSubscriptionPlan from './EditSubscriptionPlan';
 import RemoveSubscriptionPlan from './RemoveSubscriptionPlan';
 const Subscriptions = () => {
   const [addPlan, setAddPlan] = useState(false);
+  const [editPlan, setEditPlan] = useState(false);
   const [removePlan, setRemovePlan] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
-  const plans = [
-    {
-      id: '1',
-      name: 'Plan : Team',
-      description: 'Max of 24 seats. 3 Opportunities can be published at once.',
-      pricePerMonth: 7,
-      priceAnnually: 70,
-    },
-  ];
+
+  const { loading, error, plans } = useSelector(planListSelector);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    !addPlan && !editPlan && !removePlan && dispatch(fetchPlans());
+  }, [dispatch, addPlan, editPlan, removePlan]);
 
   const handleEdit = (plan) => {
     setSelectedPlan(plan);
+    setEditPlan(true);
   };
   const handleRemove = (plan) => {
     setSelectedPlan(plan);
@@ -41,6 +57,11 @@ const Subscriptions = () => {
             Add
           </Button>
           <AddSubscriptionPlan addPlan={addPlan} setAddPlan={setAddPlan} />
+          <EditSubscriptionPlan
+            editPlan={editPlan}
+            setEditPlan={setEditPlan}
+            plan={selectedPlan}
+          />
           <RemoveSubscriptionPlan
             removePlan={removePlan}
             setRemovePlan={setRemovePlan}
@@ -48,10 +69,23 @@ const Subscriptions = () => {
           />
         </Grid.Column>
       </Grid>
-      <Grid>
-        <Grid.Column>
-          {plans.map((plan) => (
-            <Card key={plan.id}>
+      <Grid stackable columns={4}>
+        <Loader active={loading} inline='centered' />
+        {error && (
+          <Message color='red' className='error-message mb-3'>
+            {error}
+          </Message>
+        )}
+        {plans.map((plan) => (
+          <Grid.Column
+            mobile={16}
+            tablet={8}
+            computer={8}
+            largeScreen={4}
+            widescreen={4}
+            key={plan.id}
+          >
+            <Card>
               <Card.Content>
                 <Card.Header>
                   {plan.name}
@@ -75,8 +109,8 @@ const Subscriptions = () => {
                 </List>
               </Card.Content>
             </Card>
-          ))}
-        </Grid.Column>
+          </Grid.Column>
+        ))}
       </Grid>
     </>
   );

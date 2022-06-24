@@ -1,25 +1,31 @@
 import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
-import { useDispatch, useSelector } from 'react-redux';
-import { Button, Form, Message, Modal } from 'semantic-ui-react';
 import {
-  addPlanSelector,
-  addSubscriptionPlan,
-} from '../../../features/plans/addPlanSlice';
+  editPlanSelector,
+  editSubscriptionPlan,
+} from '../../../features/plans/editPlanSlice';
+import { Button, Form, Message, Modal } from 'semantic-ui-react';
 
-const AddSubscriptionPlan = ({ addPlan, setAddPlan }) => {
-  const { register, setValue, handleSubmit, errors, trigger } = useForm({
+const EditSubscriptionPlan = ({ editPlan, setEditPlan, plan }) => {
+  const { register, setValue, handleSubmit, errors, trigger, watch } = useForm({
     mode: 'onBlur',
+    defaultValues: {
+      name: '',
+      description: '',
+      pricePerMonth: '',
+      pricePerYear: '',
+    },
   });
 
   // set up dispatch
   const dispatch = useDispatch();
 
   // fetch data from our store
-  const { loading, error, success } = useSelector(addPlanSelector);
+  const { loading, error, success } = useSelector(editPlanSelector);
 
-  const handleCreate = (data) => {
-    dispatch(addSubscriptionPlan(data));
+  const handleEdit = (data) => {
+    dispatch(editSubscriptionPlan(plan.id, data));
   };
 
   const handleChange = (e) => {
@@ -51,25 +57,35 @@ const AddSubscriptionPlan = ({ addPlan, setAddPlan }) => {
   }, []);
 
   useEffect(() => {
+    if (plan) {
+      const fields = ['name', 'description'];
+      fields.forEach((field) => {
+        setValue(field, plan[field]);
+        trigger(field);
+      });
+    }
+  }, [plan]);
+
+  useEffect(() => {
     if (success) {
-      setAddPlan(false);
+      setEditPlan(false);
     }
   }, [success]);
 
   return (
     <Modal
-      onClose={() => setAddPlan(false)}
-      onOpen={() => setAddPlan(true)}
-      open={addPlan}
+      onClose={() => setEditPlan(false)}
+      onOpen={() => setEditPlan(true)}
+      open={editPlan}
       dimmer='blurring'
       size='tiny'
       closeIcon
     >
-      <Modal.Header>Add Subscription Plan</Modal.Header>
+      <Modal.Header>Edit Subscription Plan</Modal.Header>
       <Modal.Content>
         <Form
-          id='add-plan'
-          onSubmit={handleSubmit(handleCreate)}
+          id='edit-plan'
+          onSubmit={handleSubmit(handleEdit)}
           loading={loading}
           error
         >
@@ -85,6 +101,7 @@ const AddSubscriptionPlan = ({ addPlan, setAddPlan }) => {
                 name='name'
                 fluid
                 placeholder='Enter name'
+                value={watch('name')}
                 onChange={handleChange}
                 onBlur={handleChange}
                 error={!!errors.name}
@@ -98,6 +115,7 @@ const AddSubscriptionPlan = ({ addPlan, setAddPlan }) => {
               <Form.TextArea
                 name='description'
                 placeholder='Enter description'
+                value={watch('description')}
                 onChange={handleChange}
                 onBlur={handleChange}
                 error={!!errors.description}
@@ -112,6 +130,7 @@ const AddSubscriptionPlan = ({ addPlan, setAddPlan }) => {
                 name='pricePerMonth'
                 fluid
                 placeholder='Enter price $'
+                value={watch('pricePerMonth')}
                 onChange={handleChange}
                 onBlur={handleChange}
                 error={!!errors.pricePerMonth}
@@ -126,6 +145,7 @@ const AddSubscriptionPlan = ({ addPlan, setAddPlan }) => {
                 name='pricePerYear'
                 fluid
                 placeholder='Enter price $'
+                value={watch('pricePerYear')}
                 onChange={handleChange}
                 onBlur={handleChange}
                 error={!!errors.pricePerYear}
@@ -140,7 +160,7 @@ const AddSubscriptionPlan = ({ addPlan, setAddPlan }) => {
       <Modal.Actions>
         <Button
           type='submit'
-          form='add-plan'
+          form='edit-plan'
           content='Save'
           className='btn'
           loading={loading}
@@ -150,4 +170,4 @@ const AddSubscriptionPlan = ({ addPlan, setAddPlan }) => {
   );
 };
 
-export default AddSubscriptionPlan;
+export default EditSubscriptionPlan;

@@ -15,6 +15,10 @@ import resendInviteMemberSlice from './team/resendInviteMemberSlice';
 import authVerifyMemberSlice from './auth/authVerifyMemberSlice';
 import authRegisterMemberSlice from './auth/authRegisterMemberSlice';
 import changeMemberRoleSlice from './team/changeMemberRoleSlice';
+import planListSlice from './plans/planListSlice';
+import addPlanSlice from './plans/addPlanSlice';
+import editPlanSlice from './plans/editPlanSlice';
+import removePlanSlice from './plans/removePlanSlice';
 
 export default configureStore({
   reducer: {
@@ -34,5 +38,9 @@ export default configureStore({
     cancelMember: cancelMemberSlice,
     resendInviteMember: resendInviteMemberSlice,
     changeMemberRole: changeMemberRoleSlice,
+    planList: planListSlice,
+    addPlan: addPlanSlice,
+    editPlan: editPlanSlice,
+    removePlan: removePlanSlice,
   },
 });

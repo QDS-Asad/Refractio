@@ -1,8 +1,27 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Button, Message, Modal } from 'semantic-ui-react';
+import {
+  removePlanSelector,
+  removeSubscriptionPlan,
+} from '../../../features/plans/removePlanSlice';
 
 const RemoveSubscriptionPlan = ({ removePlan, setRemovePlan, plan }) => {
-  const error = null;
+  const dispatch = useDispatch();
+
+  // fetch data from our store
+  const { loading, error, success } = useSelector(removePlanSelector);
+
+  const handleRemove = () => {
+    dispatch(removeSubscriptionPlan(plan.id));
+  };
+
+  useEffect(() => {
+    if (success) {
+      setRemovePlan(false);
+    }
+  }, [success]);
+
   return (
     <Modal
       onClose={() => setRemovePlan(false)}
@@ -28,7 +47,8 @@ const RemoveSubscriptionPlan = ({ removePlan, setRemovePlan, plan }) => {
         <Button
           content='Remove'
           className='btn-danger'
-          onClick={() => setRemovePlan(false)}
+          onClick={handleRemove}
+          loading={loading}
         />
       </Modal.Actions>
     </Modal>
