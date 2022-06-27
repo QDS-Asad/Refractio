@@ -37,9 +37,9 @@ app.use('/api/roles', roles);
 app.use('/api', plans);
 
 app.use('/', express.static(path.join(__dirname, '/client/build')));
-// app.use('*', (req, res) => {
-//   errorResp(res, {code: HTTP_STATUS.NOT_FOUND.CODE,msg: `${ERROR_MESSAGE.INVALID_ENDPOINT} ${req.originalUrl}`})
-// });
+app.use('*', (req, res) => {
+  errorResp(res, {code: HTTP_STATUS.NOT_FOUND.CODE,msg: `${ERROR_MESSAGE.INVALID_ENDPOINT} ${req.originalUrl}`})
+});
 
 app.get('*', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
