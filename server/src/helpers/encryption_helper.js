@@ -2,7 +2,8 @@ const CryptoJS = require("crypto-js");
 const { CRYPTO_KEY } = require('../lib/constants');
 
 const crypto_encrypt = function (originalText) {
-  const ciphertext = CryptoJS.AES.encrypt(originalText, CRYPTO_KEY).toString();
+  const ciphertext = CryptoJS.AES.encrypt(originalText, CRYPTO_KEY);
+  console.log(ciphertext, encodeUrl(ciphertext));
   return encodeUrl(ciphertext);
 }
 
@@ -17,7 +18,7 @@ const encodeUrl = (text) => {
 }
 
 const decodeUrl = (text) => {
-  return text.toString().replace('--', '+' ).replace('__', '/').replace('_', '=');
+  return text.replace('--', '+' ).replace('__', '/').replace('_', '=');
 }
 
 module.exports = {
