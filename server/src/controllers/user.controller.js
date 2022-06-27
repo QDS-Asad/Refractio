@@ -322,7 +322,7 @@ const getEmailTemplate = (obj) => {
       };
       break;
     case EMAIL_TYPES.INVITE_USER:
-      link = `${CLIENT_HOST}/auth/invite-account/${crypto_decrypt(obj.token)}`;
+      link = `${CLIENT_HOST}/auth/invite-account/${obj.token}`;
       return {
         email: obj.user.email,
         subject: INVTE_USER_EMAIL_SUBJECT,
