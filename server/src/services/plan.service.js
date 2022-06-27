@@ -31,9 +31,9 @@ exports.updateStripePlan = async (obj) => {
     active: true,
   });
   let createdPrices = [];
-  obj.priceIds.map(async(price) => {
+  obj.priceIds.map(async (price) => {
     await delStripePriceById(price);
-  })
+  });
   await Promise.all(
     obj.prices.map(async (price) => {
       let stripPrice = await createStripePrice({
@@ -60,20 +60,19 @@ exports.getAllStripePlans = async () => {
         let filterPrices = {
           id: price.id,
           amount: convertDollerToCent(price.unit_amount),
-          interval: price.recurring.interval
-        }
+          interval: price.recurring.interval,
+        };
         prices.push(filterPrices);
-      })
+      });
       let filterPlan = {
         id: plan.id,
         name: plan.name,
         description: plan.description,
         created: plan.created,
-        prices
-      }
-      plansList.push(filterPlan)
+        prices,
+      };
+      plansList.push(filterPlan);
     })
-    
   );
   return plansList.sort((a, b) => a.created - b.created);
 };
@@ -139,9 +138,9 @@ exports.deletePlanByPlanId = async (planId) => {
 
 exports.getUserPlanByPlanId = async (planId) => {
   return await User.find({
-     'stripeDetails.subscription.planId': planId
-  })
-}
+    "stripeDetails.subscription.planId": planId,
+  });
+};
 
 const convertCentToDoller = (price) => {
   return price * 100;
