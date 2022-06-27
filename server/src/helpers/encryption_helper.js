@@ -22,6 +22,8 @@ const decodeUrl = (text) => {
 }
 
 module.exports = {
-  crypto_encrypt: crypto_encrypt,
-  crypto_decrypt: crypto_decrypt
+  crypto_encrypt,
+  crypto_decrypt,
+  encodeUrl,
+  decodeUrl,
 }

@@ -37,6 +37,7 @@ const {
 } = require("../lib/constants");
 const { ObjectId } = require("mongodb");
 const { request } = require("express");
+const encryption_helper = require("../helpers/encryption_helper");
 
 // register admin user
 exports.register = async (req, res, next) => {
@@ -391,7 +392,7 @@ exports.verifyToken = async (req, res) => {
 exports.verifyEmailInvite = async (req, res) => {
   try {
     const { token } = req.params;
-    await UserService.getUserByToken(encodeURI(token))
+    await UserService.getUserByToken(encryption_helper.decodeUrl(token))
       .then(async (user) => {
         const { tokenExpiry } = user;
         if (tokenExpiry < Date.now()) {
@@ -558,7 +559,7 @@ exports.resetPassword = async (req, res) => {
   try {
     const { token } = req.params;
     const { newPassword } = req.body;
-    await UserService.getUserByToken(encodeURI(token))
+    await UserService.getUserByToken(encryption_helper.decodeUrl(token))
       .then(async (user) => {
         const { tokenExpiry } = user;
         if (tokenExpiry < Date.now()) {
@@ -973,10 +974,9 @@ exports.subscriptionRecurringPayment = async (req, res, next) => {
       status: getPaymentStatus(type),
       amount: data.object.amount_paid,
       userId: userInfo._id,
-      description: data.object.lines.data[0].description,
+      description: data.object.description || "Subscription creation",
     };
     await billingHistory(requestBody);
-    return successResp(res, {msg:SUCCESS_MESSAGE.SUBSCRIBED, code: HTTP_STATUS.SUCCESS.CODE})
     // }
   } catch (error) {
     serverError(res, error);
