@@ -392,7 +392,7 @@ exports.verifyToken = async (req, res) => {
 exports.verifyEmailInvite = async (req, res) => {
   try {
     const { token } = req.params;
-    await UserService.getUserByToken(encryption_helper.decodeUrl(token))
+    await UserService.getUserByToken(token)
       .then(async (user) => {
         const { tokenExpiry } = user;
         if (tokenExpiry < Date.now()) {
@@ -559,7 +559,7 @@ exports.resetPassword = async (req, res) => {
   try {
     const { token } = req.params;
     const { newPassword } = req.body;
-    await UserService.getUserByToken(encryption_helper.decodeUrl(token))
+    await UserService.getUserByToken(token)
       .then(async (user) => {
         const { tokenExpiry } = user;
         if (tokenExpiry < Date.now()) {
