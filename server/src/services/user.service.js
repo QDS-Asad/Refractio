@@ -19,6 +19,7 @@ exports.getUserByRoleId = async (roleId) => {
 }
 
 exports.getUserByToken = async (token) => {
+   console.log(token);
    return await User.findOne({
       token: token
    })
