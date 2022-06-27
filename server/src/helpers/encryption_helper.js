@@ -14,11 +14,11 @@ const crypto_decrypt = function (ciphertext) {
 }
 
 const encodeUrl = (text) => {
-  return text.toString().replace('+','xMl3Jk').replace('/','Por21Ld').replace('=','Ml32');
+  return text.toString().replace('+','--').replace('/','__').replace('=','_');
 }
 
 const decodeUrl = (text) => {
-  return text.toString().replace('xMl3Jk', '+' ).replace('Por21Ld', '/').replace('Ml32', '=');
+  return text.toString().replace('--', '+' ).replace('__', '/').replace('_', '=');
 }
 
 module.exports = {
