@@ -973,9 +973,10 @@ exports.subscriptionRecurringPayment = async (req, res, next) => {
       status: getPaymentStatus(type),
       amount: data.object.amount_paid,
       userId: userInfo._id,
-      description: data.object.description || "Subscription creation",
+      description: data.object.lines.data[0].description,
     };
     await billingHistory(requestBody);
+    return successResp(res, {msg:SUCCESS_MESSAGE.SUBSCRIBED, code: HTTP_STATUS.SUCCESS.CODE})
     // }
   } catch (error) {
     serverError(res, error);
