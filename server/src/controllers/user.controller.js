@@ -59,19 +59,19 @@ exports.register = async (req, res, next) => {
           const role = await RoleService.getRoleByRoleId(ROLES.ADMIN);
           await UserService.register({ ...req.body, roleId: role._id })
             .then(async (result) => {
-              // const teamData = {
-              //   createdById: result._id,
-              //   members: [{ userId: result._id, roleId: role.roleId }],
-              // };
-              // await TeamService.createTeam(teamData)
-              //   .then(async (teamRes) => {
-              //     await UserService.updateUserById(result._id, {
-              //       teamId: teamRes._id,
-              //     });
-              //   })
-              //   .catch((error) => {
-              //     serverError(res, error);
-              //   });
+              const teamData = {
+                createdById: result._id,
+                members: [{ userId: result._id, roleId: role.roleId }],
+              };
+              await TeamService.createTeam(teamData)
+                .then(async (teamRes) => {
+                  await UserService.updateUserById(result._id, {
+                    teamId: teamRes._id,
+                  });
+                })
+                .catch((error) => {
+                  serverError(res, error);
+                });
               tokenVerificationEmail(res, EMAIL_TYPES.VERIFY_REGISTER, result);
             })
             .catch((error) => {
@@ -851,10 +851,10 @@ exports.subscribe = async (req, res, next) => {
             userInfo,
           })
             .then(async (stripeCustomerRes) => {
-              await createSubscription(res, userInfo, {
+              await updateSubscription(res, userInfo, {
                 request: req.body,
                 paymentMethod,
-                customerId: stripeCustomerRes.id,
+                subscriptionId: userInfo.stripeDetails.subscription.subscriptionId,
               });
             })
             .catch((error) => {
@@ -953,6 +953,58 @@ const createSubscription = async (res, userInfo, obj) => {
   }
 };
 
+const updateSubscription = async (res, userInfo, obj) => {
+  try {
+    const userId = userInfo._id;
+    await BillingService.updateSubscription(obj)
+      .then(async (subscriptionRes) => {
+        const subscription = {
+          subscriptionId: subscriptionRes.id,
+          planId: obj.request.planId,
+          priceId: obj.request.priceId,
+          startDate: subscriptionRes.current_period_start,
+          endDate: subscriptionRes.current_period_end,
+          status: subscriptionRes.status,
+        };
+        const role = await RoleService.getRoleById(userInfo.roleId);
+        const teamData = {
+          createdById: userId,
+          members: [{ userId, roleId: role.roleId }],
+        };
+        await TeamService.createTeam(teamData)
+          .then(async (teamRes) => {
+            const reqBody = {
+              stripeDetails: {
+                paymentMethod: obj.paymentMethod,
+                customerId: obj.customerId,
+                subscription,
+              },
+              autoRenew: obj.request.autoRenew,
+              status: USER_STATUS.ACTIVE,
+              teamId: teamRes._id,
+            };
+            await UserService.updateUserById(userId, reqBody);
+            return successResp(res, {
+              msg: SUCCESS_MESSAGE.SUBSCRIBED,
+              code: HTTP_STATUS.SUCCESS.CODE,
+              data: subscriptionRes,
+            });
+          })
+          .catch((error) => {
+            serverError(res, error);
+          });
+      })
+      .catch((error) => {
+        errorResp(res, {
+          msg: error.message,
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+        });
+      });
+  } catch (error) {
+    serverError(res, error);
+  }
+};
+
 exports.subscriptionRecurringPayment = async (req, res, next) => {
   try {
     const { type, data } = req.body;
@@ -972,7 +1024,7 @@ exports.subscriptionRecurringPayment = async (req, res, next) => {
     await UserService.updateUserById(userInfo._id, { stripeDetails });
     const requestBody = {
       status: getPaymentStatus(type),
-      amount: data.object.amount_paid,
+      amount: (data.object.amount_paid / 100),
       userId: userInfo._id,
       description: data.object.description || "Subscription creation",
     };
@@ -999,7 +1051,7 @@ const getPaymentStatus = (type) => {
       status = PAYMENT_STATUS.SUCCESS;
       break;
     default:
-      status = PAYMENT_STATUS.UNKNOWN;
+      status = type;
       break;
   }
   return status;

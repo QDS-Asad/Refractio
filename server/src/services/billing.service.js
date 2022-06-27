@@ -45,14 +45,21 @@ exports.updateStripeCustomer = async ({paymentMethod, userInfo}) => {
 };
 
 exports.createSubscription = async ({request, customerId}) => {
-  const customer = await stripe.subscriptions.create({
+  const subscription = await stripe.subscriptions.create({
     customer: customerId,
     items: [
       {price: request.priceId},
     ],
     cancel_at_period_end: !request.autoRenew
   });
-  return customer;
+  return subscription;
+};
+
+exports.updateSubscription = async ({request, subscriptionId}) => {
+  const subscription = await stripe.subscriptions.update(subscriptionId, {
+    cancel_at_period_end: !request.autoRenew
+  });
+  return subscription;
 };
 
 exports.saveBillingHistory = async (obj) => {
