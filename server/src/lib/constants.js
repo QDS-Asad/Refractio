@@ -41,6 +41,8 @@ module.exports = Object.freeze({
     SUBSCRIPTION_STATUS: {
       SUCCESS: "success",
       FAILED: "failed",
+      CANCELED: "canceled",
+      ACTIVE: "active"
     },
     PAYMENT_STATUS: {
       SUCCESS: "Approved",

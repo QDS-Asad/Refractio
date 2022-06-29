@@ -2,6 +2,7 @@ const { Plan } = require("../models/plans");
 const { User } = require("../models/users");
 const { ObjectId } = require("mongodb");
 const { STRIPE_KEY } = require("../lib/constants");
+const { convertCentToDoller, convertDollerToCent } = require("../helpers/general_helper");
 const stripe = require("stripe")(STRIPE_KEY);
 
 exports.createStripePlan = async (obj) => {
@@ -140,12 +141,4 @@ exports.getUserPlanByPlanId = async (planId) => {
   return await User.find({
     "stripeDetails.subscription.planId": planId,
   });
-};
-
-const convertCentToDoller = (price) => {
-  return price * 100;
-};
-
-const convertDollerToCent = (price) => {
-  return price / 100;
 };
