@@ -137,6 +137,9 @@ const Login = () => {
         <Button type='submit' fluid primary className='mt-3 btn' tabIndex='4'>
           Log In
         </Button>
+        <div className='backToLogin'>
+          Not have an account? <Link to='/auth/register'>Sign up</Link>
+        </div>
       </Form>
     </Container>
   );
