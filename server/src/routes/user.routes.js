@@ -1332,6 +1332,75 @@ router.put("/subscribe/:userId", Auth, validateSubscribe, User.subscribe);
   */
 router.put("/change-payment-method/:userId", Auth, validateChangePaymentMethod, User.subscribe);
 
+/**
+ * @swagger
+ *   /api/users/renew-subscription/{userId}:
+ *   put:
+ *     description: renew subscription user
+ *     tags: [User]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *     schema:
+ *        type: integer
+ *     responses:
+ *        '200':
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                   success: true
+ *                   code: 200
+ *                   message: Operation successfull.
+ *        '404':
+ *           description: Operation Failed
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 404,"message": "Operation Failed."}
+ *
+ *        '422':
+ *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
+ *
+ */
+router.put("/renew-subscription/:userId", Auth, User.renewSubscription);
 
 /**
  * @swagger

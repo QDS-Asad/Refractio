@@ -92,6 +92,7 @@ module.exports = Object.freeze({
         USER_NOT_VERIFIED: "User not verified.",
         DB_NOT_CONNECTED: "Cannot Connect to the Databases.",
         PLAN_USED: "Cannot delete this plan.It is subscribed by user(s)",
+        SUBSCRIBED: "Already Subscribed!",
         UNAUTHORIZED: "authorization denied.",
         NO_DATA: "No data available.",
         NOT_FOUND: "Not found.",

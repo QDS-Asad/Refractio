@@ -930,12 +930,17 @@ exports.renewSubscription = async (req, res, next) => {
   try {
     const { userId } = req.params;
     const userInfo = await UserService.getUserById(userId);
+    if(userInfo.stripeDetails.subscription.status == SUBSCRIPTION_STATUS.ACTIVE){
+      errorResp(res, {
+        msg: ERROR_MESSAGE.SUBSCRIBED,
+        code: HTTP_STATUS.BAD_REQUEST.CODE,
+      });
+    }
     const reqBody = {
-      planId: userInfo.stripeDetails.subscription.planId,
       priceId: userInfo.stripeDetails.subscription.priceId,
       autoRenew: userInfo.autoRenew,
     };
-    await BillingService.createSubscription(obj)
+    await BillingService.createSubscription({request: reqBody, customerId: userInfo.stripeDetails.customerId})
       .then(async (subscriptionRes) => {
         const subscription = {
           subscriptionId: subscriptionRes.id,
