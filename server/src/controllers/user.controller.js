@@ -931,7 +931,7 @@ exports.renewSubscription = async (req, res, next) => {
     const { userId } = req.params;
     const userInfo = await UserService.getUserById(userId);
     if(userInfo.stripeDetails.subscription.status == SUBSCRIPTION_STATUS.ACTIVE){
-      errorResp(res, {
+      return errorResp(res, {
         msg: ERROR_MESSAGE.SUBSCRIBED,
         code: HTTP_STATUS.BAD_REQUEST.CODE,
       });
@@ -1248,7 +1248,7 @@ exports.cancelSubscription = async (req, res, next) => {
           const cancelSubscription =
             await BillingService.cancelResumeSubscription(
               userRes.stripeDetails.subscription.subscriptionId,
-              false
+              true
             );
           const stripeDetails = {
             ...userRes.stripeDetails,
@@ -1265,7 +1265,6 @@ exports.cancelSubscription = async (req, res, next) => {
           return successResp(res, {
             msg: SUCCESS_MESSAGE.CANCELED,
             code: HTTP_STATUS.SUCCESS.CODE,
-            data: cancelSubscription,
           });
         } else {
           errorResp(res, {
@@ -1297,27 +1296,26 @@ exports.resumeSubscription = async (req, res, next) => {
           userRes.stripeDetails.subscription &&
           userRes.stripeDetails.subscription.subscriptionId
         ) {
-          const cancelSubscription =
+          const renewSubscription =
             await BillingService.cancelResumeSubscription(
               userRes.stripeDetails.subscription.subscriptionId,
-              true
+              false
             );
           const stripeDetails = {
             ...userRes.stripeDetails,
             subscription: {
               ...userRes.stripeDetails.subscription,
-              canceledDate: cancelSubscription.cancel_at,
-              status: SUBSCRIPTION_STATUS.CANCELED,
+              canceledDate: renewSubscription.cancel_at,
+              status: SUBSCRIPTION_STATUS.ACTIVE,
             },
           };
           await UserService.updateUserById(user._id, {
-            autoRenew: false,
+            autoRenew: true,
             stripeDetails,
           });
           return successResp(res, {
-            msg: SUCCESS_MESSAGE.CANCELED,
+            msg: SUCCESS_MESSAGE.UPDATED,
             code: HTTP_STATUS.SUCCESS.CODE,
-            data: cancelSubscription,
           });
         } else {
           errorResp(res, {
