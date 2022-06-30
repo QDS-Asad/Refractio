@@ -62,9 +62,9 @@ exports.updateSubscription = async ({request, subscriptionId}) => {
   return subscription;
 };
 
-exports.cancelSubscription = async (subscriptionId) => {
+exports.cancelResumeSubscription = async (subscriptionId, status) => {
   const subscription = await stripe.subscriptions.update(subscriptionId, {
-    cancel_at_period_end: true
+    cancel_at_period_end: status
   });
   return subscription;
 };

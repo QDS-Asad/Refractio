@@ -859,23 +859,24 @@ exports.subscribe = async (req, res, next) => {
             userInfo,
           })
             .then(async (stripeCustomerRes) => {
-              const reqBody = {
-                stripeDetails: {
-                  ...userInfo.stripeDetails,
-                  paymentMethod,
-                },
-                autoRenew: req.body.autoRenew,
-              };
-              await UserService.updateUserById(userId, reqBody);
-              return successResp(res, {
-                msg: SUCCESS_MESSAGE.UPDATED,
-                code: HTTP_STATUS.SUCCESS.CODE,
+              // const reqBody = {
+              //   stripeDetails: {
+              //     ...userInfo.stripeDetails,
+              //     paymentMethod,
+              //   },
+              //   autoRenew: req.body.autoRenew,
+              // };
+              // await UserService.updateUserById(userId, reqBody);
+              await updateSubscription(res, userInfo, {
+                request: req.body,
+                paymentMethod,
+                customerId: stripeCustomerRes.id,
+                subscriptionId:
+                  userInfo.stripeDetails.subscription.subscriptionId,
               });
-              // await updateSubscription(res, userInfo, {
-              //   request: req.body,
-              //   paymentMethod,
-              //   subscriptionId:
-              //     userInfo.stripeDetails.subscription.subscriptionId,
+              // return successResp(res, {
+              //   msg: SUCCESS_MESSAGE.UPDATED,
+              //   code: HTTP_STATUS.SUCCESS.CODE,
               // });
             })
             .catch((error) => {
@@ -924,6 +925,52 @@ exports.subscribe = async (req, res, next) => {
   }
 };
 
+// renew user subscription
+exports.renewSubscription = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const userInfo = await UserService.getUserById(userId);
+    const reqBody = {
+      planId: userInfo.stripeDetails.subscription.planId,
+      priceId: userInfo.stripeDetails.subscription.priceId,
+      autoRenew: userInfo.autoRenew,
+    };
+    await BillingService.createSubscription(obj)
+      .then(async (subscriptionRes) => {
+        const subscription = {
+          subscriptionId: subscriptionRes.id,
+          planId: userInfo.stripeDetails.subscription.planId,
+          priceId: userInfo.stripeDetails.subscription.priceId,
+          startDate: subscriptionRes.current_period_start,
+          endDate: subscriptionRes.current_period_end,
+          canceledDate: subscriptionRes.cancel_at,
+          status:
+            (subscriptionRes.cancel_at && SUBSCRIPTION_STATUS.CANCELED) ||
+            subscriptionRes.status,
+        };
+        const reqBody = {
+          stripeDetails: {
+            ...userInfo.stripeDetails,
+            subscription,
+          },
+        };
+        await UserService.updateUserById(userId, reqBody);
+        return successResp(res, {
+          msg: SUCCESS_MESSAGE.SUBSCRIBED,
+          code: HTTP_STATUS.SUCCESS.CODE,
+        });
+      })
+      .catch((error) => {
+        errorResp(res, {
+          msg: error.message,
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+        });
+      });
+  } catch (error) {
+    serverError(res, error);
+  }
+};
+
 const createSubscription = async (res, userInfo, obj) => {
   console.log("in create subscription");
   try {
@@ -936,7 +983,10 @@ const createSubscription = async (res, userInfo, obj) => {
           priceId: obj.request.priceId,
           startDate: subscriptionRes.current_period_start,
           endDate: subscriptionRes.current_period_end,
-          status: subscriptionRes.status,
+          canceledDate: subscriptionRes.cancel_at,
+          status:
+            (subscriptionRes.cancel_at && SUBSCRIPTION_STATUS.CANCELED) ||
+            subscriptionRes.status,
         };
         const role = await RoleService.getRoleById(userInfo.roleId);
         const teamData = {
@@ -984,12 +1034,11 @@ const updateSubscription = async (res, userInfo, obj) => {
     await BillingService.updateSubscription(obj)
       .then(async (subscriptionRes) => {
         const subscription = {
-          subscriptionId: subscriptionRes.id,
-          planId: obj.request.planId,
-          priceId: obj.request.priceId,
-          startDate: subscriptionRes.current_period_start,
-          endDate: subscriptionRes.current_period_end,
-          status: subscriptionRes.status,
+          ...userInfo.stripeDetails.subscription,
+          canceledDate: subscriptionRes.cancel_at,
+          status:
+            (subscriptionRes.cancel_at && SUBSCRIPTION_STATUS.CANCELED) ||
+            subscriptionRes.status,
         };
         const reqBody = {
           stripeDetails: {
@@ -1003,7 +1052,6 @@ const updateSubscription = async (res, userInfo, obj) => {
         return successResp(res, {
           msg: SUCCESS_MESSAGE.UPDATED,
           code: HTTP_STATUS.SUCCESS.CODE,
-          data: subscriptionRes,
         });
       })
       .catch((error) => {
@@ -1036,7 +1084,10 @@ exports.subscriptionRecurringPayment = async (req, res, next) => {
           endDate: data.object.lines.data[0].period.end,
         },
       };
-      await UserService.updateUserById(userInfo._id, { autoRenew: !data.object.cancel_period_end, stripeDetails });
+      await UserService.updateUserById(userInfo._id, {
+        autoRenew: !data.object.cancel_period_end,
+        stripeDetails,
+      });
       const requestBody = {
         status: getPaymentStatus(type),
         type,
@@ -1045,6 +1096,10 @@ exports.subscriptionRecurringPayment = async (req, res, next) => {
         description: data.object.lines.data[0].description,
       };
       await billingHistory(requestBody);
+      return successResp(res, {
+        msg: SUCCESS_MESSAGE.UPDATED,
+        code: HTTP_STATUS.SUCCESS.CODE,
+      });
     }
     // }
   } catch (error) {
@@ -1185,9 +1240,63 @@ exports.cancelSubscription = async (req, res, next) => {
           userRes.stripeDetails.subscription &&
           userRes.stripeDetails.subscription.subscriptionId
         ) {
-          const cancelSubscription = await BillingService.cancelSubscription(
-            userRes.stripeDetails.subscription.subscriptionId
-          );
+          const cancelSubscription =
+            await BillingService.cancelResumeSubscription(
+              userRes.stripeDetails.subscription.subscriptionId,
+              false
+            );
+          const stripeDetails = {
+            ...userRes.stripeDetails,
+            subscription: {
+              ...userRes.stripeDetails.subscription,
+              canceledDate: cancelSubscription.cancel_at,
+              status: SUBSCRIPTION_STATUS.CANCELED,
+            },
+          };
+          await UserService.updateUserById(user._id, {
+            autoRenew: false,
+            stripeDetails,
+          });
+          return successResp(res, {
+            msg: SUCCESS_MESSAGE.CANCELED,
+            code: HTTP_STATUS.SUCCESS.CODE,
+            data: cancelSubscription,
+          });
+        } else {
+          errorResp(res, {
+            msg: ERROR_MESSAGE.NOT_FOUND,
+            code: HTTP_STATUS.NOT_FOUND.CODE,
+          });
+        }
+      })
+      .catch((error) => {
+        errorResp(res, {
+          msg: ERROR_MESSAGE.NOT_FOUND,
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+        });
+      });
+  } catch (error) {
+    console.log(error);
+    serverError(res, error);
+  }
+};
+
+//resume user subscription details
+exports.resumeSubscription = async (req, res, next) => {
+  try {
+    const { user } = req.body;
+    await UserService.getUserById(user._id)
+      .then(async (userRes) => {
+        if (
+          userRes.stripeDetails &&
+          userRes.stripeDetails.subscription &&
+          userRes.stripeDetails.subscription.subscriptionId
+        ) {
+          const cancelSubscription =
+            await BillingService.cancelResumeSubscription(
+              userRes.stripeDetails.subscription.subscriptionId,
+              true
+            );
           const stripeDetails = {
             ...userRes.stripeDetails,
             subscription: {
