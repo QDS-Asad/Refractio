@@ -19,6 +19,8 @@ import AllOpportunities from './AllOpportunities';
 import CompletedOpportunities from './CompletedOpportunities';
 import EmptyOpportunities from './EmptyOpportunities';
 import OpportunityCreate from './OpportunityCreate';
+import { authLoginSelector } from '../../../features/auth/authLoginSlice';
+import { ROLES } from '../../../common/constants';
 
 const Opportunities = () => {
   const [showCreate, setShowCreate] = useState(false);
@@ -29,6 +31,8 @@ const Opportunities = () => {
   const { loading, error, opportunities, completedOpportunities } = useSelector(
     opportunityListSelector
   );
+
+  const { userLogin } = useSelector(authLoginSelector);
 
   // hook to fetch items
   useEffect(() => {
@@ -94,16 +98,19 @@ const Opportunities = () => {
             Opportunities
           </Header>
         </Grid.Column>
-        <Grid.Column width={8}>
-          <Button
-            primary
-            className='btn'
-            onClick={() => setShowCreate(true)}
-            floated='right'
-          >
-            Create New
-          </Button>
-        </Grid.Column>
+        {(userLogin.role.roleId === ROLES.ADMIN ||
+          userLogin.role.roleId === ROLES.ORGANIZER) && (
+          <Grid.Column width={8}>
+            <Button
+              primary
+              className='btn'
+              onClick={() => setShowCreate(true)}
+              floated='right'
+            >
+              Create New
+            </Button>
+          </Grid.Column>
+        )}
       </Grid>
       <Grid>
         <Grid.Column>

@@ -20,6 +20,7 @@ import addPlanSlice from './plans/addPlanSlice';
 import editPlanSlice from './plans/editPlanSlice';
 import removePlanSlice from './plans/removePlanSlice';
 import removeMemberSlice from './team/removeMemberSlice';
+import subscriptionSlice from './subscriptions/subscriptionSlice';
 
 export default configureStore({
   reducer: {
@@ -30,6 +31,7 @@ export default configureStore({
     authNewPassword: authNewPasswordSlice,
     authVerifyMember: authVerifyMemberSlice,
     authRegisterMember: authRegisterMemberSlice,
+    subscription: subscriptionSlice,
     roleList: roleListSlice,
     opportunityList: opportunityListSlice,
     opportunityDetail: opportunityDetailSlice,
