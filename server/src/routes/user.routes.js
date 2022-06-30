@@ -1331,7 +1331,7 @@ router.get("/team", Auth, User.getTeam);
 
 /**
  * @swagger
- *   /api/users/subscription-detials:
+ *   /api/users/subscription-details:
  *   get:
  *     description: get Subscription Details
  *     tags: [User]
