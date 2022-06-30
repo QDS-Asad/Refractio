@@ -1,7 +1,12 @@
 const UserService = require("../services/user.service");
 const RoleService = require("../services/role.service");
 const TeamService = require("../services/team.service");
+const PlanService = require("../services/plan.service");
 const BillingService = require("../services/billing.service");
+const {
+  convertDollerToCent,
+  convertTimestampToDate,
+} = require("../helpers/general_helper");
 const jwt = require("jsonwebtoken");
 const {
   crypto_encrypt,
@@ -34,6 +39,7 @@ const {
   TOTAL_TEAM_ADMIN,
   TOTAL_TEAM_ORGANIZER,
   PAYMENT_STATUS,
+  SUBSCRIPTION_STATUS,
 } = require("../lib/constants");
 const { ObjectId } = require("mongodb");
 const { request } = require("express");
@@ -737,21 +743,19 @@ exports.disableUser = async (req, res, next) => {
     await UserService.updateUserById(userId, userData)
       .then(async (user) => {
         const team = await TeamService.getTeamById(user.teamId);
-      const filterTeamMembers = team.members.filter((obj) => {
-        return obj.userId.toString() !== userId;
-      });
-      await TeamService.updateTeamMembers(user.teamId, {
-        members: filterTeamMembers,
-      })
-        .then((teamRes) => {
+        const filterTeamMembers = team.members.filter((obj) => {
+          return obj.userId.toString() !== userId;
+        });
+        await TeamService.updateTeamMembers(user.teamId, {
+          members: filterTeamMembers,
+        }).then((teamRes) => {
           return successResp(res, {
             msg: SUCCESS_MESSAGE.DELETED,
             code: HTTP_STATUS.SUCCESS.CODE,
           });
-        })
+        });
       })
       .catch((error) => {
-        console.log(error);
         errorResp(res, {
           msg: ERROR_MESSAGE.NOT_FOUND,
           code: HTTP_STATUS.NOT_FOUND.CODE,
@@ -832,8 +836,6 @@ exports.subscribe = async (req, res, next) => {
   try {
     const { userId } = req.params;
     const userInfo = await UserService.getUserById(userId);
-    if (userInfo.stripeDetails.paymentMethod.paymentMethodId) {
-    }
     BillingService.paymentMethod(req.body)
       .then(async (paymentMethodRes) => {
         const paymentMethod = {
@@ -844,18 +846,37 @@ exports.subscribe = async (req, res, next) => {
           expYear: paymentMethodRes.card.exp_year,
           last4Digits: paymentMethodRes.card.last4,
         };
+        console.log(
+          userInfo,
+          "customer id - ",
+          userInfo.stripeDetails.customerId
+        );
         if (userInfo.stripeDetails.customerId) {
+          console.log("in update customer");
           BillingService.updateStripeCustomer({
             request: req.body,
             paymentMethod: paymentMethodRes,
             userInfo,
           })
             .then(async (stripeCustomerRes) => {
-              await updateSubscription(res, userInfo, {
-                request: req.body,
-                paymentMethod,
-                subscriptionId: userInfo.stripeDetails.subscription.subscriptionId,
+              const reqBody = {
+                stripeDetails: {
+                  ...userInfo.stripeDetails,
+                  paymentMethod,
+                },
+                autoRenew: req.body.autoRenew,
+              };
+              await UserService.updateUserById(userId, reqBody);
+              return successResp(res, {
+                msg: SUCCESS_MESSAGE.UPDATED,
+                code: HTTP_STATUS.SUCCESS.CODE,
               });
+              // await updateSubscription(res, userInfo, {
+              //   request: req.body,
+              //   paymentMethod,
+              //   subscriptionId:
+              //     userInfo.stripeDetails.subscription.subscriptionId,
+              // });
             })
             .catch((error) => {
               errorResp(res, {
@@ -864,6 +885,8 @@ exports.subscribe = async (req, res, next) => {
               });
             });
         } else {
+          console.log("in create customer");
+
           BillingService.createStripeCustomer({
             request: req.body,
             paymentMethod: paymentMethodRes,
@@ -902,6 +925,7 @@ exports.subscribe = async (req, res, next) => {
 };
 
 const createSubscription = async (res, userInfo, obj) => {
+  console.log("in create subscription");
   try {
     const userId = userInfo._id;
     await BillingService.createSubscription(obj)
@@ -935,7 +959,6 @@ const createSubscription = async (res, userInfo, obj) => {
             return successResp(res, {
               msg: SUCCESS_MESSAGE.SUBSCRIBED,
               code: HTTP_STATUS.SUCCESS.CODE,
-              data: subscriptionRes,
             });
           })
           .catch((error) => {
@@ -954,6 +977,8 @@ const createSubscription = async (res, userInfo, obj) => {
 };
 
 const updateSubscription = async (res, userInfo, obj) => {
+  console.log("in update subscription");
+
   try {
     const userId = userInfo._id;
     await BillingService.updateSubscription(obj)
@@ -966,33 +991,20 @@ const updateSubscription = async (res, userInfo, obj) => {
           endDate: subscriptionRes.current_period_end,
           status: subscriptionRes.status,
         };
-        const role = await RoleService.getRoleById(userInfo.roleId);
-        const teamData = {
-          createdById: userId,
-          members: [{ userId, roleId: role.roleId }],
+        const reqBody = {
+          stripeDetails: {
+            paymentMethod: obj.paymentMethod,
+            customerId: obj.customerId,
+            subscription,
+          },
+          autoRenew: obj.request.autoRenew,
         };
-        await TeamService.createTeam(teamData)
-          .then(async (teamRes) => {
-            const reqBody = {
-              stripeDetails: {
-                paymentMethod: obj.paymentMethod,
-                customerId: obj.customerId,
-                subscription,
-              },
-              autoRenew: obj.request.autoRenew,
-              status: USER_STATUS.ACTIVE,
-              teamId: teamRes._id,
-            };
-            await UserService.updateUserById(userId, reqBody);
-            return successResp(res, {
-              msg: SUCCESS_MESSAGE.SUBSCRIBED,
-              code: HTTP_STATUS.SUCCESS.CODE,
-              data: subscriptionRes,
-            });
-          })
-          .catch((error) => {
-            serverError(res, error);
-          });
+        await UserService.updateUserById(userId, reqBody);
+        return successResp(res, {
+          msg: SUCCESS_MESSAGE.UPDATED,
+          code: HTTP_STATUS.SUCCESS.CODE,
+          data: subscriptionRes,
+        });
       })
       .catch((error) => {
         errorResp(res, {
@@ -1008,27 +1020,32 @@ const updateSubscription = async (res, userInfo, obj) => {
 exports.subscriptionRecurringPayment = async (req, res, next) => {
   try {
     const { type, data } = req.body;
-    // console.log(req.body);
-    // if (type == "invoice.payment_succeeded") {
-    const userInfo = await UserService.getUserByEmail(
-      data.object.customer_email
-    );
-    const stripeDetails = {
-      ...userInfo.stripeDetails,
-      subscription: {
-        ...userInfo.stripeDetails.subscription,
-        startDate: data.object.lines.data[0].period.start,
-        endDate: data.object.lines.data[0].period.end,
-      },
-    };
-    await UserService.updateUserById(userInfo._id, { stripeDetails });
-    const requestBody = {
-      status: getPaymentStatus(type),
-      amount: (data.object.amount_paid / 100),
-      userId: userInfo._id,
-      description: data.object.description || "Subscription creation",
-    };
-    await billingHistory(requestBody);
+    const status = getPaymentStatus(type);
+    console.log(status, type);
+    if (status) {
+      console.log("data - ", data);
+      // if (type == "invoice.payment_succeeded") {
+      const userInfo = await UserService.getUserByEmail(
+        data.object.customer_email
+      );
+      const stripeDetails = {
+        ...userInfo.stripeDetails,
+        subscription: {
+          ...userInfo.stripeDetails.subscription,
+          startDate: data.object.lines.data[0].period.start,
+          endDate: data.object.lines.data[0].period.end,
+        },
+      };
+      await UserService.updateUserById(userInfo._id, { autoRenew: !data.object.cancel_period_end, stripeDetails });
+      const requestBody = {
+        status: getPaymentStatus(type),
+        type,
+        amount: convertDollerToCent(data.object.amount_paid),
+        userId: userInfo._id,
+        description: data.object.lines.data[0].description,
+      };
+      await billingHistory(requestBody);
+    }
     // }
   } catch (error) {
     serverError(res, error);
@@ -1051,12 +1068,158 @@ const getPaymentStatus = (type) => {
       status = PAYMENT_STATUS.SUCCESS;
       break;
     default:
-      status = type;
+      status = undefined;
       break;
   }
   return status;
 };
 
+//save billing history
 const billingHistory = async (obj) => {
   return await BillingService.saveBillingHistory(obj);
+};
+
+//get billing history list with pagination
+exports.getBillingHistory = async (req, res, next) => {
+  try {
+    const { page, page_size } = req.query;
+    const { user } = req.body;
+    const filterData = {
+      user,
+      page,
+      page_size,
+      userId: user._id,
+    };
+    await BillingService.getBillingHistory(filterData)
+      .then(async (billingRes) => {
+        return successResp(res, {
+          msg: SUCCESS_MESSAGE.DATA_FETCHED,
+          code: HTTP_STATUS.SUCCESS.CODE,
+          data: billingRes,
+        });
+      })
+      .catch((error) => {
+        errorResp(res, {
+          msg: ERROR_MESSAGE.NOT_FOUND,
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+        });
+      });
+  } catch (error) {
+    serverError(res, error);
+  }
+};
+
+//get user subscription details
+exports.getSubscriptionDetails = async (req, res, next) => {
+  try {
+    const { user } = req.body;
+    await UserService.getUserById(user._id)
+      .then(async (userRes) => {
+        if (
+          userRes.stripeDetails &&
+          userRes.stripeDetails.subscription &&
+          userRes.stripeDetails.subscription.planId
+        ) {
+          const reqBody = {
+            planId: userRes.stripeDetails.subscription.planId,
+            prices: [userRes.stripeDetails.subscription.priceId],
+          };
+          const stripePlan = await PlanService.getStripePlanById(reqBody);
+          const resBody = {
+            planName: stripePlan.name,
+            interval: stripePlan.prices[0].recurring.interval,
+            amount: convertDollerToCent(stripePlan.prices[0].unit_amount),
+            nextBillingAt:
+              (userRes.stripeDetails.subscription.status ==
+                SUBSCRIPTION_STATUS.ACTIVE &&
+                new Date(
+                  convertTimestampToDate(
+                    userRes.stripeDetails.subscription.endDate
+                  )
+                )) ||
+              null,
+            cancelAt:
+              (userRes.stripeDetails.subscription.status ==
+                SUBSCRIPTION_STATUS.CANCELED &&
+                new Date(
+                  convertTimestampToDate(
+                    userRes.stripeDetails.subscription.canceledDate
+                  )
+                )) ||
+              null,
+            autoRenew: userRes.autoRenew,
+            PaymentMethod: userRes.stripeDetails.paymentMethod,
+            status: userRes.stripeDetails.subscription.status,
+          };
+          return successResp(res, {
+            msg: SUCCESS_MESSAGE.DATA_FETCHED,
+            code: HTTP_STATUS.SUCCESS.CODE,
+            data: resBody,
+          });
+        } else {
+          errorResp(res, {
+            msg: ERROR_MESSAGE.NOT_FOUND,
+            code: HTTP_STATUS.NOT_FOUND.CODE,
+          });
+        }
+      })
+      .catch((error) => {
+        errorResp(res, {
+          msg: ERROR_MESSAGE.NOT_FOUND,
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+        });
+      });
+  } catch (error) {
+    serverError(res, error);
+  }
+};
+
+//cancel user subscription details
+exports.cancelSubscription = async (req, res, next) => {
+  try {
+    const { user } = req.body;
+    await UserService.getUserById(user._id)
+      .then(async (userRes) => {
+        if (
+          userRes.stripeDetails &&
+          userRes.stripeDetails.subscription &&
+          userRes.stripeDetails.subscription.subscriptionId
+        ) {
+          const cancelSubscription = await BillingService.cancelSubscription(
+            userRes.stripeDetails.subscription.subscriptionId
+          );
+          const stripeDetails = {
+            ...userRes.stripeDetails,
+            subscription: {
+              ...userRes.stripeDetails.subscription,
+              canceledDate: cancelSubscription.cancel_at,
+              status: SUBSCRIPTION_STATUS.CANCELED,
+            },
+          };
+          await UserService.updateUserById(user._id, {
+            autoRenew: false,
+            stripeDetails,
+          });
+          return successResp(res, {
+            msg: SUCCESS_MESSAGE.CANCELED,
+            code: HTTP_STATUS.SUCCESS.CODE,
+            data: cancelSubscription,
+          });
+        } else {
+          errorResp(res, {
+            msg: ERROR_MESSAGE.NOT_FOUND,
+            code: HTTP_STATUS.NOT_FOUND.CODE,
+          });
+        }
+      })
+      .catch((error) => {
+        errorResp(res, {
+          msg: ERROR_MESSAGE.NOT_FOUND,
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+        });
+      });
+  } catch (error) {
+    console.log(error);
+    serverError(res, error);
+  }
 };

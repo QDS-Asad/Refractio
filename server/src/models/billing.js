@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const mongoosePaginate = require('mongoose-paginate-v2');
 const Schema = mongoose.Schema;
 
 const BillingSchema = new Schema(
@@ -8,6 +9,10 @@ const BillingSchema = new Schema(
       required: true,
     },
     status: {
+      type: String,
+      required: true,
+    },
+    type: {
       type: String,
       required: true,
     },
@@ -33,6 +38,7 @@ BillingSchema.pre("findOneAndUpdate", function (next) {
   next();
 });
 
+BillingSchema.plugin(mongoosePaginate);
 module.exports = {
   Billing: mongoose.model("billing", BillingSchema),
 };
