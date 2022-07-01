@@ -21,6 +21,11 @@ import editPlanSlice from './plans/editPlanSlice';
 import removePlanSlice from './plans/removePlanSlice';
 import removeMemberSlice from './team/removeMemberSlice';
 import subscriptionSlice from './subscriptions/subscriptionSlice';
+import billingListSlice from './billing/billingListSlice';
+import subscriptionDetailSlice from './subscriptions/subscriptionDetailSlice';
+import changeCardSlice from './billing/changeCardSlice';
+import subscriptionCancelSlice from './subscriptions/subscriptionCancelSlice';
+import subscriptionResumeSlice from './subscriptions/subscriptionResumeSlice';
 
 export default configureStore({
   reducer: {
@@ -46,5 +51,10 @@ export default configureStore({
     addPlan: addPlanSlice,
     editPlan: editPlanSlice,
     removePlan: removePlanSlice,
+    billingList: billingListSlice,
+    subscriptionDetail: subscriptionDetailSlice,
+    changeCard: changeCardSlice,
+    subscriptionCancel: subscriptionCancelSlice,
+    subscriptionResume: subscriptionResumeSlice,
   },
 });

@@ -14,8 +14,8 @@ import { USER_STATUS } from '../../../common/constants';
 import { fetchRoles, roleListSelector } from '../../../features/roles/roleList';
 
 const ManageUsers = () => {
-  const [inviteTeamMember, setInviteTeamMember] = useState(false);
-  const { loading, error, users, page, limit, totalPages } = { users: [] };
+  const [, setInviteTeamMember] = useState(false);
+  const { loading, error, users, page, totalPages } = { users: [] };
 
   const { roles } = useSelector(roleListSelector);
 

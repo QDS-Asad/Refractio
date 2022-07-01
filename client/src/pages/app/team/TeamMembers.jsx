@@ -54,7 +54,13 @@ const TeamMembers = () => {
       !removeTeamMember &&
       dispatch(fetchTeamList(page, limit)) &&
       dispatch(fetchRoles());
-  }, [inviteTeamMember, cancelInvitation, resendInvitation, changeMemberRole, removeTeamMember]);
+  }, [
+    inviteTeamMember,
+    cancelInvitation,
+    resendInvitation,
+    changeMemberRole,
+    removeTeamMember,
+  ]);
 
   const removeTeamMemberHandler = (id) => {
     setSelectedMember(id);
@@ -193,15 +199,16 @@ const TeamMembers = () => {
                     )}
                     {userLogin.role.roleId === ROLES.ADMIN && (
                       <Table.Cell className='clearfix'>
-                        {user.status === USER_STATUS.ACTIVE && (
-                          <Button
-                            className='btn-link'
-                            floated='right'
-                            onClick={() => removeTeamMemberHandler(user._id)}
-                          >
-                            Remove
-                          </Button>
-                        )}
+                        {userLogin.id !== user._id &&
+                          user.status === USER_STATUS.ACTIVE && (
+                            <Button
+                              className='btn-link'
+                              floated='right'
+                              onClick={() => removeTeamMemberHandler(user._id)}
+                            >
+                              Remove
+                            </Button>
+                          )}
                         {user.status === USER_STATUS.INVITE_SENT && (
                           <>
                             <Button
