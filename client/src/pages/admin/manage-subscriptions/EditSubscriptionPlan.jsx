@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import {
   editPlanSelector,
   editSubscriptionPlan,
+  reset,
 } from '../../../features/plans/editPlanSlice';
 import { Button, Form, Message, Modal } from 'semantic-ui-react';
 
@@ -63,12 +64,17 @@ const EditSubscriptionPlan = ({ editPlan, setEditPlan, plan }) => {
         setValue(field, plan[field]);
         trigger(field);
       });
+      let perMonth = plan.prices.find((a) => a.interval === 'month');
+      let perYear = plan.prices.find((a) => a.interval === 'year');
+      setValue('pricePerMonth', perMonth != null ? perMonth.amount : 0);
+      setValue('pricePerYear', perYear != null ? perYear.amount : 0);
     }
   }, [plan]);
 
   useEffect(() => {
     if (success) {
       setEditPlan(false);
+      dispatch(reset());
     }
   }, [success]);
 
@@ -127,6 +133,8 @@ const EditSubscriptionPlan = ({ editPlan, setEditPlan, plan }) => {
             <Form.Field className='mb-3'>
               <label>Price per month</label>
               <Form.Input
+                icon='dollar sign'
+                iconPosition='left'
                 name='pricePerMonth'
                 fluid
                 placeholder='Enter price $'
@@ -142,6 +150,8 @@ const EditSubscriptionPlan = ({ editPlan, setEditPlan, plan }) => {
             <Form.Field className='mb-3'>
               <label>Price annually</label>
               <Form.Input
+                icon='dollar sign'
+                iconPosition='left'
                 name='pricePerYear'
                 fluid
                 placeholder='Enter price $'

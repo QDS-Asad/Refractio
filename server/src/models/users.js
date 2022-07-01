@@ -106,6 +106,10 @@ const UserSchema = new Schema(
           type: String,
           default: "",
         },
+        canceledDate: {
+          type: String,
+          default: "",
+        },
         status: {
           type: String,
           enum: [SUBSCRIPTION_STATUS.SUCCESS, SUBSCRIPTION_STATUS.FAILED],

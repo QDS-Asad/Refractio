@@ -1,4 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import {
   Button,
   Card,
@@ -7,163 +10,425 @@ import {
   Form,
   Grid,
   Header,
+  Icon,
   List,
+  Loader,
+  Message,
+  Radio,
   Segment,
 } from 'semantic-ui-react';
+import { USER_STATUS } from '../../common/constants';
+import {
+  authLoginSelector,
+  updateUserStatus,
+} from '../../features/auth/authLoginSlice';
+import {
+  fetchPlans,
+  planListSelector,
+} from '../../features/plans/planListSlice';
+import {
+  subscriptionSelector,
+  userSubscription,
+} from '../../features/subscriptions/subscriptionSlice';
 
 const Subscription = () => {
+  const { register, setValue, handleSubmit, errors, trigger, watch } = useForm({
+    mode: 'onBlur',
+    defaultValues: {
+      autoRenew: false,
+      couponCode: '6546',
+    },
+  });
+  const [prices, setPrices] = useState([]);
+
+  const { userLogin } = useSelector(authLoginSelector);
+
+  const { loading, error, plans } = useSelector(planListSelector);
+
+  const { loading: formLoading, error: formError, success } = useSelector(
+    subscriptionSelector
+  );
+
+  const dispatch = useDispatch();
+
+  const navigate = useNavigate();
+
+  const handleCreate = (data) => {
+    // dispatch user subscription;
+    dispatch(userSubscription(userLogin.id, data));
+  };
+
+  const handleChange = (e) => {
+    e.persist();
+    setValue(e.target.name, e.target.value);
+    trigger(e.target.name);
+  };
+
+  const handlePlanChange = (e, change) => {
+    e.persist();
+    setValue(change.name, change.value);
+    trigger(change.name);
+    setPrices(plans.find((a) => a.id === change.value).prices);
+  };
+
+  const handlePriceChange = (e, change) => {
+    e.persist();
+    setValue(change.name, change.value);
+    trigger(change.name);
+  };
+
+  const handleChangeCheckBox = (e) => {
+    debugger;
+    e.persist();
+    setValue(e.target.name, e.target.checked);
+    trigger(e.target.name);
+  };
+
+  const createOptions = {
+    planId: {
+      required: 'Plan is required',
+    },
+    priceId: {
+      required: 'Pricing is required',
+    },
+    nameOnCard: {
+      required: 'Name on card is required',
+    },
+    cardNumber: {
+      required: 'Card number is required',
+    },
+    cardExpiry: {
+      required: 'Card expiry is required',
+      pattern: {
+        value: /^(0[1-9]|1[0-2])\/?([0-9]{2})$/,
+        message: 'Invalid expiry date.',
+      },
+    },
+    cardCvv: {
+      required: 'Card Cvv is required',
+      maxLength: {
+        value: 3,
+        message: "Card cvc can't exceed from 3 numbers",
+      },
+      minLength: {
+        value: 3,
+        message: 'Enter at least 3 numbers',
+      },
+      pattern: {
+        value: /^[0-9]*$/,
+        message: 'Only numbers are allowed',
+      },
+    },
+  };
+
+  const handleGoToApplication = () => {
+    navigate('/');
+  };
+
+  useEffect(() => {
+    register({ name: 'planId' }, createOptions.planId);
+    register({ name: 'priceId' }, createOptions.priceId);
+    register({ name: 'nameOnCard' }, createOptions.nameOnCard);
+    register({ name: 'cardNumber' }, createOptions.cardNumber);
+    register({ name: 'cardExpiry' }, createOptions.cardExpiry);
+    register({ name: 'cardCvv' }, createOptions.cardCvv);
+    register({ name: 'autoRenew' });
+    register({ name: 'couponCode' });
+    dispatch(fetchPlans());
+  }, []);
+
+  useEffect(() => {
+    if (success) {
+      dispatch(updateUserStatus(USER_STATUS.ACTIVE));
+    }
+  }, [success]);
+
   return (
     <Container>
       <Card fluid>
         <Card.Content>
-          <Grid className='px-3'>
-            <Grid.Row columns={2}>
-              <Grid.Column computer={16} largeScreen={10} widescreen={10}>
-                <Card.Header as='h3' className='mb-4'>
-                  Choose Plan
-                </Card.Header>
-                <Segment className='mx-2'>
-                  <Checkbox
-                    radio
-                    label={
-                      <label>
-                        <strong className='fw-bold fs-5'>Team</strong>
-                        <Header.Subheader className='mt-2'>
-                          Max of 24 seats. 3 Opportunities can be published at
-                          once.
-                        </Header.Subheader>
-                      </label>
-                    }
-                  />
-                </Segment>
+          {success ? (
+            <Grid className='px-3' centered columns={2}>
+              <Grid.Column className='text-center'>
+                <Icon name='check circle' size='huge' color='green' />
+                <h3>Subscription completed successfully!</h3>
+                <Button className='btn' onClick={handleGoToApplication}>
+                  Go to Application
+                </Button>
+              </Grid.Column>
+            </Grid>
+          ) : (
+            <Grid className='px-3'>
+              <Grid.Row columns={2}>
+                <Grid.Column computer={16} largeScreen={10} widescreen={10}>
+                  <Card.Header as='h3' className='mb-4'>
+                    Choose Plan
+                  </Card.Header>
+                  <Loader active={loading} inline='centered' />
+                  {error && (
+                    <Message color='red' className='error-message mb-3'>
+                      {error}
+                    </Message>
+                  )}
+                  {plans.map((plan) => (
+                    <Segment className='mx-2' key={plan.id}>
+                      <Form.Field>
+                        <Radio
+                          name='planId'
+                          value={plan.id}
+                          checked={plan.id === watch('planId')}
+                          label={
+                            <label>
+                              <strong className='fw-bold fs-5'>
+                                {plan.name}
+                              </strong>
+                              <Header.Subheader className='mt-2'>
+                                {plan.description}
+                              </Header.Subheader>
+                            </label>
+                          }
+                          onChange={handlePlanChange}
+                        />
+                        {errors && errors.planId && (
+                          <Message error content={errors.planId.message} />
+                        )}
+                      </Form.Field>
+                    </Segment>
+                  ))}
+                  {prices.length > 0 && (
+                    <>
+                      <Card.Header as='h3' className='mt-4 mb-3'>
+                        Choose Billing Cycle
+                      </Card.Header>
+                      {prices.map((price) => (
+                        <Segment className='mx-2' key={price.id}>
+                          <Form.Field>
+                            <Radio
+                              name='priceId'
+                              value={price.id}
+                              checked={price.id === watch('priceId')}
+                              label={
+                                <label>
+                                  <strong className='fw-bold fs-5 '>
+                                    Pay{' '}
+                                    <span className='text-capitalize'>
+                                      {price.interval}ly
+                                    </span>
+                                  </strong>
+                                  <Header.Subheader className='mt-2'>
+                                    ${price.amount} / per {price.interval}
+                                  </Header.Subheader>
+                                </label>
+                              }
+                              onChange={handlePriceChange}
+                            />
+                            {errors && errors.priceId && (
+                              <Message error content={errors.priceId.message} />
+                            )}
+                          </Form.Field>
+                        </Segment>
+                      ))}
+                    </>
+                  )}
 
-                <Card.Header as='h3' className='mt-4 mb-3'>
-                  Choose Billing Cycle
-                </Card.Header>
-                <Segment className='mx-2'>
-                  <Checkbox
-                    radio
-                    label={
-                      <label>
-                        <strong className='fw-bold fs-5 '>Pay Monthly</strong>
-                        <Header.Subheader className='mt-2'>
-                          $7 / per month
-                        </Header.Subheader>
-                      </label>
-                    }
-                  />
-                </Segment>
-                <Card.Header as='h3' className='mt-4 mb-3'>
-                  Payment Method
-                </Card.Header>
-                <Form>
-                  <Form.Field className='mb-3'>
-                    <label>Name on card</label>
-                    <Form.Input
-                      name='text'
-                      fluid
-                      placeholder='Enter name on card'
-                    />
-                  </Form.Field>
-                  <Form.Field className='mb-3'>
-                    <label>Card number</label>
-                    <Form.Input
-                      name='text'
-                      fluid
-                      placeholder='0000 0000 0000 0000'
-                    />
-                  </Form.Field>
-                  <Form.Group widths='equal'>
+                  <Card.Header as='h3' className='mt-4 mb-3'>
+                    Payment Method
+                  </Card.Header>
+                  {formError && (
+                    <Message color='red' className='error-message mb-3'>
+                      {formError}
+                    </Message>
+                  )}
+                  <Form
+                    id='subscription'
+                    onSubmit={handleSubmit(handleCreate)}
+                    loading={formLoading}
+                    error
+                  >
                     <Form.Field className='mb-3'>
-                      <label>Expiration Date</label>
-                      <Form.Input name='text' fluid placeholder='MM/YY' />
+                      <label>Name on card</label>
+                      <Form.Input
+                        name='nameOnCard'
+                        fluid
+                        placeholder='Enter name on card'
+                        error={!!errors.nameOnCard}
+                        onBlur={handleChange}
+                      />
+
+                      {errors && errors.nameOnCard && (
+                        <Message error content={errors.nameOnCard.message} />
+                      )}
                     </Form.Field>
                     <Form.Field className='mb-3'>
-                      <label>CVV</label>
-                      <Form.Input name='text' fluid placeholder='3 digits' />
+                      <label>Card number</label>
+                      <Form.Input
+                        name='cardNumber'
+                        fluid
+                        placeholder='0000 0000 0000 0000'
+                        error={!!errors.cardNumber}
+                        onBlur={handleChange}
+                      />
+
+                      {errors && errors.cardNumber && (
+                        <Message error content={errors.cardNumber.message} />
+                      )}
                     </Form.Field>
-                  </Form.Group>
-                  <Form.Field>
-                    <Checkbox label='Autorenewal subscription' />
-                  </Form.Field>
-                  <Button type='submit' fluid primary className='mt-3 btn'>
-                    Pay
-                  </Button>
-                </Form>
-              </Grid.Column>
-              <Grid.Column
-                computer={16}
-                largeScreen={6}
-                widescreen={6}
-                className='mt-5'
-              >
-                <Card fluid>
-                  <Card.Content>
-                    <List divided relaxed='very'>
-                      <List.Item className='py-4'>
-                        <Card.Header as='h3' className='text-uppercase'>
-                          Summary of Your Purchase
-                        </Card.Header>
-                      </List.Item>
-                      <List.Item className='py-4'>
-                        <List.Content floated='right' className='fs-3 my-3'>
-                          $7
-                        </List.Content>
-                        <div>
-                          <strong className='fw-bold fs-5 '>Team Plan</strong>
-                          <Header.Subheader className='mt-2'>
-                            $7 / per month
-                          </Header.Subheader>
-                        </div>
-                      </List.Item>
-                      <List.Item className='pt-4 pb-5'>
-                        <Form.Field className='mb-3'>
-                          <label className='mb-2'>Coupon code</label>
-                          <Form.Input
-                            name='email'
-                            fluid
-                            placeholder='Enter coupon code'
-                            tabIndex='1'
-                            action
+                    <Form.Group widths='equal'>
+                      <Form.Field className='mb-3'>
+                        <label>Expiration Date</label>
+                        <Form.Input
+                          name='cardExpiry'
+                          fluid
+                          placeholder='MM/YY'
+                          error={!!errors.cardExpiry}
+                          onBlur={handleChange}
+                        />
+
+                        {errors && errors.cardExpiry && (
+                          <Message error content={errors.cardExpiry.message} />
+                        )}
+                      </Form.Field>
+                      <Form.Field className='mb-3'>
+                        <label>CVC</label>
+                        <Form.Input
+                          name='cardCvv'
+                          fluid
+                          placeholder='3 digits'
+                          error={!!errors.cardCvv}
+                          onBlur={handleChange}
+                        />
+
+                        {errors && errors.cardCvv && (
+                          <Message error content={errors.cardCvv.message} />
+                        )}
+                      </Form.Field>
+                    </Form.Group>
+                    <Form.Field>
+                      <Checkbox
+                        label='Autorenewal subscription'
+                        name='autoRenew'
+                        onBlur={handleChangeCheckBox}
+                      />
+                    </Form.Field>
+                    <Button type='submit' fluid primary className='mt-3 btn'>
+                      Pay
+                    </Button>
+                  </Form>
+                </Grid.Column>
+                <Grid.Column
+                  computer={16}
+                  largeScreen={6}
+                  widescreen={6}
+                  className='mt-5'
+                >
+                  <Card fluid>
+                    <Card.Content>
+                      <List divided relaxed='very'>
+                        <List.Item className='py-4'>
+                          <Card.Header as='h3' className='text-uppercase'>
+                            Summary of Your Purchase
+                          </Card.Header>
+                        </List.Item>
+                        <List.Item className='py-4'>
+                          <List.Content floated='right' className='fs-3 my-3'>
+                            $
+                            {prices &&
+                            prices.find((a) => a.id === watch('priceId'))
+                              ? prices.find((a) => a.id === watch('priceId'))
+                                  .amount
+                              : 0}
+                          </List.Content>
+                          <div>
+                            <strong className='fw-bold fs-5 '>
+                              {plans &&
+                              plans.find((a) => a.id === watch('planId')) ? (
+                                plans.find((a) => a.id === watch('planId')).name
+                              ) : (
+                                <>Select Plan</>
+                              )}
+                            </strong>
+                            <Header.Subheader className='mt-2'>
+                              $
+                              {prices &&
+                              prices.find((a) => a.id === watch('priceId')) ? (
+                                <>
+                                  {
+                                    prices.find(
+                                      (a) => a.id === watch('priceId')
+                                    ).amount
+                                  }{' '}
+                                  / per&nbsp;
+                                  {
+                                    prices.find(
+                                      (a) => a.id === watch('priceId')
+                                    ).interval
+                                  }
+                                </>
+                              ) : (
+                                <>0 / per month</>
+                              )}
+                            </Header.Subheader>
+                          </div>
+                        </List.Item>
+                        <List.Item className='pt-4 pb-5'>
+                          <Form.Field className='mb-3'>
+                            <label className='mb-2'>Coupon code</label>
+                            <Form.Input
+                              name='email'
+                              fluid
+                              placeholder='Enter coupon code'
+                              tabIndex='1'
+                              action
+                            >
+                              <input />
+                              <Button type='submit' className='btn text-center'>
+                                Apply
+                              </Button>
+                            </Form.Input>
+                          </Form.Field>
+                        </List.Item>
+                        <List.Item>
+                          <List.Content floated='right'>$0</List.Content>
+                          Discount:
+                        </List.Item>
+                        <List.Item>
+                          <List.Content floated='right'>
+                            $
+                            {prices &&
+                            prices.find((a) => a.id === watch('priceId'))
+                              ? prices.find((a) => a.id === watch('priceId'))
+                                  .amount
+                              : 0}
+                          </List.Content>
+                          Sub Total:
+                        </List.Item>
+                        <List.Item>
+                          <List.Content
+                            floated='right'
+                            className='fw-bold fs-4'
                           >
-                            <input />
-                            <Button type='submit' className='btn text-center'>
-                              Apply
-                            </Button>
-                          </Form.Input>
-                        </Form.Field>
-                      </List.Item>
-                      <List.Item>
-                        <List.Content floated='right'>$0</List.Content>
-                        Discount:
-                      </List.Item>
-                      <List.Item>
-                        <List.Content floated='right'>$7</List.Content>
-                        Sub Total:
-                      </List.Item>
-                      <List.Item>
-                        <List.Content floated='right' className='fw-bold fs-4'>
-                          $7
-                        </List.Content>
-                        <span className='fw-bold fs-4'>Total:</span>
-                        <p className='mt-5'>
-                          Unless you make any changes to your plan, you will be
-                          billed automatically every month. You may cancel your
-                          subscription at any time.
-                        </p>
-                        <a
-                          href='mailto:help@refractio.com'
-                          className='primary-dark-color'
-                        >
-                          help@refractio.com
-                        </a>
-                      </List.Item>
-                    </List>
-                  </Card.Content>
-                </Card>
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
+                            $7
+                          </List.Content>
+                          <span className='fw-bold fs-4'>Total:</span>
+                          <p className='mt-5'>
+                            Unless you make any changes to your plan, you will
+                            be billed automatically every month. You may cancel
+                            your subscription at any time.
+                          </p>
+                          <a
+                            href='mailto:help@refractio.com'
+                            className='primary-dark-color'
+                          >
+                            help@refractio.com
+                          </a>
+                        </List.Item>
+                      </List>
+                    </Card.Content>
+                  </Card>
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
+          )}
         </Card.Content>
       </Card>
     </Container>

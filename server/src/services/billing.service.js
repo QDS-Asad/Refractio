@@ -62,6 +62,31 @@ exports.updateSubscription = async ({request, subscriptionId}) => {
   return subscription;
 };
 
+exports.cancelResumeSubscription = async (subscriptionId, status) => {
+  const subscription = await stripe.subscriptions.update(subscriptionId, {
+    cancel_at_period_end: status
+  });
+  return subscription;
+};
+
 exports.saveBillingHistory = async (obj) => {
   return await Billing.create(obj);
 };
+
+exports.getBillingHistory = async (obj) => {
+  const { page, page_size, userId } = obj;
+  const options = {
+    page: page || DEFAULT_PAGE_NO,
+    limit: page_size || DEFAULT_PAGE_SIZE,
+    sort: {
+      createdAt: 1, //Sort by Date Added ASC
+    },
+    select: {},
+  };
+  return await Billing.paginate(
+    {
+      userId,
+    },
+    options
+  );
+}
