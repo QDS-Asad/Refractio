@@ -87,3 +87,10 @@ export const logoutUser = () => async (dispatch) => {
   dispatch(setLogout());
   window.localStorage.removeItem('userInfo');
 };
+
+export const updateUserStatus = (status) => async (dispatch, getState) => {
+  let userInfo = Object.assign({}, getState().authLogin.userLogin);
+  userInfo.status = status;
+  dispatch(setUserLogin(userInfo));
+  window.localStorage.setItem('userInfo', JSON.stringify(userInfo));
+};

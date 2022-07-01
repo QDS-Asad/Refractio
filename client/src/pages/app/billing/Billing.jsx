@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Header, Segment } from 'semantic-ui-react';
+import { Grid, Header } from 'semantic-ui-react';
 import PaymentHistory from './PaymentHistory';
 import SubscriptionDetails from './SubscriptionDetails';
 
@@ -15,16 +15,12 @@ const Billing = () => {
       </Grid>
       <Grid>
         <Grid.Column>
-          <Segment>
-            <SubscriptionDetails />
-          </Segment>
+          <SubscriptionDetails />
         </Grid.Column>
       </Grid>
       <Grid>
         <Grid.Column>
-          <Segment>
-            <PaymentHistory />
-          </Segment>
+          <PaymentHistory />
         </Grid.Column>
       </Grid>
     </>

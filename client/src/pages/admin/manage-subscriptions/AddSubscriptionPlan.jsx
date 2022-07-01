@@ -109,6 +109,8 @@ const AddSubscriptionPlan = ({ addPlan, setAddPlan }) => {
             <Form.Field className='mb-3'>
               <label>Price per month</label>
               <Form.Input
+                icon='dollar sign'
+                iconPosition='left'
                 name='pricePerMonth'
                 fluid
                 placeholder='Enter price $'
@@ -123,6 +125,8 @@ const AddSubscriptionPlan = ({ addPlan, setAddPlan }) => {
             <Form.Field className='mb-3'>
               <label>Price annually</label>
               <Form.Input
+                icon='dollar sign'
+                iconPosition='left'
                 name='pricePerYear'
                 fluid
                 placeholder='Enter price $'
