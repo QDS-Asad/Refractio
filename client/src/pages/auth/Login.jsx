@@ -35,6 +35,9 @@ const Login = () => {
   const handleChange = (e) => {
     e.persist();
     setValue(e.target.name, e.target.value);
+  };
+
+  const handleBlur = (e) => {
     trigger(e.target.name);
   };
 
@@ -100,7 +103,8 @@ const Login = () => {
             name='email'
             fluid
             placeholder='Enter your Email'
-            onBlur={handleChange}
+            onBlur={handleBlur}
+            onChange={handleChange}
             error={!!errors.email}
             tabIndex='1'
           />
@@ -118,7 +122,8 @@ const Login = () => {
             type='password'
             fluid
             placeholder='Enter your Password'
-            onBlur={handleChange}
+            onBlur={handleBlur}
+            onChange={handleChange}
             error={!!errors.password}
             tabIndex='2'
           />
@@ -130,7 +135,8 @@ const Login = () => {
           <Checkbox
             label='Remember me'
             name='rememberMe'
-            onBlur={handleChangeCheckBox}
+            onBlur={handleBlur}
+            onChange={handleChangeCheckBox}
             tabIndex='3'
           />
         </Form.Field>

@@ -27,6 +27,9 @@ const PasswordRecover = () => {
   const handleChange = (e) => {
     e.persist();
     setValue(e.target.name, e.target.value);
+  };
+
+  const handleBlur = (e) => {
     trigger(e.target.name);
   };
 
@@ -71,7 +74,7 @@ const PasswordRecover = () => {
                 name='email'
                 fluid
                 placeholder='Enter your Email'
-                onBlur={handleChange}
+                onBlur={handleBlur}
                 onChange={handleChange}
                 error={!!errors.email}
               />

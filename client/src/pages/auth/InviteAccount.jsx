@@ -43,6 +43,9 @@ const InviteAccount = () => {
   const handleChange = (e) => {
     e.persist();
     setValue(e.target.name, e.target.value);
+  };
+
+  const handleBlur = (e) => {
     trigger(e.target.name);
   };
 
@@ -161,7 +164,8 @@ const InviteAccount = () => {
                 fluid
                 placeholder='Enter your name'
                 error={!!errors.fullName}
-                onBlur={handleChange}
+                onBlur={handleBlur}
+                onChange={handleChange}
               />
               {errors && errors.fullName && (
                 <Message error content={errors.fullName.message} />
@@ -179,7 +183,8 @@ const InviteAccount = () => {
                 fluid
                 placeholder='Enter password'
                 error={!!errors.newPassword}
-                onBlur={handleChange}
+                onBlur={handleBlur}
+                onChange={handleChange}
               />
               {errors && errors.newPassword && (
                 <Message error content={errors.newPassword.message} />
@@ -193,7 +198,8 @@ const InviteAccount = () => {
                 fluid
                 placeholder='Confirm password'
                 error={!!errors.confirmPassword}
-                onBlur={handleChange}
+                onBlur={handleBlur}
+                onChange={handleChange}
               />
               {errors && errors.confirmPassword && (
                 <Message error content={errors.confirmPassword.message} />

@@ -32,6 +32,9 @@ const Register = () => {
     } else {
       setValue(e.target.name, e.target.value);
     }
+  };
+
+  const handleBlur = (e) => {
     trigger(e.target.name);
   };
 
@@ -94,7 +97,8 @@ const Register = () => {
             fluid
             placeholder='Enter your Name'
             error={!!errors.fullName}
-            onBlur={handleChange}
+            onBlur={handleBlur}
+            onChange={handleChange}
           />
           {errors && errors.fullName && (
             <Message error content={errors.fullName.message} />
@@ -108,7 +112,8 @@ const Register = () => {
             fluid
             placeholder='Enter your email'
             error={!!errors.email}
-            onBlur={handleChange}
+            onBlur={handleBlur}
+            onChange={handleChange}
           />
           {errors && errors.email && (
             <Message error content={errors.email.message} />
@@ -121,7 +126,8 @@ const Register = () => {
             placeholder='Enter new password'
             type='password'
             error={!!errors.password}
-            onBlur={handleChange}
+            onBlur={handleBlur}
+            onChange={handleChange}
           />
           {errors && errors.password && (
             <Message error content={errors.password.message} />
@@ -131,7 +137,8 @@ const Register = () => {
           <Form.Checkbox
             name='agreement'
             error={!!errors.agreement}
-            onBlur={handleChange}
+            onBlur={handleBlur}
+            onChange={handleChange}
             label={
               <label>
                 I accept{' '}
