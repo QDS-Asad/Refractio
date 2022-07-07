@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-  Grid,
-  Header,
-  Button,
-  Card,
-  List,
-  Icon,
-  Dropdown,
-} from 'semantic-ui-react';
+import { Grid, Header, Button, Card, List, Icon } from 'semantic-ui-react';
 const Promocodes = () => {
   const codes = [
     {
@@ -49,25 +41,12 @@ const Promocodes = () => {
             Promocodes management
           </Header>
         </Grid.Column>
-        <Grid.Column width={8}>
-          <Button primary className='btn' floated='right'>
-            Add
-          </Button>
-        </Grid.Column>
       </Grid>
       <Grid>
         <Grid.Column>
           <Card>
             <Card.Content>
-              <Card.Header>
-                5% Codes
-                <Dropdown icon='ellipsis horizontal' className='float-end'>
-                  <Dropdown.Menu>
-                    <Dropdown.Item>Edit</Dropdown.Item>
-                    <Dropdown.Item>Remove</Dropdown.Item>
-                  </Dropdown.Menu>
-                </Dropdown>
-              </Card.Header>
+              <Card.Header>5% Codes</Card.Header>
             </Card.Content>
             <Card.Content>
               <List>

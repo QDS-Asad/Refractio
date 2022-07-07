@@ -47,8 +47,12 @@ const VerificationCode = () => {
   const handleChange = (e) => {
     e.persist();
     setValue(e.target.name, e.target.value);
+  };
+
+  const handleBlur = (e) => {
     trigger(e.target.name);
   };
+
   const handleVerification = ({ verificationCode }) => {
     dispatch(codeVerification(userId, verificationCode));
   };
@@ -146,7 +150,8 @@ const VerificationCode = () => {
                 placeholder='Verification code'
                 name='verificationCode'
                 fluid
-                onBlur={handleChange}
+                onBlur={handleBlur}
+                onChange={handleChange}
                 error={!!errors.verificationCode}
               />
               {errors && errors.verificationCode && (

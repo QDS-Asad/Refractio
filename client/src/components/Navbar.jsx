@@ -27,7 +27,9 @@ const NavBar = ({ showLogo = false }) => {
             name={userLogin.fullName}
             className='me-4'
             style={{ color: '#98A6AD', minHeight: '4.5rem' }}
-          />
+          >
+            {userLogin.fullName}
+          </Menu.Item>
         </Menu.Menu>
       </Menu>
     </>
