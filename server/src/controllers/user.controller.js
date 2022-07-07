@@ -6,6 +6,7 @@ const BillingService = require("../services/billing.service");
 const {
   convertDollerToCent,
   convertTimestampToDate,
+  getCurrentTimeStamp,
 } = require("../helpers/general_helper");
 const jwt = require("jsonwebtoken");
 const {
@@ -41,9 +42,6 @@ const {
   PAYMENT_STATUS,
   SUBSCRIPTION_STATUS,
 } = require("../lib/constants");
-const { ObjectId } = require("mongodb");
-const { request } = require("express");
-const encryption_helper = require("../helpers/encryption_helper");
 
 // register admin user
 exports.register = async (req, res, next) => {
@@ -59,26 +57,17 @@ exports.register = async (req, res, next) => {
               code: HTTP_STATUS.BAD_REQUEST.CODE,
             });
           } else {
-            tokenVerificationEmail(res, EMAIL_TYPES.VERIFY_REGISTER, user);
+            tokenVerificationEmail(req, res, EMAIL_TYPES.VERIFY_REGISTER, user);
           }
         } else {
-          const role = await RoleService.getRoleByRoleId(ROLES.ADMIN);
-          await UserService.register({ ...req.body, roleId: role._id })
+          await UserService.register({ ...req.body, isRegistered: true })
             .then(async (result) => {
-              const teamData = {
-                createdById: result._id,
-                members: [{ userId: result._id, roleId: role.roleId }],
-              };
-              await TeamService.createTeam(teamData)
-                .then(async (teamRes) => {
-                  await UserService.updateUserById(result._id, {
-                    teamId: teamRes._id,
-                  });
-                })
-                .catch((error) => {
-                  serverError(res, error);
-                });
-              tokenVerificationEmail(res, EMAIL_TYPES.VERIFY_REGISTER, result);
+              tokenVerificationEmail(
+                req,
+                res,
+                EMAIL_TYPES.VERIFY_REGISTER,
+                result
+              );
             })
             .catch((error) => {
               serverError(res, error);
@@ -99,15 +88,96 @@ exports.inviteUser = async (req, res, next) => {
     await UserService.getUserByEmail(email)
       .then(async (userRes) => {
         if (userRes) {
-          if (userRes.isVerified) {
-            return errorResp(res, {
-              msg: ERROR_MESSAGE.ALLREADY_REGISTERED,
-              code: HTTP_STATUS.BAD_REQUEST.CODE,
-            });
-          } else if (userRes.status == USER_STATUS.DISABLED) {
+          const userTeam = await TeamService.getUserSelectedTeamByTeamId(
+            userRes,
+            user.teamId
+          );
+          if (userTeam) {
+            if (userTeam.status == USER_STATUS.ACTIVE) {
+              return errorResp(res, {
+                msg: ERROR_MESSAGE.ALLREADY_REGISTERED,
+                code: HTTP_STATUS.BAD_REQUEST.CODE,
+              });
+            } else if (userTeam.status == USER_STATUS.DISABLED) {
+              const role = await RoleService.getRoleByRoleId(roleId);
+              const team = await TeamService.getTeamById(user.teamId);
+              const teamInfo = getTeaminfo(team);
+              if (team.members.length === TOTAL_TEAM_MEMBERS) {
+                return errorResp(res, {
+                  msg: ERROR_MESSAGE.TEAM_LIMIT_EXCEED,
+                  code: HTTP_STATUS.BAD_REQUEST,
+                });
+              }
+              if (
+                roleId == ROLES.ADMIN &&
+                teamInfo.totalAdmin.length === TOTAL_TEAM_ADMIN
+              ) {
+                return errorResp(res, {
+                  msg: ERROR_MESSAGE.TEAM_ADMIN_LIMIT_EXCEED,
+                  code: HTTP_STATUS.BAD_REQUEST,
+                });
+              }
+              if (
+                roleId == ROLES.ORGANIZER &&
+                teamInfo.totalOrganizer.length === TOTAL_TEAM_ORGANIZER
+              ) {
+                return errorResp(res, {
+                  msg: ERROR_MESSAGE.TEAM_ORGANIZER_LIMIT_EXCEED,
+                  code: HTTP_STATUS.BAD_REQUEST,
+                });
+              }
+              const userTeamIndex = userRes.teams.findIndex(
+                (obj) => obj.teamId.toString() == user.teamId
+              );
+              if (userTeamIndex >= 0) {
+                userRes.teams[userTeamIndex] = {
+                  roleId: role._id,
+                  status: USER_STATUS.INVITE_SENT,
+                };
+                await UserService.updateUserById(userRes._id, {
+                  ...req.body,
+                  teams: userRes.teams,
+                })
+                  .then(async (result) => {
+                    const members = [
+                      ...team.members,
+                      { userId: result._id, roleId },
+                    ];
+                    await TeamService.updateTeamMembers(team._id, { members })
+                      .then(async (teamRes) => {
+                        // await UserService.updateUserById(result._id, {
+                        //   teamId: team._id,
+                        // });
+                        tokenVerificationEmail(
+                          req,
+                          res,
+                          EMAIL_TYPES.INVITE_USER,
+                          result,
+                          user
+                        );
+                      })
+                      .catch((error) => {
+                        serverError(res, error);
+                      });
+                  })
+                  .catch((error) => {
+                    serverError(res, error);
+                  });
+              } else {
+                return errorResp(res, {
+                  msg: ERROR_MESSAGE.NOT_FOUND,
+                  code: HTTP_STATUS.NOT_FOUND.CODE,
+                });
+              }
+            } else {
+              return errorResp(res, {
+                msg: ERROR_MESSAGE.ALLREADY_INVITED,
+                code: HTTP_STATUS.BAD_REQUEST.CODE,
+              });
+            }
+          } else {
             const role = await RoleService.getRoleByRoleId(roleId);
-            const inivteBy = await UserService.getUserById(user._id);
-            const team = await TeamService.getTeamById(inivteBy.teamId);
+            const team = await TeamService.getTeamById(user.teamId);
             const teamInfo = getTeaminfo(team);
             if (team.members.length === TOTAL_TEAM_MEMBERS) {
               return errorResp(res, {
@@ -135,8 +205,14 @@ exports.inviteUser = async (req, res, next) => {
             }
             await UserService.updateUserById(userRes._id, {
               ...req.body,
-              roleId: role._id,
-              status: USER_STATUS.INVITE_SENT,
+              teams: [
+                ...userRes.teams,
+                {
+                  teamId: team._id,
+                  roleId: role._id,
+                  status: USER_STATUS.INVITE_SENT,
+                },
+              ],
             })
               .then(async (result) => {
                 const members = [
@@ -145,10 +221,11 @@ exports.inviteUser = async (req, res, next) => {
                 ];
                 await TeamService.updateTeamMembers(team._id, { members })
                   .then(async (teamRes) => {
-                    await UserService.updateUserById(result._id, {
-                      teamId: team._id,
-                    });
+                    // await UserService.updateUserById(result._id, {
+                    //   teamId: team._id,
+                    // });
                     tokenVerificationEmail(
+                      req,
                       res,
                       EMAIL_TYPES.INVITE_USER,
                       result,
@@ -162,22 +239,17 @@ exports.inviteUser = async (req, res, next) => {
               .catch((error) => {
                 serverError(res, error);
               });
-          } else {
-            return errorResp(res, {
-              msg: ERROR_MESSAGE.ALLREADY_INVITED,
-              code: HTTP_STATUS.BAD_REQUEST.CODE,
-            });
           }
         } else {
           const role = await RoleService.getRoleByRoleId(roleId);
-          const inivteBy = await UserService.getUserById(user._id);
-          const team = await TeamService.getTeamById(inivteBy.teamId);
+          const team = await TeamService.getTeamById(user.teamId);
           const teamInfo = getTeaminfo(team);
           if (team.members.length === TOTAL_TEAM_MEMBERS) {
             return errorResp(res, {
               msg: ERROR_MESSAGE.TEAM_LIMIT_EXCEED,
               code: HTTP_STATUS.BAD_REQUEST,
             });
+            Í;
           }
           if (
             roleId == ROLES.ADMIN &&
@@ -199,17 +271,23 @@ exports.inviteUser = async (req, res, next) => {
           }
           await UserService.register({
             ...req.body,
-            roleId: role._id,
-            status: USER_STATUS.INVITE_SENT,
+            teams: [
+              {
+                teamId: team._id,
+                roleId: role._id,
+                status: USER_STATUS.INVITE_SENT,
+              },
+            ],
           })
             .then(async (result) => {
               const members = [...team.members, { userId: result._id, roleId }];
               await TeamService.updateTeamMembers(team._id, { members })
                 .then(async (teamRes) => {
-                  await UserService.updateUserById(result._id, {
-                    teamId: team._id,
-                  });
+                  // await UserService.updateUserById(result._id, {
+                  //   teamId: team._id,
+                  // });
                   tokenVerificationEmail(
+                    req,
                     res,
                     EMAIL_TYPES.INVITE_USER,
                     result,
@@ -245,11 +323,12 @@ const getTeaminfo = (team) => {
 };
 
 // generic email for register and forgot password
-const tokenVerificationEmail = async (res, type, user, sender = {}) => {
+const tokenVerificationEmail = async (req, res, type, user, sender = {}) => {
   user.token = crypto_encrypt(`${Math.floor(1000 + Math.random() * 9000)}`);
   const extendExpiry = type == EMAIL_TYPES.INVITE_USER ? 24 : 1;
   const tokenExpiry = Date.now() + TOKEN_EXPIRY * extendExpiry;
   const newUser = getEmailTemplate({
+    loggedInUser: req.user,
     type,
     token: user.token,
     user,
@@ -298,7 +377,7 @@ exports.resendToken = async (req, res) => {
               code: HTTP_STATUS.BAD_REQUEST.CODE,
             });
           } else {
-            tokenVerificationEmail(res, EMAIL_TYPES.VERIFY_REGISTER, user);
+            tokenVerificationEmail(req, res, EMAIL_TYPES.VERIFY_REGISTER, user);
           }
         } else {
           return errorResp(res, {
@@ -329,7 +408,7 @@ const getEmailTemplate = (obj) => {
       };
       break;
     case EMAIL_TYPES.INVITE_USER:
-      link = `${CLIENT_HOST}/auth/invite-account/${obj.token}`;
+      link = `${CLIENT_HOST}/auth/invite-account/${obj.token}/${obj.loggedInUser.teamId}`;
       return {
         email: obj.user.email,
         subject: INVTE_USER_EMAIL_SUBJECT,
@@ -475,29 +554,20 @@ exports.login = async (req, res) => {
   try {
     await UserService.login(req.body)
       .then(async (user) => {
-        if (!user) {
+        if (
+          !user ||
+          !user.canLogin ||
+          req.body.password !== crypto_decrypt(user.password)
+        ) {
           return errorResp(res, {
             msg: ERROR_MESSAGE.INVALID_CREDS,
             code: HTTP_STATUS.BAD_REQUEST.CODE,
           });
         }
-        if (!user.canLogin) {
-          return errorResp(res, {
-            msg: ERROR_MESSAGE.INVALID_CREDS,
-            code: HTTP_STATUS.BAD_REQUEST.CODE,
-          });
-        }
-        if (req.body.password !== crypto_decrypt(user.password)) {
-          return errorResp(res, {
-            msg: ERROR_MESSAGE.INVALID_CREDS,
-            code: HTTP_STATUS.BAD_REQUEST.CODE,
-          });
-        }
-        const role = await RoleService.getRoleById(user.roleId);
         const expiry =
           (req.body.rememberMe && JWT_EXPIRY_REMEMBER_ME) || JWT_EXPIRY;
         const token = jwt.sign(
-          { _id: user._id, email: user.email, roleId: role._id },
+          { _id: user._id, email: user.email, rememberMe: req.body.rememberMe },
           JWT_KEY,
           {
             expiresIn: expiry,
@@ -509,10 +579,8 @@ exports.login = async (req, res) => {
             id: user._id,
             fullName: user.fullName,
             email: user.email,
-            role: { roleId: role.roleId, name: role.name },
             isVerified: user.isVerified,
             canLogin: user.canLogin,
-            status: user.status,
             token: token,
           };
           return successResp(res, {
@@ -521,7 +589,7 @@ exports.login = async (req, res) => {
             data: userData,
           });
         } else {
-          tokenVerificationEmail(res, EMAIL_TYPES.VERIFY_REGISTER, user);
+          tokenVerificationEmail(req, res, EMAIL_TYPES.VERIFY_REGISTER, user);
         }
       })
       .catch((error) => {
@@ -530,6 +598,51 @@ exports.login = async (req, res) => {
           code: HTTP_STATUS.NOT_FOUND.CODE,
         });
       });
+  } catch (error) {
+    serverError(res, error);
+  }
+};
+
+// login user
+exports.selectTeam = async (req, res) => {
+  try {
+    const { user, team } = req.body;
+    const userInfo = await UserService.getUserById(user._id);
+    const teamInfo = TeamService.getUserSelectedTeamByTeamId(userInfo, team);
+    const roleInfo = await RoleService.getRoleById(teamInfo.roleId);
+    const expiry = (user.rememberMe && JWT_EXPIRY_REMEMBER_ME) || JWT_EXPIRY;
+    const token = jwt.sign(
+      {
+        _id: user._id,
+        email: user.email,
+        teamId: teamInfo.teamId,
+        roleId: roleInfo._id,
+      },
+      JWT_KEY,
+      {
+        expiresIn: expiry,
+      }
+    );
+    let userData = {};
+    if (user.isVerified) {
+      userData = {
+        id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        role: { roleId: roleInfo.roleId, name: roleInfo.name },
+        isVerified: user.isVerified,
+        canLogin: user.canLogin,
+        status: teamInfo.status,
+        token: token,
+      };
+      return successResp(res, {
+        msg: SUCCESS_MESSAGE.LOGIN_SUCCESS,
+        code: HTTP_STATUS.SUCCESS.CODE,
+        data: userData,
+      });
+    } else {
+      tokenVerificationEmail(req, res, EMAIL_TYPES.VERIFY_REGISTER, user);
+    }
   } catch (error) {
     serverError(res, error);
   }
@@ -546,7 +659,7 @@ exports.forgetPassword = async (req, res) => {
             code: HTTP_STATUS.BAD_REQUEST.CODE,
           });
         } else {
-          tokenVerificationEmail(res, EMAIL_TYPES.FORGOT_PASSWORD, user);
+          tokenVerificationEmail(req, res, EMAIL_TYPES.FORGOT_PASSWORD, user);
         }
       })
       .catch((error) => {
@@ -603,22 +716,25 @@ exports.getTeam = async (req, res, next) => {
     const { page, page_size } = req.query;
     const { user } = req.body;
     const role = await RoleService.getRoleById(user.roleId);
-    const userData = await UserService.getUserById(user._id);
     const teamData = {
       user,
       page,
       page_size,
       roleId: role.roleId,
-      teamId: userData.teamId,
+      teamId: user.teamId,
     };
     const filterData = await getTeamByRole(teamData);
     await TeamService.getTeam(filterData)
       .then(async (teamRes) => {
         let docs = [];
         await Promise.all(
-          teamRes.docs.map(async (team, key) => {
-            await RoleService.getRoleById(team.roleId).then((role) => {
-              docs[key] = { ...team._doc, role };
+          teamRes.docs.map(async (userObj, key) => {
+            const teamInfo = TeamService.getUserSelectedTeamByTeamId(
+              userObj,
+              user.teamId
+            );
+            await RoleService.getRoleById(teamInfo.roleId).then((role) => {
+              docs[key] = { ...userObj._doc, role };
             });
           })
         );
@@ -672,7 +788,7 @@ exports.resendInvite = async (req, res) => {
               code: HTTP_STATUS.BAD_REQUEST.CODE,
             });
           } else {
-            tokenVerificationEmail(res, EMAIL_TYPES.INVITE_USER, user);
+            tokenVerificationEmail(req, res, EMAIL_TYPES.INVITE_USER, user);
           }
         } else {
           return errorResp(res, {
@@ -691,27 +807,96 @@ exports.resendInvite = async (req, res) => {
 
 //cancel/delete/remove user by admin and super admin
 exports.cancelUserInvite = async (req, res, next) => {
-  const { userId } = req.params;
-  const userData = {
-    status: USER_STATUS.DISABLED,
-    canLogin: false,
-    isVerified: false,
-    token: "",
-    tokenExpiry: null,
-  };
-  await UserService.updateUserById(userId, userData)
-    .then(async (user) => {
-      const team = await TeamService.getTeamById(user.teamId);
-      const filterTeamMembers = team.members.filter((obj) => {
-        return obj.userId.toString() !== userId;
+  try {
+    const { userId } = req.params;
+    const { user } = req.body;
+    const userInfo = await UserService.getUserById(userId);
+    const userTeamIndex = userInfo.teams.findIndex(
+      (obj) => obj.teamId.toString() == user.teamId
+    );
+    if (userTeamIndex >= 0) {
+      userInfo.teams[userTeamIndex] = {
+        status: USER_STATUS.DISABLED,
+      };
+      const userData = {
+        teams: userInfo.teams,
+        canLogin: false,
+        isVerified: false,
+        token: "",
+        tokenExpiry: null,
+      };
+      await UserService.updateUserById(userId, userData)
+        .then(async (user) => {
+          const team = await TeamService.getTeamById(user.teamId);
+          const filterTeamMembers = team.members.filter((obj) => {
+            return obj.userId.toString() !== userId;
+          });
+          await TeamService.updateTeamMembers(user.teamId, {
+            members: filterTeamMembers,
+          })
+            .then((teamRes) => {
+              return successResp(res, {
+                msg: SUCCESS_MESSAGE.DELETED,
+                code: HTTP_STATUS.SUCCESS.CODE,
+              });
+            })
+            .catch((error) => {
+              errorResp(res, {
+                msg: ERROR_MESSAGE.NOT_FOUND,
+                code: HTTP_STATUS.NOT_FOUND.CODE,
+              });
+            });
+        })
+        .catch((error) => {
+          errorResp(res, {
+            msg: ERROR_MESSAGE.NOT_FOUND,
+            code: HTTP_STATUS.NOT_FOUND.CODE,
+          });
+        });
+    } else {
+      return errorResp(res, {
+        msg: ERROR_MESSAGE.NOT_FOUND,
+        code: HTTP_STATUS.NOT_FOUND.CODE,
       });
-      await TeamService.updateTeamMembers(user.teamId, {
-        members: filterTeamMembers,
-      })
-        .then((teamRes) => {
-          return successResp(res, {
-            msg: SUCCESS_MESSAGE.DELETED,
-            code: HTTP_STATUS.SUCCESS.CODE,
+    }
+  } catch (error) {
+    serverError(res, error);
+  }
+};
+
+//cancel/delete/remove user by admin and super admin
+exports.disableUser = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const { user } = req.body;
+    const userInfo = await UserService.getUserById(userId);
+    const userTeamIndex = userInfo.teams.findIndex(
+      (obj) => obj.teamId.toString() == user.teamId
+    );
+    if (userTeamIndex >= 0) {
+      userInfo.teams[userTeamIndex] = {
+        status: USER_STATUS.DISABLED,
+      };
+      const userData = {
+        teams: userInfo.teams,
+        canLogin: false,
+        isVerified: false,
+        token: "",
+        tokenExpiry: null,
+      };
+      await UserService.updateUserById(userId, userData)
+        .then(async (user) => {
+          const team = await TeamService.getTeamById(user.teamId);
+          const filterTeamMembers = team.members.filter((obj) => {
+            return obj.userId.toString() !== userId;
+          });
+          await TeamService.updateTeamMembers(user.teamId, {
+            members: filterTeamMembers,
+          }).then((teamRes) => {
+            return successResp(res, {
+              msg: SUCCESS_MESSAGE.DELETED,
+              code: HTTP_STATUS.SUCCESS.CODE,
+            });
           });
         })
         .catch((error) => {
@@ -720,47 +905,12 @@ exports.cancelUserInvite = async (req, res, next) => {
             code: HTTP_STATUS.NOT_FOUND.CODE,
           });
         });
-    })
-    .catch((error) => {
-      errorResp(res, {
+    } else {
+      return errorResp(res, {
         msg: ERROR_MESSAGE.NOT_FOUND,
         code: HTTP_STATUS.NOT_FOUND.CODE,
       });
-    });
-};
-
-//cancel/delete/remove user by admin and super admin
-exports.disableUser = async (req, res, next) => {
-  try {
-    const { userId } = req.params;
-    const userData = {
-      status: USER_STATUS.DISABLED,
-      canLogin: false,
-      isVerified: false,
-      token: "",
-      tokenExpiry: null,
-    };
-    await UserService.updateUserById(userId, userData)
-      .then(async (user) => {
-        const team = await TeamService.getTeamById(user.teamId);
-        const filterTeamMembers = team.members.filter((obj) => {
-          return obj.userId.toString() !== userId;
-        });
-        await TeamService.updateTeamMembers(user.teamId, {
-          members: filterTeamMembers,
-        }).then((teamRes) => {
-          return successResp(res, {
-            msg: SUCCESS_MESSAGE.DELETED,
-            code: HTTP_STATUS.SUCCESS.CODE,
-          });
-        });
-      })
-      .catch((error) => {
-        errorResp(res, {
-          msg: ERROR_MESSAGE.NOT_FOUND,
-          code: HTTP_STATUS.NOT_FOUND.CODE,
-        });
-      });
+    }
   } catch (error) {
     serverError(res, error);
   }
@@ -771,9 +921,9 @@ exports.updateUserRole = async (req, res, next) => {
   try {
     const { userId, roleId } = req.params;
     const { user } = req.body;
+    const userInfo = await UserService.getUserById(userId);
     const role = await RoleService.getRoleByRoleId(roleId);
-    const inviteBy = await UserService.getUserById(user._id);
-    const team = await TeamService.getTeamById(inviteBy.teamId);
+    const team = await TeamService.getTeamById(user.teamId);
     const teamInfo = getTeaminfo(team);
     if (
       roleId == ROLES.ADMIN &&
@@ -793,39 +943,41 @@ exports.updateUserRole = async (req, res, next) => {
         code: HTTP_STATUS.BAD_REQUEST,
       });
     }
-    await UserService.updateUserById(userId, { roleId: role._id })
-      .then(async (userRes) => {
-        const memberIndex = team.members.findIndex(
-          (obj) => obj.userId.toString() == userId
-        );
-        if (memberIndex >= 0) {
-          team.members[memberIndex] = {
-            userId,
-            roleId: role.roleId,
-          };
-          await TeamService.updateTeamMembers(team._id, {
-            members: team.members,
-          })
-            .then(async (teamRes) => {
-              return successResp(res, {
-                msg: SUCCESS_MESSAGE.UPDATED,
-                code: HTTP_STATUS.SUCCESS.CODE,
-              });
-            })
-            .catch((error) => {
-              errorResp(res, {
-                msg: ERROR_MESSAGE.NOT_FOUND,
-                code: HTTP_STATUS.NOT_FOUND.CODE,
-              });
-            });
-        }
-      })
-      .catch((error) => {
+    const userTeamIndex = userInfo.teams.findIndex(
+      (obj) => obj.userId.toString() == userId
+    );
+    if (userTeamIndex >= 0) {
+      userInfo.teams[userTeamIndex] = {
+        roleId: role.roleId,
+      };
+      await UserService.updateUserById(userId, { teams: userInfo.teams });
+      const memberIndex = team.members.findIndex(
+        (obj) => obj.userId.toString() == userId
+      );
+      if (memberIndex >= 0) {
+        team.members[memberIndex] = {
+          userId,
+          roleId: role.roleId,
+        };
+        await TeamService.updateTeamMembers(team._id, {
+          members: team.members,
+        });
+        return successResp(res, {
+          msg: SUCCESS_MESSAGE.UPDATED,
+          code: HTTP_STATUS.SUCCESS.CODE,
+        });
+      } else {
         errorResp(res, {
           msg: ERROR_MESSAGE.NOT_FOUND,
           code: HTTP_STATUS.NOT_FOUND.CODE,
         });
+      }
+    } else {
+      errorResp(res, {
+        msg: ERROR_MESSAGE.NOT_FOUND,
+        code: HTTP_STATUS.NOT_FOUND.CODE,
       });
+    }
   } catch (error) {
     serverError(res, error);
   }
@@ -859,14 +1011,6 @@ exports.subscribe = async (req, res, next) => {
             userInfo,
           })
             .then(async (stripeCustomerRes) => {
-              // const reqBody = {
-              //   stripeDetails: {
-              //     ...userInfo.stripeDetails,
-              //     paymentMethod,
-              //   },
-              //   autoRenew: req.body.autoRenew,
-              // };
-              // await UserService.updateUserById(userId, reqBody);
               await updateSubscription(res, userInfo, {
                 request: req.body,
                 paymentMethod,
@@ -874,10 +1018,6 @@ exports.subscribe = async (req, res, next) => {
                 subscriptionId:
                   userInfo.stripeDetails.subscription.subscriptionId,
               });
-              // return successResp(res, {
-              //   msg: SUCCESS_MESSAGE.UPDATED,
-              //   code: HTTP_STATUS.SUCCESS.CODE,
-              // });
             })
             .catch((error) => {
               errorResp(res, {
@@ -930,7 +1070,9 @@ exports.renewSubscription = async (req, res, next) => {
   try {
     const { userId } = req.params;
     const userInfo = await UserService.getUserById(userId);
-    if(userInfo.stripeDetails.subscription.status == SUBSCRIPTION_STATUS.ACTIVE){
+    if (
+      userInfo.stripeDetails.subscription.status == SUBSCRIPTION_STATUS.ACTIVE
+    ) {
       return errorResp(res, {
         msg: ERROR_MESSAGE.SUBSCRIBED,
         code: HTTP_STATUS.BAD_REQUEST.CODE,
@@ -940,7 +1082,10 @@ exports.renewSubscription = async (req, res, next) => {
       priceId: userInfo.stripeDetails.subscription.priceId,
       autoRenew: userInfo.autoRenew,
     };
-    await BillingService.createSubscription({request: reqBody, customerId: userInfo.stripeDetails.customerId})
+    await BillingService.createSubscription({
+      request: reqBody,
+      customerId: userInfo.stripeDetails.customerId,
+    })
       .then(async (subscriptionRes) => {
         const subscription = {
           subscriptionId: subscriptionRes.id,
@@ -993,8 +1138,9 @@ const createSubscription = async (res, userInfo, obj) => {
             (subscriptionRes.cancel_at && SUBSCRIPTION_STATUS.CANCELED) ||
             subscriptionRes.status,
         };
-        const role = await RoleService.getRoleById(userInfo.roleId);
+        const role = await RoleService.getRoleById(ROLES.ADMIN);
         const teamData = {
+          name: obj.request.teamName,
           createdById: userId,
           members: [{ userId, roleId: role.roleId }],
         };
@@ -1007,8 +1153,14 @@ const createSubscription = async (res, userInfo, obj) => {
                 subscription,
               },
               autoRenew: obj.request.autoRenew,
-              status: USER_STATUS.ACTIVE,
-              teamId: teamRes._id,
+              teams: [
+                ...userInfo.teams,
+                {
+                  teamId: teamRes._id,
+                  roleId: role._id,
+                  status: USER_STATUS.ACTIVE,
+                },
+              ],
             };
             await UserService.updateUserById(userId, reqBody);
             return successResp(res, {
@@ -1210,6 +1362,12 @@ exports.getSubscriptionDetails = async (req, res, next) => {
             autoRenew: userRes.autoRenew,
             PaymentMethod: userRes.stripeDetails.paymentMethod,
             status: userRes.stripeDetails.subscription.status,
+            isExpired:
+              (userRes.stripeDetails.subscription.status ==
+                SUBSCRIPTION_STATUS.CANCELED &&
+                userRes.stripeDetails.subscription.canceledDate <
+                  getCurrentTimeStamp()) ||
+              false,
           };
           return successResp(res, {
             msg: SUCCESS_MESSAGE.DATA_FETCHED,

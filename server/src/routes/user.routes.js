@@ -350,6 +350,87 @@ router.post("/login", validateLogin, User.login);
 
 /**
  * @swagger
+ *   /api/users/select-team:
+ *   post:
+ *     description: select login user team
+ *     tags: [User]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/PostLogin'
+ *     responses:
+ *        '200':
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                   success: true
+ *                   code: 200
+ *                   message: Operation successfull.
+ *        '404':
+ *           description: Operation Failed
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 404,"message": "Operation Failed."}
+ *
+ *        '422':
+ *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
+ *
+ * components:
+ *  schemas:
+ *   PostLogin:
+ *    type: object
+ *    required:
+ *      - team
+ *    properties:
+ *      team:
+ *        type: string
+ */
+ router.post("/select-team", Auth, validateLogin, User.selectTeam);
+
+
+/**
+ * @swagger
  *   /api/users/forget-password:
  *   post:
  *     description: login user
@@ -1213,6 +1294,7 @@ router.get("/team", Auth, User.getTeam);
  *      - cardNumber
  *      - cardExpiry
  *      - cardCvv
+ *      - teamName
  *      - autoRenew
  *      - couponCode
  *    properties:
@@ -1227,6 +1309,8 @@ router.get("/team", Auth, User.getTeam);
  *      cardExpiry:
  *         type: string
  *      cardCvv:
+ *         type: string
+ *      teamName:
  *         type: string
  *      autoRenew:
  *         type: string

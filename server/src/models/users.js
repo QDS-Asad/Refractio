@@ -5,10 +5,10 @@ const Schema = mongoose.Schema;
 
 const UserSchema = new Schema(
   {
-    roleId: {
-      type: Schema.Types.ObjectId,
-      required: true,
-    },
+    // roleId: {
+    //   type: Schema.Types.ObjectId,
+    //   required: true,
+    // },
     fullName: {
       type: String,
     },
@@ -37,20 +37,44 @@ const UserSchema = new Schema(
       enum: [true, false],
       default: false,
     },
-    status: {
-      type: String,
-      enum: [
-        USER_STATUS.ACTIVE,
-        USER_STATUS.INVITE_SENT,
-        USER_STATUS.SUBSCRIPTION_PENDING,
-        USER_STATUS.DISABLED,
-      ],
-      default: USER_STATUS.DISABLED,
+    // status: {
+    //   type: String,
+    //   enum: [
+    //     USER_STATUS.ACTIVE,
+    //     USER_STATUS.INVITE_SENT,
+    //     USER_STATUS.SUBSCRIPTION_PENDING,
+    //     USER_STATUS.DISABLED,
+    //   ],
+    //   default: USER_STATUS.DISABLED,
+    // },
+    // teamId: {
+    //   type: Schema.Types.ObjectId,
+    // },
+    isRegistered: {
+      type: Boolean,
+      default: false,
     },
-    teamId: {
-      type: Schema.Types.ObjectId,
-    },
-
+    teams: [
+      {
+        teamId: {
+          type: Schema.Types.ObjectId,
+        },
+        roleId: {
+          type: Schema.Types.ObjectId,
+        },
+        status: {
+          type: String,
+          enum: [
+            USER_STATUS.ACTIVE,
+            USER_STATUS.INVITE_SENT,
+            USER_STATUS.INVITE_CANCELED,
+            USER_STATUS.SUBSCRIPTION_PENDING,
+            USER_STATUS.DISABLED,
+          ],
+          default: USER_STATUS.DISABLED,
+        },
+      },
+    ],
     nameOnCard: {
       type: String,
     },

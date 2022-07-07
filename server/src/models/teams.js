@@ -14,7 +14,7 @@ const TeamSchema = new Schema(
         },
         roleId: {
           type: Number,
-        },
+        }
       },
     ],
     createdBy: {
