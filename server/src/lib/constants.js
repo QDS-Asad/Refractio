@@ -36,7 +36,6 @@ module.exports = Object.freeze({
       ACTIVE: "active",
       DISABLED: "disabled",
       INVITE_SENT: "invite_sent",
-      INVITE_CANCELED: "invite_canceled",
       SUBSCRIPTION_PENDING: "subscription_pending",
     },
     SUBSCRIPTION_STATUS: {

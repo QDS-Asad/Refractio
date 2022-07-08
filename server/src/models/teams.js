@@ -3,6 +3,9 @@ const Schema = mongoose.Schema;
 
 const TeamSchema = new Schema(
   {
+    name: {
+      type: String,
+    },
     createdById: {
       type: Schema.Types.ObjectId,
       required: true,

@@ -117,20 +117,21 @@ exports.inviteUser = async (req, res, next) => {
                   code: HTTP_STATUS.BAD_REQUEST,
                 });
               }
-              if (
-                roleId == ROLES.ORGANIZER &&
-                teamInfo.totalOrganizer.length === TOTAL_TEAM_ORGANIZER
-              ) {
-                return errorResp(res, {
-                  msg: ERROR_MESSAGE.TEAM_ORGANIZER_LIMIT_EXCEED,
-                  code: HTTP_STATUS.BAD_REQUEST,
-                });
-              }
+              // if (
+              //   roleId == ROLES.ORGANIZER &&
+              //   teamInfo.totalOrganizer.length === TOTAL_TEAM_ORGANIZER
+              // ) {
+              //   return errorResp(res, {
+              //     msg: ERROR_MESSAGE.TEAM_ORGANIZER_LIMIT_EXCEED,
+              //     code: HTTP_STATUS.BAD_REQUEST,
+              //   });
+              // }
               const userTeamIndex = userRes.teams.findIndex(
                 (obj) => obj.teamId.toString() == user.teamId
               );
               if (userTeamIndex >= 0) {
                 userRes.teams[userTeamIndex] = {
+                  teamId: userRes.teams[userTeamIndex].teamId,
                   roleId: role._id,
                   status: USER_STATUS.INVITE_SENT,
                 };
@@ -194,15 +195,15 @@ exports.inviteUser = async (req, res, next) => {
                 code: HTTP_STATUS.BAD_REQUEST,
               });
             }
-            if (
-              roleId == ROLES.ORGANIZER &&
-              teamInfo.totalOrganizer.length === TOTAL_TEAM_ORGANIZER
-            ) {
-              return errorResp(res, {
-                msg: ERROR_MESSAGE.TEAM_ORGANIZER_LIMIT_EXCEED,
-                code: HTTP_STATUS.BAD_REQUEST,
-              });
-            }
+            // if (
+            //   roleId == ROLES.ORGANIZER &&
+            //   teamInfo.totalOrganizer.length === TOTAL_TEAM_ORGANIZER
+            // ) {
+            //   return errorResp(res, {
+            //     msg: ERROR_MESSAGE.TEAM_ORGANIZER_LIMIT_EXCEED,
+            //     code: HTTP_STATUS.BAD_REQUEST,
+            //   });
+            // }
             await UserService.updateUserById(userRes._id, {
               ...req.body,
               teams: [
@@ -260,15 +261,15 @@ exports.inviteUser = async (req, res, next) => {
               code: HTTP_STATUS.BAD_REQUEST,
             });
           }
-          if (
-            roleId == ROLES.ORGANIZER &&
-            teamInfo.totalOrganizer.length === TOTAL_TEAM_ORGANIZER
-          ) {
-            return errorResp(res, {
-              msg: ERROR_MESSAGE.TEAM_ORGANIZER_LIMIT_EXCEED,
-              code: HTTP_STATUS.BAD_REQUEST,
-            });
-          }
+          // if (
+          //   roleId == ROLES.ORGANIZER &&
+          //   teamInfo.totalOrganizer.length === TOTAL_TEAM_ORGANIZER
+          // ) {
+          //   return errorResp(res, {
+          //     msg: ERROR_MESSAGE.TEAM_ORGANIZER_LIMIT_EXCEED,
+          //     code: HTTP_STATUS.BAD_REQUEST,
+          //   });
+          // }
           await UserService.register({
             ...req.body,
             teams: [
@@ -304,9 +305,11 @@ exports.inviteUser = async (req, res, next) => {
         }
       })
       .catch((error) => {
+        console.log(error);
         serverError(res, error);
       });
   } catch (error) {
+    console.log(error);
     serverError(res, error);
   }
 };
@@ -328,12 +331,13 @@ const tokenVerificationEmail = async (req, res, type, user, sender = {}) => {
   const extendExpiry = type == EMAIL_TYPES.INVITE_USER ? 24 : 1;
   const tokenExpiry = Date.now() + TOKEN_EXPIRY * extendExpiry;
   const newUser = getEmailTemplate({
-    loggedInUser: req.user,
+    loggedInUser: req.body.user,
     type,
     token: user.token,
     user,
     senderEmail: sender.email,
   });
+  console.log(newUser);
   await UserService.tokenVerificationEmail(newUser)
     .then(async (result) => {
       if (!result) {
@@ -396,6 +400,7 @@ exports.resendToken = async (req, res) => {
 
 // email templates
 const getEmailTemplate = (obj) => {
+  console.log(obj);
   let link;
   switch (obj.type) {
     case EMAIL_TYPES.VERIFY_REGISTER:
@@ -489,6 +494,7 @@ exports.verifyEmailInvite = async (req, res) => {
         const userData = {
           email: user.email,
           userId: user._id,
+          isVerified: user.isVerified,
         };
         return successResp(res, {
           msg: SUCCESS_MESSAGE.DATA_FETCHED,
@@ -510,7 +516,7 @@ exports.verifyEmailInvite = async (req, res) => {
 // reset user password
 exports.inviteRegister = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const { userId, teamId } = req.params;
     const { fullName, newPassword } = req.body;
     await UserService.getUserById(userId)
       .then(async (user) => {
@@ -522,21 +528,37 @@ exports.inviteRegister = async (req, res) => {
           });
         }
         const password = crypto_encrypt(newPassword);
-        const userData = {
-          fullName,
-          password,
-          isVerified: true,
-          canLogin: true,
-          status: USER_STATUS.ACTIVE,
-          token: "",
-          tokenExpiry: null,
-        };
-        await UserService.updateUserById(userId, userData).then(() => {
-          return successResp(res, {
-            msg: SUCCESS_MESSAGE.USER_REGISTERED,
-            code: HTTP_STATUS.SUCCESS.CODE,
+        const userTeamIndex = user.teams.findIndex(
+          (obj) => obj.teamId.toString() == teamId
+        );
+        console.log(userTeamIndex);
+        if (userTeamIndex >= 0) {
+          user.teams[userTeamIndex] = {
+            teamId: user.teams[userTeamIndex].teamId,
+            roleId: user.teams[userTeamIndex].roleId,
+            status: USER_STATUS.ACTIVE,
+          };
+          const userData = {
+            fullName,
+            password,
+            isVerified: true,
+            canLogin: true,
+            teams: user.teams,
+            token: "",
+            tokenExpiry: null,
+          };
+          await UserService.updateUserById(userId, userData).then(() => {
+            return successResp(res, {
+              msg: SUCCESS_MESSAGE.USER_REGISTERED,
+              code: HTTP_STATUS.SUCCESS.CODE,
+            });
           });
-        });
+        } else {
+          errorResp(res, {
+            msg: ERROR_MESSAGE.NOT_FOUND,
+            code: HTTP_STATUS.NOT_FOUND.CODE,
+          });
+        }
       })
       .catch((error) => {
         errorResp(res, {
@@ -624,14 +646,15 @@ exports.selectTeam = async (req, res) => {
       }
     );
     let userData = {};
-    if (user.isVerified) {
+    console.log(user);
+    if (userInfo.isVerified) {
       userData = {
-        id: user._id,
-        fullName: user.fullName,
-        email: user.email,
+        id: userInfo._id,
+        fullName: userInfo.fullName,
+        email: userInfo.email,
         role: { roleId: roleInfo.roleId, name: roleInfo.name },
-        isVerified: user.isVerified,
-        canLogin: user.canLogin,
+        isVerified: userInfo.isVerified,
+        canLogin: userInfo.canLogin,
         status: teamInfo.status,
         token: token,
       };
@@ -715,6 +738,7 @@ exports.getTeam = async (req, res, next) => {
   try {
     const { page, page_size } = req.query;
     const { user } = req.body;
+    console.log(user);
     const role = await RoleService.getRoleById(user.roleId);
     const teamData = {
       user,
@@ -724,6 +748,7 @@ exports.getTeam = async (req, res, next) => {
       teamId: user.teamId,
     };
     const filterData = await getTeamByRole(teamData);
+    console.log(filterData);
     await TeamService.getTeam(filterData)
       .then(async (teamRes) => {
         let docs = [];
@@ -734,7 +759,8 @@ exports.getTeam = async (req, res, next) => {
               user.teamId
             );
             await RoleService.getRoleById(teamInfo.roleId).then((role) => {
-              docs[key] = { ...userObj._doc, role };
+              delete userObj._doc.teams;
+              docs[key] = { ...userObj._doc, role: {_id: role._id, roleId: role.roleId, name: role.name}, teamId: teamInfo.teamId, status: teamInfo.status };
             });
           })
         );
@@ -749,12 +775,54 @@ exports.getTeam = async (req, res, next) => {
         });
       })
       .catch((error) => {
+        console.log(error);
         errorResp(res, {
           msg: ERROR_MESSAGE.NOT_FOUND,
           code: HTTP_STATUS.NOT_FOUND.CODE,
         });
       });
   } catch (error) {
+    console.log(error);
+    serverError(res, error);
+  }
+};
+
+exports.getUserTeams = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    await UserService.getUserById(userId)
+      .then(async (userInfo) => {
+        let teamsList = [];
+        await Promise.all(
+          userInfo.teams.map(async (team, key) => {
+            const teamData = await TeamService.getTeamById(team.teamId);
+            const member = teamData.members.find(
+              (member) => member.userId.toString() === userId
+            );
+            teamsList.push({
+              teamId: team.teamId,
+              status: team.status,
+              name: teamData.name,
+              roleId: member.roleId,
+            });
+            console.log(teamsList);
+          })
+        );
+        return successResp(res, {
+          msg: SUCCESS_MESSAGE.DATA_FETCHED,
+          code: HTTP_STATUS.SUCCESS.CODE,
+          data: teamsList,
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        errorResp(res, {
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+          msg: ERROR_MESSAGE.NOT_FOUND,
+        });
+      });
+  } catch (error) {
+    console.log(error);
     serverError(res, error);
   }
 };
@@ -779,16 +847,22 @@ const getTeamByRole = async (obj) => {
 exports.resendInvite = async (req, res) => {
   try {
     const { userId } = req.params;
+    const { user } = req.body;
     await UserService.getUserById(userId)
-      .then(async (user) => {
-        if (user) {
-          if (user.isVerified) {
+      .then(async (userRes) => {
+        if (userRes) {
+          const userTeam = await TeamService.getUserSelectedTeamByTeamId(
+            userRes,
+            user.teamId
+          );
+          console.log(userTeam);
+          if (userTeam.status == USER_STATUS.ACTIVE) {
             return errorResp(res, {
               msg: ERROR_MESSAGE.ALLREADY_REGISTERED,
               code: HTTP_STATUS.BAD_REQUEST.CODE,
             });
           } else {
-            tokenVerificationEmail(req, res, EMAIL_TYPES.INVITE_USER, user);
+            tokenVerificationEmail(req, res, EMAIL_TYPES.INVITE_USER, userRes);
           }
         } else {
           return errorResp(res, {
@@ -816,17 +890,20 @@ exports.cancelUserInvite = async (req, res, next) => {
     );
     if (userTeamIndex >= 0) {
       userInfo.teams[userTeamIndex] = {
+        teamId: userInfo.teams[userTeamIndex].teamId,
+        roleId: userInfo.teams[userTeamIndex].roleId,
         status: USER_STATUS.DISABLED,
       };
       const userData = {
         teams: userInfo.teams,
-        canLogin: false,
-        isVerified: false,
-        token: "",
-        tokenExpiry: null,
+        // canLogin: false,
+        // isVerified: false,
+        // token: "",
+        // tokenExpiry: null,
       };
+      console.log(userData);
       await UserService.updateUserById(userId, userData)
-        .then(async (user) => {
+        .then(async (userRes) => {
           const team = await TeamService.getTeamById(user.teamId);
           const filterTeamMembers = team.members.filter((obj) => {
             return obj.userId.toString() !== userId;
@@ -848,18 +925,21 @@ exports.cancelUserInvite = async (req, res, next) => {
             });
         })
         .catch((error) => {
+          console.log(error);
           errorResp(res, {
             msg: ERROR_MESSAGE.NOT_FOUND,
             code: HTTP_STATUS.NOT_FOUND.CODE,
           });
         });
     } else {
+      console.log(error);
       return errorResp(res, {
         msg: ERROR_MESSAGE.NOT_FOUND,
         code: HTTP_STATUS.NOT_FOUND.CODE,
       });
     }
   } catch (error) {
+    console.log(error);
     serverError(res, error);
   }
 };
@@ -875,14 +955,16 @@ exports.disableUser = async (req, res, next) => {
     );
     if (userTeamIndex >= 0) {
       userInfo.teams[userTeamIndex] = {
+        teamId: userInfo.teams[userTeamIndex].teamId,
+        roleId: userInfo.teams[userTeamIndex].roleId,
         status: USER_STATUS.DISABLED,
       };
       const userData = {
         teams: userInfo.teams,
-        canLogin: false,
-        isVerified: false,
-        token: "",
-        tokenExpiry: null,
+        // canLogin: false,
+        // isVerified: false,
+        // token: "",
+        // tokenExpiry: null,
       };
       await UserService.updateUserById(userId, userData)
         .then(async (user) => {
@@ -934,22 +1016,25 @@ exports.updateUserRole = async (req, res, next) => {
         code: HTTP_STATUS.BAD_REQUEST,
       });
     }
-    if (
-      roleId == ROLES.ORGANIZER &&
-      teamInfo.totalOrganizer.length === TOTAL_TEAM_ORGANIZER
-    ) {
-      return errorResp(res, {
-        msg: ERROR_MESSAGE.TEAM_ORGANIZER_LIMIT_EXCEED,
-        code: HTTP_STATUS.BAD_REQUEST,
-      });
-    }
+    // if (
+    //   roleId == ROLES.ORGANIZER &&
+    //   teamInfo.totalOrganizer.length === TOTAL_TEAM_ORGANIZER
+    // ) {
+    //   return errorResp(res, {
+    //     msg: ERROR_MESSAGE.TEAM_ORGANIZER_LIMIT_EXCEED,
+    //     code: HTTP_STATUS.BAD_REQUEST,
+    //   });
+    // }
     const userTeamIndex = userInfo.teams.findIndex(
-      (obj) => obj.userId.toString() == userId
+      (obj) => obj.teamId.toString() == user.teamId
     );
     if (userTeamIndex >= 0) {
       userInfo.teams[userTeamIndex] = {
-        roleId: role.roleId,
+        teamId: userInfo.teams[userTeamIndex].teamId,
+        status: userInfo.teams[userTeamIndex].status,
+        roleId: role._id,
       };
+      // console.log(userInfo.teams);return;
       await UserService.updateUserById(userId, { teams: userInfo.teams });
       const memberIndex = team.members.findIndex(
         (obj) => obj.userId.toString() == userId
@@ -979,6 +1064,7 @@ exports.updateUserRole = async (req, res, next) => {
       });
     }
   } catch (error) {
+    console.log(error);
     serverError(res, error);
   }
 };
@@ -1138,7 +1224,7 @@ const createSubscription = async (res, userInfo, obj) => {
             (subscriptionRes.cancel_at && SUBSCRIPTION_STATUS.CANCELED) ||
             subscriptionRes.status,
         };
-        const role = await RoleService.getRoleById(ROLES.ADMIN);
+        const role = await RoleService.getRoleByRoleId(ROLES.ADMIN);
         const teamData = {
           name: obj.request.teamName,
           createdById: userId,

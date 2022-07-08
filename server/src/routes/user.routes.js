@@ -8,6 +8,7 @@ const { validateLogin } = require("../middlewares/login");
 const { validateChangePaymentMethod } = require("../middlewares/paymentMethod");
 const { validateRegister } = require("../middlewares/register");
 const { validateResetPassword } = require("../middlewares/resetPassword");
+const { validatePostLogin } = require("../middlewares/selectTeam");
 const { validateSubscribe } = require("../middlewares/subscribe");
 
 /**
@@ -350,6 +351,75 @@ router.post("/login", validateLogin, User.login);
 
 /**
  * @swagger
+ *   /api/users/user-teams/{userId}:
+ *   get:
+ *     description: get user team list
+ *     tags: [User]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *     schema:
+ *        type: integer
+ *     responses:
+ *        '200':
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                   success: true
+ *                   code: 200
+ *                   message: Operation successfull.
+ *        '404':
+ *           description: Operation Failed
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 404,"message": "Operation Failed."}
+ *
+ *        '422':
+ *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
+ */
+router.get("/user-teams/:userId", Auth, User.getUserTeams);
+
+/**
+ * @swagger
  *   /api/users/select-team:
  *   post:
  *     description: select login user team
@@ -426,8 +496,7 @@ router.post("/login", validateLogin, User.login);
  *      team:
  *        type: string
  */
- router.post("/select-team", Auth, validateLogin, User.selectTeam);
-
+router.post("/select-team", Auth, validatePostLogin, User.selectTeam);
 
 /**
  * @swagger
@@ -823,13 +892,15 @@ router.get("/verify-invite-account/:token", User.verifyEmailInvite);
 
 /**
  * @swagger
- *   /api/users/register-invite-account/{userId}:
+ *   /api/users/register-invite-account/{userId}/{teamId}:
  *   put:
  *     description: accept user invite and register
  *     tags: [Team]
  *     parameters:
  *       - in: path
  *         name: userId
+ *       - in: path
+ *         name: teamId
  *     schema:
  *        type: integer
  *     requestBody:
@@ -913,7 +984,7 @@ router.get("/verify-invite-account/:token", User.verifyEmailInvite);
  *      confirmPassword:
  *        type: string
  */
-router.put("/register-invite-account/:userId", validateAcceptInvite, User.inviteRegister);
+router.put("/register-invite-account/:userId/:teamId", validateAcceptInvite, User.inviteRegister);
 
 /**
  * @swagger
@@ -982,7 +1053,7 @@ router.put("/register-invite-account/:userId", validateAcceptInvite, User.invite
  *                 example:
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
  */
-router.put("/resend-invite-account/:userId", User.resendInvite);
+router.put("/resend-invite-account/:userId", Auth, User.resendInvite);
 
 /**
  * @swagger
@@ -1612,7 +1683,7 @@ router.get("/subscription-details", Auth, User.getSubscriptionDetails);
  *                 example:
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
  */
- router.delete("/cancel-subscription", Auth, User.cancelSubscription);
+router.delete("/cancel-subscription", Auth, User.cancelSubscription);
 
 /**
  * @swagger

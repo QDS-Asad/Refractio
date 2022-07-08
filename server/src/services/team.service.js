@@ -39,7 +39,9 @@ exports.getTeam = async (obj) => {
   };
   return await User.paginate(
     {
-      teams: {teamId, roleId: { $nin: roleIds }, status: { $nin: USER_STATUS.DISABLED }},
+      "teams.teamId": ObjectId(teamId),
+      "teams.roleId": { $nin: roleIds },
+      "teams.status": { $nin: USER_STATUS.DISABLED },
     },
     options
   );

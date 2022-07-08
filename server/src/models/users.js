@@ -67,7 +67,6 @@ const UserSchema = new Schema(
           enum: [
             USER_STATUS.ACTIVE,
             USER_STATUS.INVITE_SENT,
-            USER_STATUS.INVITE_CANCELED,
             USER_STATUS.SUBSCRIPTION_PENDING,
             USER_STATUS.DISABLED,
           ],
