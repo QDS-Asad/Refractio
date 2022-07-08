@@ -4886,6 +4886,6 @@ const Auth = require('../middlewares/auth');
  *                 example:
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
  */
-router.get('/plans', Auth, Plan.getAllPlans);
+router.get('/plans', Plan.getAllPlans);
 
 module.exports = router;

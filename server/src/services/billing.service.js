@@ -34,9 +34,9 @@ exports.createStripeCustomer = async ({paymentMethod, userInfo}) => {
 exports.updateStripeCustomer = async ({paymentMethod, userInfo}) => {
   await stripe.paymentMethods.attach(
     paymentMethod.id,
-    {customer: userInfo.stripeDetails.customerId}
+    {customer: userInfo.customerId}
   );
-  const customer = await stripe.customers.update(userInfo.stripeDetails.customerId, {
+  const customer = await stripe.customers.update(userInfo.customerId, {
     invoice_settings: {
       default_payment_method: paymentMethod.id,
     },
@@ -74,7 +74,7 @@ exports.saveBillingHistory = async (obj) => {
 };
 
 exports.getBillingHistory = async (obj) => {
-  const { page, page_size, userId } = obj;
+  const { page, page_size, userId, teamId } = obj;
   const options = {
     page: page || DEFAULT_PAGE_NO,
     limit: page_size || DEFAULT_PAGE_SIZE,
@@ -86,6 +86,7 @@ exports.getBillingHistory = async (obj) => {
   return await Billing.paginate(
     {
       userId,
+      teamId
     },
     options
   );
