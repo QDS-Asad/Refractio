@@ -135,8 +135,7 @@ const Login = () => {
           <Checkbox
             label='Remember me'
             name='rememberMe'
-            onBlur={handleBlur}
-            onChange={handleChangeCheckBox}
+            onBlur={handleChangeCheckBox}
             tabIndex='3'
           />
         </Form.Field>
