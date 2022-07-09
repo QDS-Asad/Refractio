@@ -805,10 +805,12 @@ exports.getTeam = async (req, res, next) => {
               userObj,
               user.teamId
             );
-            await RoleService.getRoleById(teamInfo.roleId).then((role) => {
+            await RoleService.getRoleById(teamInfo.roleId).then(async(role) => {
+            const teamData = await TeamService.getTeamById(teamInfo.teamId);
               delete userObj._doc.teams;
               docs[key] = {
                 ...userObj._doc,
+                isOwner: userObj._doc._id.toString() === teamData.createdById.toString(),
                 role: { _id: role._id, roleId: role.roleId, name: role.name },
                 teamId: teamInfo.teamId,
                 status: teamInfo.status,
