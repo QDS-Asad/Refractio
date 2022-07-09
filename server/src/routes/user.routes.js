@@ -822,13 +822,15 @@ router.post("/invite-account", Auth, validateInvite, User.inviteUser);
 
 /**
  * @swagger
- *   /api/users/verify-invite-account/{token}:
+ *   /api/users/verify-invite-account/{token}/{teamId}:
  *   get:
  *     description: get invited user info
  *     tags: [Team]
  *     parameters:
  *       - in: path
  *         name: token
+ *       - in: path
+ *         name: teamId
  *     schema:
  *        type: integer
  *     responses:
@@ -888,7 +890,7 @@ router.post("/invite-account", Auth, validateInvite, User.inviteUser);
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
  *
  */
-router.get("/verify-invite-account/:token", User.verifyEmailInvite);
+router.get("/verify-invite-account/:token/:teamId", User.verifyEmailInvite);
 
 /**
  * @swagger

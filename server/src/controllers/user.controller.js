@@ -456,7 +456,6 @@ exports.verifyToken = async (req, res) => {
         await UserService.updateUserById(userId, {
           isVerified: true,
           canLogin: true,
-          status: USER_STATUS.SUBSCRIPTION_PENDING,
           token: "",
           tokenExpiry: null,
         }).then(() => {
@@ -480,7 +479,7 @@ exports.verifyToken = async (req, res) => {
 // verify invite token
 exports.verifyEmailInvite = async (req, res) => {
   try {
-    const { token } = req.params;
+    const { token, teamId } = req.params;
     await UserService.getUserByToken(token)
       .then(async (user) => {
         const { tokenExpiry } = user;
@@ -493,6 +492,7 @@ exports.verifyEmailInvite = async (req, res) => {
         const userData = {
           email: user.email,
           userId: user._id,
+          teamId,
           isVerified: user.isVerified,
         };
         return successResp(res, {
@@ -649,6 +649,7 @@ exports.login = async (req, res) => {
             email: user.email,
             isVerified: user.isVerified,
             canLogin: user.canLogin,
+            isRegistered: user.isRegistered,
             token: token,
           };
           return successResp(res, {
@@ -1364,6 +1365,7 @@ const createSubscription = async (res, userInfo, obj) => {
           .then(async (teamRes) => {
             const reqBody = {
               customerId: obj.customerId,
+              isRegistered: false,
               teams: [
                 ...userInfo.teams,
                 {
@@ -1515,7 +1517,7 @@ exports.subscriptionRecurringPayment = async (req, res, next) => {
         }
       } else {
         errorResp(res, {
-          msg: error.message,
+          msg: ERROR_MESSAGE.NOT_FOUND,
           code: HTTP_STATUS.NOT_FOUND.CODE,
         });
       }
