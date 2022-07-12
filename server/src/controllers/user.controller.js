@@ -7,6 +7,7 @@ const {
   convertDollerToCent,
   convertTimestampToDate,
   getCurrentTimeStamp,
+  convertCentToDoller,
 } = require("../helpers/general_helper");
 const jwt = require("jsonwebtoken");
 const {
@@ -683,7 +684,7 @@ exports.selectTeam = async (req, res) => {
     const teamOwnerDetail = await UserService.getUserById(
       teamDetail.createdById
     );
-    
+
     // if (
     //   teamOwnerDetail.stripeDetails.subscription.status ==
     //     SUBSCRIPTION_STATUS.CANCELED &&
@@ -885,12 +886,16 @@ exports.getUserTeams = async (req, res, next) => {
             console.log(teamsList);
           })
         );
-        const activeTeamList = teamsList.filter((team) => team.status == USER_STATUS.ACTIVE);
-        const invitedTeamList = teamsList.filter((team) => team.status == USER_STATUS.INVITE_SENT);
+        const activeTeamList = teamsList.filter(
+          (team) => team.status == USER_STATUS.ACTIVE
+        );
+        const invitedTeamList = teamsList.filter(
+          (team) => team.status == USER_STATUS.INVITE_SENT
+        );
         return successResp(res, {
           msg: SUCCESS_MESSAGE.DATA_FETCHED,
           code: HTTP_STATUS.SUCCESS.CODE,
-          data: {activeTeamList, invitedTeamList},
+          data: { activeTeamList, invitedTeamList },
         });
       })
       .catch((error) => {
@@ -1152,23 +1157,35 @@ exports.updateUserRole = async (req, res, next) => {
 exports.applyCoupon = async (req, res, next) => {
   try {
     const { couponCode } = req.params;
-    await BillingService.couponDetails(couponCode).then((couponRes) => {
-      return successResp(res, {
-        msg: SUCCESS_MESSAGE.DATA_FETCHED,
-        code: HTTP_STATUS.SUCCESS.CODE,
-        data: couponRes
+    await BillingService.couponDetails(couponCode)
+      .then((couponRes) => {
+        couponRes = {
+          currency: couponRes.currency,
+          duration: couponRes.duration,
+          valid: couponRes.valid,
+          name: couponRes.name,
+          times_redeemed: couponRes.times_redeemed,
+          percent_off: couponRes.percent_off,
+          amount_off: convertDollerToCent(couponRes.amount_off),
+
+        }
+        return successResp(res, {
+          msg: SUCCESS_MESSAGE.DATA_FETCHED,
+          code: HTTP_STATUS.SUCCESS.CODE,
+          data: couponRes,
+        });
+      })
+      .catch((error) => {
+        errorResp(res, {
+          msg: error.message,
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+        });
       });
-    }).catch((error) => {
-              errorResp(res, {
-                msg: error.message,
-                code: HTTP_STATUS.NOT_FOUND.CODE,
-              });
-            });
   } catch (error) {
     console.log(error);
     serverError(res, error);
   }
-}
+};
 
 // subscribe user
 exports.subscribe = async (req, res, next) => {

@@ -57,7 +57,7 @@ exports.createSubscription = async ({request, customerId}) => {
     items: [
       {price: request.priceId},
     ],
-    automatic_tax: {enabled: true},
+    // automatic_tax: {enabled: true},
     coupon: request.couponCode || "",
     cancel_at_period_end: !request.autoRenew
   });

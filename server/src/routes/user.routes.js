@@ -1377,7 +1377,7 @@ router.get("/team", Auth, User.getTeam);
 /**
  * @swagger
  *   /api/users/apply-coupon/{couponCode}:
- *   put:
+ *   get:
  *     description: coupon for user
  *     tags: [User]
  *     parameters:
@@ -1447,7 +1447,7 @@ router.get("/team", Auth, User.getTeam);
  *                 example:
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
  */
-router.put("/apply-coupon/:couponCode", User.applyCoupon);
+router.get("/apply-coupon/:couponCode", User.applyCoupon);
 
 /**
  * @swagger
