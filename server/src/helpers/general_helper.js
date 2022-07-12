@@ -10,8 +10,13 @@ const convertTimestampToDate = (timestamp) => {
   return timestamp * 1000;
 };
 
+const getCurrentTimeStamp = () => {
+  return Date.now() / 1000
+};
+
 module.exports = {
     convertCentToDoller,
     convertDollerToCent,
-    convertTimestampToDate
+    convertTimestampToDate,
+    getCurrentTimeStamp
 }

@@ -3,6 +3,9 @@ const Schema = mongoose.Schema;
 
 const TeamSchema = new Schema(
   {
+    name: {
+      type: String,
+    },
     createdById: {
       type: Schema.Types.ObjectId,
       required: true,
@@ -14,7 +17,7 @@ const TeamSchema = new Schema(
         },
         roleId: {
           type: Number,
-        },
+        }
       },
     ],
     createdBy: {
