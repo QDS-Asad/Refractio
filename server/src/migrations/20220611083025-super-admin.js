@@ -6,8 +6,6 @@ module.exports = {
   async up(db, client) {
     try {
       const role = await RoleService.getRoleByRoleId(ROLES.SUPER_ADMIN);
-      const superAdmin = await UserService.getUserByRoleId(role._id);
-      if (!superAdmin) {
         const adminData = {
           roleId: role._id,
           fullName: "Refractio Super Admin",
@@ -16,11 +14,9 @@ module.exports = {
           status: USER_STATUS.ACTIVE,
           isVerified: true,
           canLogin: true,
+          isSuperAdmin: true,
         };
         await UserService.register(adminData);
-      }else{
-        console.log(ERROR_MESSAGE.SUPER_ADMIN_EXIST);
-      }
     } catch (error) {
       console.log(error);
     }

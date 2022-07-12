@@ -648,6 +648,7 @@ exports.login = async (req, res) => {
             fullName: user.fullName,
             email: user.email,
             isVerified: user.isVerified,
+            isSuperAdmin: user.isSuperAdmin,
             canLogin: user.canLogin,
             isRegistered: user.isRegistered,
             token: token,

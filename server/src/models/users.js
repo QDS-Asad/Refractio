@@ -37,6 +37,11 @@ const UserSchema = new Schema(
       enum: [true, false],
       default: false,
     },
+    isSuperAdmin: {
+      type: Boolean,
+      enum: [true, false],
+      default: false,
+    },
     // status: {
     //   type: String,
     //   enum: [
