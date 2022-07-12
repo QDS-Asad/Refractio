@@ -29,6 +29,7 @@ const Register = () => {
     e.persist();
     if (e.target.type === 'checkbox') {
       setValue(e.target.name, e.target.checked);
+      trigger(e.target.name);
     } else {
       setValue(e.target.name, e.target.value);
     }
@@ -137,8 +138,7 @@ const Register = () => {
           <Form.Checkbox
             name='agreement'
             error={!!errors.agreement}
-            onBlur={handleBlur}
-            onChange={handleChange}
+            onBlur={handleChange}
             label={
               <label>
                 I accept{' '}
