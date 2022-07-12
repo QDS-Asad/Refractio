@@ -1148,6 +1148,28 @@ exports.updateUserRole = async (req, res, next) => {
   }
 };
 
+//coupon details
+exports.applyCoupon = async (req, res, next) => {
+  try {
+    const { couponCode } = req.params;
+    await BillingService.couponDetails(couponCode).then((couponRes) => {
+      return successResp(res, {
+        msg: SUCCESS_MESSAGE.DATA_FETCHED,
+        code: HTTP_STATUS.SUCCESS.CODE,
+        data: couponRes
+      });
+    }).catch((error) => {
+              errorResp(res, {
+                msg: error.message,
+                code: HTTP_STATUS.NOT_FOUND.CODE,
+              });
+            });
+  } catch (error) {
+    console.log(error);
+    serverError(res, error);
+  }
+}
+
 // subscribe user
 exports.subscribe = async (req, res, next) => {
   try {

@@ -44,12 +44,21 @@ exports.updateStripeCustomer = async ({paymentMethod, userInfo}) => {
   return customer;
 };
 
+exports.couponDetails = async (couponCode) => {
+  const coupon = await stripe.coupons.retrieve(
+    couponCode
+  );
+  return coupon;
+};
+
 exports.createSubscription = async ({request, customerId}) => {
   const subscription = await stripe.subscriptions.create({
     customer: customerId,
     items: [
       {price: request.priceId},
     ],
+    automatic_tax: {enabled: true},
+    coupon: request.couponCode || "",
     cancel_at_period_end: !request.autoRenew
   });
   return subscription;
