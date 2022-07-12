@@ -679,6 +679,23 @@ exports.selectTeam = async (req, res) => {
     const { user, team } = req.body;
     const userInfo = await UserService.getUserById(user._id);
     const teamInfo = TeamService.getUserSelectedTeamByTeamId(userInfo, team);
+    const teamDetail = await TeamService.getTeamById(teamInfo.teamId);
+    const teamOwnerDetail = await UserService.getUserById(
+      teamDetail.createdById
+    );
+    
+    if (
+      teamOwnerDetail.stripeDetails.subscription.status ==
+        SUBSCRIPTION_STATUS.CANCELED &&
+      teamOwnerDetail.stripeDetails.subscription.canceledDate <
+        getCurrentTimeStamp() && userInfo._id.toString() !== teamOwnerDetail._id.toString()
+    ) {
+      return errorResp(res, {
+        msg: ERROR_MESSAGE.SUBSCRIBED_CANCELED,
+        code: HTTP_STATUS.BAD_REQUEST.CODE,
+      });
+    }
+
     const roleInfo = await RoleService.getRoleById(teamInfo.roleId);
     const expiry = (user.rememberMe && JWT_EXPIRY_REMEMBER_ME) || JWT_EXPIRY;
     const token = jwt.sign(
@@ -806,17 +823,21 @@ exports.getTeam = async (req, res, next) => {
               userObj,
               user.teamId
             );
-            await RoleService.getRoleById(teamInfo.roleId).then(async(role) => {
-            const teamData = await TeamService.getTeamById(teamInfo.teamId);
-              delete userObj._doc.teams;
-              docs[key] = {
-                ...userObj._doc,
-                isOwner: userObj._doc._id.toString() === teamData.createdById.toString(),
-                role: { _id: role._id, roleId: role.roleId, name: role.name },
-                teamId: teamInfo.teamId,
-                status: teamInfo.status,
-              };
-            });
+            await RoleService.getRoleById(teamInfo.roleId).then(
+              async (role) => {
+                const teamData = await TeamService.getTeamById(teamInfo.teamId);
+                delete userObj._doc.teams;
+                docs[key] = {
+                  ...userObj._doc,
+                  isOwner:
+                    userObj._doc._id.toString() ===
+                    teamData.createdById.toString(),
+                  role: { _id: role._id, roleId: role.roleId, name: role.name },
+                  teamId: teamInfo.teamId,
+                  status: teamInfo.status,
+                };
+              }
+            );
           })
         );
         teamRes = {
