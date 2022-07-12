@@ -9,7 +9,10 @@ const UserSchema = new Schema(
     //   type: Schema.Types.ObjectId,
     //   required: true,
     // },
-    fullName: {
+    firstName: {
+      type: String,
+    },
+    lastName: {
       type: String,
     },
     email: {

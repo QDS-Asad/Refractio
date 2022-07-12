@@ -21,7 +21,7 @@ exports.paymentMethod = async (obj) => {
 
 exports.createStripeCustomer = async ({paymentMethod, userInfo}) => {
   const customer = await stripe.customers.create({
-    name: userInfo.fullName,
+    name: `${userInfo.firstName} ${userInfo.lastName}`,
     email: userInfo.email,
     payment_method: paymentMethod.id,
     invoice_settings: {

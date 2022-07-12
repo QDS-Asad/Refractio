@@ -84,11 +84,14 @@ const { validateSubscribe } = require("../middlewares/subscribe");
  *   Register:
  *    type: object
  *    required:
- *      - fullName
+ *      - firstName
+ *      - lastName
  *      - email
  *      - password
  *    properties:
- *      fullName:
+ *      firstName:
+ *        type: string
+ *      lastName:
  *        type: string
  *      email:
  *        type: string
@@ -968,13 +971,16 @@ router.get("/verify-invite-account/:token/:teamId", User.verifyEmailInvite);
  *    type: object
  *    required:
  *      - email
- *      - fullName
+ *      - firstName
+ *      - lastName
  *      - newPassword
  *      - confirmPassword
  *    properties:
  *      email:
  *        type: string
- *      fullName:
+ *      firstName:
+ *        type: string
+ *      lastName:
  *        type: string
  *      newPassword:
  *        type: string
@@ -1064,13 +1070,16 @@ router.put("/register-invite-account/:userId/:teamId", validateAcceptInvite, Use
  *    type: object
  *    required:
  *      - email
- *      - fullName
+ *      - firstName
+ *      - lastName
  *      - newPassword
  *      - confirmPassword
  *    properties:
  *      email:
  *        type: string
- *      fullName:
+ *      firstName:
+ *        type: string
+ *      lastName:
  *        type: string
  *      newPassword:
  *        type: string

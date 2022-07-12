@@ -251,7 +251,6 @@ exports.inviteUser = async (req, res, next) => {
               msg: ERROR_MESSAGE.TEAM_LIMIT_EXCEED,
               code: HTTP_STATUS.BAD_REQUEST,
             });
-            Í;
           }
           if (
             roleId == ROLES.ADMIN &&
@@ -481,6 +480,8 @@ exports.verifyToken = async (req, res) => {
 exports.verifyEmailInvite = async (req, res) => {
   try {
     const { token, teamId } = req.params;
+    const teamInfo = await TeamService.getTeamById(teamId);
+    console.log(teamInfo);
     await UserService.getUserByToken(token)
       .then(async (user) => {
         const { tokenExpiry } = user;
@@ -494,7 +495,9 @@ exports.verifyEmailInvite = async (req, res) => {
           email: user.email,
           userId: user._id,
           teamId,
+          teamName: teamInfo.name,
           isVerified: user.isVerified,
+          
         };
         return successResp(res, {
           msg: SUCCESS_MESSAGE.DATA_FETCHED,
@@ -517,7 +520,7 @@ exports.verifyEmailInvite = async (req, res) => {
 exports.inviteRegister = async (req, res) => {
   try {
     const { userId, teamId } = req.params;
-    const { fullName, newPassword } = req.body;
+    const { firstName, lastName, newPassword } = req.body;
     await UserService.getUserById(userId)
       .then(async (user) => {
         const { tokenExpiry } = user;
@@ -539,7 +542,8 @@ exports.inviteRegister = async (req, res) => {
             status: USER_STATUS.ACTIVE,
           };
           const userData = {
-            fullName,
+            firstName,
+            lastName,
             password,
             isVerified: true,
             canLogin: true,
@@ -646,7 +650,8 @@ exports.login = async (req, res) => {
         if (user.isVerified) {
           userData = {
             id: user._id,
-            fullName: user.fullName,
+            firstName: user.firstName,
+            lastName: user.lastName,
             email: user.email,
             isVerified: user.isVerified,
             isSuperAdmin: user.isSuperAdmin,
@@ -684,18 +689,18 @@ exports.selectTeam = async (req, res) => {
     const teamOwnerDetail = await UserService.getUserById(
       teamDetail.createdById
     );
-
-    // if (
-    //   teamOwnerDetail.stripeDetails.subscription.status ==
-    //     SUBSCRIPTION_STATUS.CANCELED &&
-    //   teamOwnerDetail.stripeDetails.subscription.canceledDate <
-    //     getCurrentTimeStamp() && userInfo._id.toString() !== teamOwnerDetail._id.toString()
-    // ) {
-    //   return errorResp(res, {
-    //     msg: ERROR_MESSAGE.SUBSCRIBED_CANCELED,
-    //     code: HTTP_STATUS.BAD_REQUEST.CODE,
-    //   });
-    // }
+    const ownerTeamInfo = TeamService.getUserSelectedTeamByTeamId(teamOwnerDetail, team);
+    if (
+      ownerTeamInfo.stripeDetails.subscription.status ==
+        SUBSCRIPTION_STATUS.CANCELED &&
+        ownerTeamInfo.stripeDetails.subscription.canceledDate <
+        getCurrentTimeStamp() && userInfo._id.toString() !== teamOwnerDetail._id.toString()
+    ) {
+      return errorResp(res, {
+        msg: ERROR_MESSAGE.SUBSCRIBED_CANCELED,
+        code: HTTP_STATUS.BAD_REQUEST.CODE,
+      });
+    }
 
     const roleInfo = await RoleService.getRoleById(teamInfo.roleId);
     const expiry = (user.rememberMe && JWT_EXPIRY_REMEMBER_ME) || JWT_EXPIRY;
@@ -716,7 +721,8 @@ exports.selectTeam = async (req, res) => {
     if (userInfo.isVerified) {
       userData = {
         id: userInfo._id,
-        fullName: userInfo.fullName,
+        firstName: userInfo.firstName,
+        lastName: userInfo.lastName,
         email: userInfo.email,
         role: { roleId: roleInfo.roleId, name: roleInfo.name },
         isVerified: userInfo.isVerified,
@@ -867,7 +873,7 @@ exports.getTeam = async (req, res, next) => {
 exports.getUserTeams = async (req, res, next) => {
   try {
     const { user } = req.body;
-    userId = user._id;
+    const userId = user._id;
     await UserService.getUserById(userId)
       .then(async (userInfo) => {
         let teamsList = [];
@@ -882,6 +888,7 @@ exports.getUserTeams = async (req, res, next) => {
               status: team.status,
               name: teamData.name,
               roleId: member.roleId,
+              totalMembers: teamData.members.length
             });
             console.log(teamsList);
           })
@@ -1162,7 +1169,7 @@ exports.applyCoupon = async (req, res, next) => {
         couponRes = {
           currency: couponRes.currency,
           duration: couponRes.duration,
-          valid: couponRes.valid,
+          valid: couponRes.valid, 
           name: couponRes.name,
           times_redeemed: couponRes.times_redeemed,
           percent_off: couponRes.percent_off,
