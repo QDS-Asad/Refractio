@@ -684,17 +684,17 @@ exports.selectTeam = async (req, res) => {
       teamDetail.createdById
     );
     
-    if (
-      teamOwnerDetail.stripeDetails.subscription.status ==
-        SUBSCRIPTION_STATUS.CANCELED &&
-      teamOwnerDetail.stripeDetails.subscription.canceledDate <
-        getCurrentTimeStamp() && userInfo._id.toString() !== teamOwnerDetail._id.toString()
-    ) {
-      return errorResp(res, {
-        msg: ERROR_MESSAGE.SUBSCRIBED_CANCELED,
-        code: HTTP_STATUS.BAD_REQUEST.CODE,
-      });
-    }
+    // if (
+    //   teamOwnerDetail.stripeDetails.subscription.status ==
+    //     SUBSCRIPTION_STATUS.CANCELED &&
+    //   teamOwnerDetail.stripeDetails.subscription.canceledDate <
+    //     getCurrentTimeStamp() && userInfo._id.toString() !== teamOwnerDetail._id.toString()
+    // ) {
+    //   return errorResp(res, {
+    //     msg: ERROR_MESSAGE.SUBSCRIBED_CANCELED,
+    //     code: HTTP_STATUS.BAD_REQUEST.CODE,
+    //   });
+    // }
 
     const roleInfo = await RoleService.getRoleById(teamInfo.roleId);
     const expiry = (user.rememberMe && JWT_EXPIRY_REMEMBER_ME) || JWT_EXPIRY;
