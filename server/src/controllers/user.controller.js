@@ -681,7 +681,7 @@ exports.forgetPassword = async (req, res) => {
   try {
     await UserService.getUserByEmail(req.body.email)
       .then(async (user) => {
-        if (!user) {
+        if (!user && !user.canLogin) {
           return errorResp(res, {
             msg: ERROR_MESSAGE.INVALID_EMAIL,
             code: HTTP_STATUS.BAD_REQUEST.CODE,
