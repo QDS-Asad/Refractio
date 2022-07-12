@@ -351,15 +351,10 @@ router.post("/login", validateLogin, User.login);
 
 /**
  * @swagger
- *   /api/users/user-teams/{userId}:
+ *   /api/users/user-teams:
  *   get:
  *     description: get user team list
  *     tags: [User]
- *     parameters:
- *       - in: path
- *         name: userId
- *     schema:
- *        type: integer
  *     responses:
  *        '200':
  *           description: Success
@@ -416,7 +411,7 @@ router.post("/login", validateLogin, User.login);
  *                 example:
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
  */
-router.get("/user-teams/:userId", Auth, User.getUserTeams);
+router.get("/user-teams", Auth, User.getUserTeams);
 
 /**
  * @swagger

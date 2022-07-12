@@ -865,7 +865,8 @@ exports.getTeam = async (req, res, next) => {
 
 exports.getUserTeams = async (req, res, next) => {
   try {
-    const { userId } = req.params;
+    const { user } = req.body;
+    userId = user._id;
     await UserService.getUserById(userId)
       .then(async (userInfo) => {
         let teamsList = [];
@@ -884,10 +885,12 @@ exports.getUserTeams = async (req, res, next) => {
             console.log(teamsList);
           })
         );
+        const activeTeamList = teamsList.filter((team) => team.status == USER_STATUS.ACTIVE);
+        const invitedTeamList = teamsList.filter((team) => team.status == USER_STATUS.INVITE_SENT);
         return successResp(res, {
           msg: SUCCESS_MESSAGE.DATA_FETCHED,
           code: HTTP_STATUS.SUCCESS.CODE,
-          data: teamsList,
+          data: {activeTeamList, invitedTeamList},
         });
       })
       .catch((error) => {
