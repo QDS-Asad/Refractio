@@ -624,7 +624,7 @@ exports.login = async (req, res) => {
       .then(async (user) => {
         if (
           !user ||
-          !user.canLogin ||
+          !user.isVerified ||
           req.body.password !== crypto_decrypt(user.password)
         ) {
           return errorResp(res, {
@@ -649,7 +649,6 @@ exports.login = async (req, res) => {
             email: user.email,
             isVerified: user.isVerified,
             isSuperAdmin: user.isSuperAdmin,
-            canLogin: user.canLogin,
             isRegistered: user.isRegistered,
             token: token,
           };
@@ -684,17 +683,17 @@ exports.selectTeam = async (req, res) => {
       teamDetail.createdById
     );
     
-    if (
-      teamOwnerDetail.stripeDetails.subscription.status ==
-        SUBSCRIPTION_STATUS.CANCELED &&
-      teamOwnerDetail.stripeDetails.subscription.canceledDate <
-        getCurrentTimeStamp() && userInfo._id.toString() !== teamOwnerDetail._id.toString()
-    ) {
-      return errorResp(res, {
-        msg: ERROR_MESSAGE.SUBSCRIBED_CANCELED,
-        code: HTTP_STATUS.BAD_REQUEST.CODE,
-      });
-    }
+    // if (
+    //   teamOwnerDetail.stripeDetails.subscription.status ==
+    //     SUBSCRIPTION_STATUS.CANCELED &&
+    //   teamOwnerDetail.stripeDetails.subscription.canceledDate <
+    //     getCurrentTimeStamp() && userInfo._id.toString() !== teamOwnerDetail._id.toString()
+    // ) {
+    //   return errorResp(res, {
+    //     msg: ERROR_MESSAGE.SUBSCRIBED_CANCELED,
+    //     code: HTTP_STATUS.BAD_REQUEST.CODE,
+    //   });
+    // }
 
     const roleInfo = await RoleService.getRoleById(teamInfo.roleId);
     const expiry = (user.rememberMe && JWT_EXPIRY_REMEMBER_ME) || JWT_EXPIRY;
@@ -719,7 +718,6 @@ exports.selectTeam = async (req, res) => {
         email: userInfo.email,
         role: { roleId: roleInfo.roleId, name: roleInfo.name },
         isVerified: userInfo.isVerified,
-        canLogin: userInfo.canLogin,
         status: teamInfo.status,
         token: token,
       };
@@ -741,7 +739,7 @@ exports.forgetPassword = async (req, res) => {
   try {
     await UserService.getUserByEmail(req.body.email)
       .then(async (user) => {
-        if (!user && !user.canLogin) {
+        if (!user && !user.isVerified) {
           return errorResp(res, {
             msg: ERROR_MESSAGE.INVALID_EMAIL,
             code: HTTP_STATUS.BAD_REQUEST.CODE,
@@ -1827,6 +1825,59 @@ exports.resumeSubscription = async (req, res, next) => {
           code: HTTP_STATUS.NOT_FOUND.CODE,
         });
       });
+  } catch (error) {
+    console.log(error);
+    serverError(res, error);
+  }
+};
+
+exports.transferTeamOwnerShip = async (req, res, next) => {
+  try {
+    const {userId} = req.params;
+    const {user} = req.body;
+    const team = await TeamService.updateTeamMembers(user.teamId, {createdById: userId}); 
+    //disable previous owner
+    const userInfo = await UserService.getUserById(user._id);
+    const userTeamIndex = userInfo.teams.findIndex(
+      (obj) => obj.teamId.toString() == user.teamId
+    );
+    if (userTeamIndex >= 0) {
+      userInfo.teams[userTeamIndex] = {
+        teamId: userInfo.teams[userTeamIndex].teamId,
+        roleId: userInfo.teams[userTeamIndex].roleId,
+        status: USER_STATUS.DISABLED,
+      };
+      const userData = {
+        teams: userInfo.teams,
+      };
+      await UserService.updateUserById(user._id, userData)
+        .then(async (user) => {
+          const team = await TeamService.getTeamById(user.teamId);
+          const filterTeamMembers = team.members.filter((obj) => {
+            return obj.userId.toString() !== user._id;
+          });
+          await TeamService.updateTeamMembers(user.teamId, {
+            members: filterTeamMembers,
+          }).then((teamRes) => {
+            return successResp(res, {
+              msg: SUCCESS_MESSAGE.TRANSFERED,
+              code: HTTP_STATUS.SUCCESS.CODE,
+            });
+          });
+        })
+        .catch((error) => {
+          errorResp(res, {
+            msg: ERROR_MESSAGE.NOT_FOUND,
+            code: HTTP_STATUS.NOT_FOUND.CODE,
+          });
+        });
+    } else {
+      return errorResp(res, {
+        msg: ERROR_MESSAGE.NOT_FOUND,
+        code: HTTP_STATUS.NOT_FOUND.CODE,
+      });
+    }
+    
   } catch (error) {
     console.log(error);
     serverError(res, error);

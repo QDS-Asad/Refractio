@@ -83,6 +83,7 @@ module.exports = Object.freeze({
         UPDATED: "Updated Successfully",
         DELETED: "Deleted Successfully",
         CANCELED: "Canceled Successfully",
+        TRANSFERED: "Transfered Succesfully"
 
     },
     ERROR_MESSAGE:{
