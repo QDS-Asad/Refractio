@@ -823,6 +823,7 @@ exports.getTeam = async (req, res, next) => {
     console.log(filterData);
     await TeamService.getTeam(filterData)
       .then(async (teamRes) => {
+        console.log(teamRes);
         let docs = [];
         await Promise.all(
           teamRes.docs.map(async (userObj, key) => {
@@ -992,7 +993,6 @@ exports.cancelUserInvite = async (req, res, next) => {
         // token: "",
         // tokenExpiry: null,
       };
-      console.log(userData);
       await UserService.updateUserById(userId, userData)
         .then(async (userRes) => {
           const team = await TeamService.getTeamById(user.teamId);
@@ -1044,6 +1044,7 @@ exports.disableUser = async (req, res, next) => {
     const userTeamIndex = userInfo.teams.findIndex(
       (obj) => obj.teamId.toString() == user.teamId
     );
+    console.log(userTeamIndex);
     if (userTeamIndex >= 0) {
       userInfo.teams[userTeamIndex] = {
         teamId: userInfo.teams[userTeamIndex].teamId,
@@ -1058,7 +1059,7 @@ exports.disableUser = async (req, res, next) => {
         // tokenExpiry: null,
       };
       await UserService.updateUserById(userId, userData)
-        .then(async (user) => {
+        .then(async (userRes) => {
           const team = await TeamService.getTeamById(user.teamId);
           const filterTeamMembers = team.members.filter((obj) => {
             return obj.userId.toString() !== userId;
