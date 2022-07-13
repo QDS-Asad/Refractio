@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   fetchOpportunity,
   opportunityDetailSelector,
-} from '../../../features/opportunities/opportunityDetailSlice';
+} from "../../../features/opportunities/opportunityDetailSlice";
 import {
   Button,
   Form,
@@ -13,15 +13,17 @@ import {
   Message,
   Tab,
   Segment,
-} from 'semantic-ui-react';
-import { useParams } from 'react-router-dom';
-import OpportunityStatus from '../../../components/OpportunityStatus';
-import PublishOpportunity from './PublishOpportunity';
-import ManageParticipants from './ManageParticipants';
+} from "semantic-ui-react";
+import { useParams } from "react-router-dom";
+import OpportunityStatus from "../../../components/OpportunityStatus";
+import PublishOpportunity from "./PublishOpportunity";
+import ManageParticipants from "./ManageParticipants";
+import OpportunityCreate from "./OpportunityCreate";
 
 const OpportunityDetail = () => {
   const [viewParticipant, setViewParticipant] = useState(false);
   const [viewPublish, setViewPublish] = useState(false);
+  const [editOpportunity, setEditOpportunity] = useState(false);
   const { id } = useParams();
 
   // set up dispatch
@@ -39,7 +41,7 @@ const OpportunityDetail = () => {
 
   const panes = [
     {
-      menuItem: 'Questions',
+      menuItem: "Questions",
       render: () => (
         <Tab.Pane loading={loading} attached={false}>
           {opportunity && (
@@ -54,18 +56,18 @@ const OpportunityDetail = () => {
               <Form.Field>
                 <label>Question 1 (Required)</label>
                 <Form.Input
-                  name='q1'
+                  name="q1"
                   fluid
-                  placeholder='e.g. What is the best reason for Team to pursue Opportunity'
+                  placeholder="e.g. What is the best reason for Team to pursue Opportunity"
                 />
               </Form.Field>
 
               <Form.Field>
                 <label>Question 2</label>
                 <Form.Input
-                  name='q1'
+                  name="q1"
                   fluid
-                  placeholder='e.g. What is the best reason for Team to NOT pursue Opportunity'
+                  placeholder="e.g. What is the best reason for Team to NOT pursue Opportunity"
                 />
               </Form.Field>
               <Header>
@@ -78,49 +80,45 @@ const OpportunityDetail = () => {
               <Form.Field>
                 <label>Question 1 (Required)</label>
                 <Form.Input
-                  name='q1'
+                  name="q1"
                   fluid
-                  placeholder='e.g. Describe the Stakeholders involved in the Idea you are submitting'
+                  placeholder="e.g. Describe the Stakeholders involved in the Idea you are submitting"
                 />
               </Form.Field>
 
               <Form.Field>
                 <label>Question 2</label>
                 <Form.Input
-                  name='q2'
+                  name="q2"
                   fluid
-                  readOnly
-                  placeholder='e.g. Describe the EXPECTED RESULTS from action taken to pursue Opportunity'
+                  placeholder="e.g. Describe the EXPECTED RESULTS from action taken to pursue Opportunity"
                 />
               </Form.Field>
 
               <Form.Field>
                 <label>Question 3</label>
                 <Form.Input
-                  name='q3'
+                  name="q3"
                   fluid
-                  readOnly
-                  placeholder='e.g. Describe the EXPECTED RESULTS from action taken to pursue Opportunity'
+                  placeholder="e.g. Describe the EXPECTED RESULTS from action taken to pursue Opportunity"
                 />
               </Form.Field>
 
               <Form.Field>
                 <label>Question 4</label>
                 <Form.Input
-                  name='q4'
+                  name="q4"
                   fluid
-                  readOnly
-                  placeholder='e.g. Describe the RISKS from action taken to pursue Opportunity'
+                  placeholder="e.g. Describe the RISKS from action taken to pursue Opportunity"
                 />
               </Form.Field>
 
               <Form.Field>
                 <label>Question 5</label>
                 <Form.Input
-                  name='q5'
+                  name="q5"
                   fluid
-                  readOnly
-                  placeholder='e.g. WHEN can or should Team work on pursuing Opportunity? What are DEPENDENCIES?'
+                  placeholder="e.g. WHEN can or should Team work on pursuing Opportunity? What are DEPENDENCIES?"
                 />
               </Form.Field>
             </>
@@ -129,27 +127,40 @@ const OpportunityDetail = () => {
       ),
     },
     {
-      menuItem: 'Information',
+      menuItem: "Information",
       render: () => (
         <Tab.Pane loading={loading} attached={false}>
           {opportunity && (
             <Segment>
-              <div className='clearfix'>
-                <Header floated='left'>Opportunity Information</Header>
-                <Button className='btn-link' floated='right'>
-                  Edit
-                </Button>
+              <div className="clearfix">
+                <Header floated="left">Opportunity Information</Header>
+                {opportunity.status === "draft" && (
+                  <>
+                    <Button
+                      className="btn-link"
+                      floated="right"
+                      onClick={() => setEditOpportunity((prev) => !prev)}
+                    >
+                      Edit
+                    </Button>
+                    <OpportunityCreate
+                      showCreate={editOpportunity}
+                      setShowCreate={setEditOpportunity}
+                      opportunity={opportunity.name}
+                    />
+                  </>
+                )}
               </div>
 
-              <Header size='small'>
+              <Header size="small">
                 Opportunity Name
-                <Header.Subheader className='mt-3'>
+                <Header.Subheader className="mt-3">
                   {opportunity.name}
                 </Header.Subheader>
               </Header>
-              <Header size='small'>
+              <Header size="small">
                 Description
-                <Header.Subheader className='mt-3'>
+                <Header.Subheader className="mt-3">
                   {opportunity.description}
                 </Header.Subheader>
               </Header>
@@ -165,26 +176,26 @@ const OpportunityDetail = () => {
       <Grid>
         <Grid.Column width={8}>
           {opportunity && (
-            <Header as='h3' className='primary-dark-color'>
-              {opportunity.name}{' '}
+            <Header as="h3" className="primary-dark-color">
+              {opportunity.name}{" "}
               <OpportunityStatus status={opportunity.status} />
-              <Header.Subheader className='mt-3'>
+              <Header.Subheader className="mt-3">
                 <Image
-                  src='/images/team.svg'
-                  className='d-inline-block'
-                  verticalAlign='middle'
+                  src="/images/team.svg"
+                  className="d-inline-block"
+                  verticalAlign="middle"
                 />
-                <span className='secondary-color'>
+                <span className="secondary-color">
                   {opportunity.participants.length}
                 </span>
 
                 <span
-                  className='ms-2 fw-bold primary-color'
+                  className="ms-2 fw-bold primary-color"
                   onClick={() => setViewParticipant(true)}
                 >
                   {opportunity.participants.length > 0
-                    ? 'View Participants'
-                    : 'Add Participants'}
+                    ? "View Participants"
+                    : "Add Participants"}
                 </span>
                 <ManageParticipants
                   opportunity={opportunity}
@@ -195,13 +206,13 @@ const OpportunityDetail = () => {
             </Header>
           )}
         </Grid.Column>
-        {opportunity && opportunity.status === 'draft' && (
+        {opportunity && opportunity.status === "draft" && (
           <>
             <Grid.Column width={8}>
               <Button
                 primary
-                className='btn-secondary'
-                floated='right'
+                className="btn-secondary"
+                floated="right"
                 onClick={() => setViewPublish(true)}
               >
                 Publish
@@ -210,7 +221,7 @@ const OpportunityDetail = () => {
                 viewPublish={viewPublish}
                 setViewPublish={setViewPublish}
               />
-              <Button primary className='btn-outline me-3' floated='right'>
+              <Button primary className="btn-outline me-3" floated="right">
                 Save as Draft
               </Button>
             </Grid.Column>
@@ -227,9 +238,9 @@ const OpportunityDetail = () => {
       </Grid>
       <Grid>
         <Grid.Column>
-          <Form id='create-opportunity' error size='small'>
+          <Form id="create-opportunity" error size="small">
             {error && (
-              <Message color='red' className='error-message'>
+              <Message color="red" className="error-message">
                 {error}
               </Message>
             )}
