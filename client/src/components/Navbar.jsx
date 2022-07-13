@@ -24,11 +24,11 @@ const NavBar = ({ showLogo = false }) => {
         <Menu.Menu position='right'>
           <Menu.Item
             as='a'
-            name={userLogin.fullName}
+            name={`${userLogin.firstName} ${userLogin.lastName} `}
             className='me-4'
             style={{ color: '#98A6AD', minHeight: '4.5rem' }}
           >
-            {userLogin.fullName}
+            {`${userLogin.firstName} ${userLogin.lastName} `}
           </Menu.Item>
         </Menu.Menu>
       </Menu>

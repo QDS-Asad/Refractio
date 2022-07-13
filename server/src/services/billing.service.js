@@ -21,7 +21,7 @@ exports.paymentMethod = async (obj) => {
 
 exports.createStripeCustomer = async ({paymentMethod, userInfo}) => {
   const customer = await stripe.customers.create({
-    name: userInfo.fullName,
+    name: `${userInfo.firstName} ${userInfo.lastName}`,
     email: userInfo.email,
     payment_method: paymentMethod.id,
     invoice_settings: {
@@ -44,12 +44,21 @@ exports.updateStripeCustomer = async ({paymentMethod, userInfo}) => {
   return customer;
 };
 
+exports.couponDetails = async (couponCode) => {
+  const coupon = await stripe.coupons.retrieve(
+    couponCode
+  );
+  return coupon;
+};
+
 exports.createSubscription = async ({request, customerId}) => {
   const subscription = await stripe.subscriptions.create({
     customer: customerId,
     items: [
       {price: request.priceId},
     ],
+    // automatic_tax: {enabled: true},
+    coupon: request.couponCode || "",
     cancel_at_period_end: !request.autoRenew
   });
   return subscription;

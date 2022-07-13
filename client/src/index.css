@@ -109,6 +109,10 @@ label {
   min-width: 10rem !important;
 }
 
+.cursor-pointer {
+  cursor: pointer !important;
+}
+
 
 .btn-outline {
   background: none !important;

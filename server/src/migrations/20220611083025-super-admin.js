@@ -8,7 +8,8 @@ module.exports = {
       const role = await RoleService.getRoleByRoleId(ROLES.SUPER_ADMIN);
         const adminData = {
           roleId: role._id,
-          fullName: "Refractio Super Admin",
+          firstName: "Refractio",
+          lastName: "Super Admin",
           email: "refractio@yopmail.com",
           password: crypto_encrypt("Qwe123@@@"),
           status: USER_STATUS.ACTIVE,

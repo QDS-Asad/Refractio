@@ -3,7 +3,10 @@ const { errorResp } = require("../helpers/error_helper");
 const { HTTP_STATUS, ERROR_MESSAGE, REGEX_PATTERN } = require("../lib/constants");
 
 module.exports.validateRegister = [
-    check('fullName')
+    check('firstName')
+    .exists().bail().withMessage(ERROR_MESSAGE.REQUIRED)
+    .notEmpty().bail().withMessage(ERROR_MESSAGE.NOT_EMPTY),
+    check('lastName')
     .exists().bail().withMessage(ERROR_MESSAGE.REQUIRED)
     .notEmpty().bail().withMessage(ERROR_MESSAGE.NOT_EMPTY),
     check('email')
