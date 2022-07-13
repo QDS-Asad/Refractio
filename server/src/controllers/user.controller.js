@@ -713,6 +713,7 @@ exports.selectTeam = async (req, res) => {
         email: user.email,
         teamId: teamInfo.teamId,
         roleId: roleInfo._id,
+        isOwner: user._id.toString() === teamDetail.createdById.toString()
       },
       JWT_KEY,
       {
@@ -814,6 +815,7 @@ exports.getTeam = async (req, res, next) => {
     const { page, page_size } = req.query;
     const { user } = req.body;
     console.log(user);
+    const teamDetail = await TeamService.getTeamById(user.teamId);
     const role = await RoleService.getRoleById(user.roleId);
     const teamData = {
       user,
@@ -821,10 +823,11 @@ exports.getTeam = async (req, res, next) => {
       page_size,
       roleId: role.roleId,
       teamId: user.teamId,
+      OwnerId: teamDetail.createdById
     };
-    const filterData = await getTeamByRole(teamData);
-    console.log(filterData);
-    await TeamService.getTeam(filterData)
+    // const filterData = await getTeamByRole(teamData);
+    // console.log(filterData);
+    await TeamService.getTeam(teamData)
       .then(async (teamRes) => {
         console.log(teamRes);
         let docs = [];
@@ -834,23 +837,33 @@ exports.getTeam = async (req, res, next) => {
               userObj,
               user.teamId
             );
-            await RoleService.getRoleById(teamInfo.roleId).then(
-              async (role) => {
-                const teamData = await TeamService.getTeamById(teamInfo.teamId);
-                delete userObj._doc.teams;
-                docs[key] = {
-                  ...userObj._doc,
-                  isOwner:
-                    userObj._doc._id.toString() ===
-                    teamData.createdById.toString(),
-                  role: { _id: role._id, roleId: role.roleId, name: role.name },
-                  teamId: teamInfo.teamId,
-                  status: teamInfo.status,
-                };
-              }
-            );
+            // if (teamInfo.status !== USER_STATUS.DISABLED) {
+              await RoleService.getRoleById(teamInfo.roleId).then(
+                async (role) => {
+                  const teamData = await TeamService.getTeamById(
+                    teamInfo.teamId
+                  );
+                  delete userObj._doc.teams;
+                  docs[key] = {
+                    ...userObj._doc,
+                    isOwner:
+                      userObj._doc._id.toString() ===
+                      teamData.createdById.toString(),
+                    role: {
+                      _id: role._id,
+                      roleId: role.roleId,
+                      name: role.name,
+                    },
+                    teamId: teamInfo.teamId,
+                    status: teamInfo.status,
+                  };
+                }
+              );
+            // }
           })
         );
+        // !user.isOwner && (docs = docs.filter((obj) => !obj.isOwner))
+
         teamRes = {
           ...teamRes,
           docs,
@@ -928,14 +941,17 @@ const getTeamByRole = async (obj) => {
   let roles;
   let roleIds = [];
   if (obj.roleId !== ROLES.ADMIN) {
-    roles = await RoleService.getRolesByRoleIds([ROLES.ADMIN]);
+    roles = await RoleService.getRolesByRoleIds([
+      ROLES.ADMIN,
+      ROLES.SUPER_ADMIN,
+    ]);
     roles.map((role) => {
       roleIds.push(role._id);
     });
   } else {
-    roles = await RoleService.getRolesByRoleIds([]);
+    roles = await RoleService.getRolesByRoleIds([ROLES.SUPER_ADMIN]);
     roles.map((role) => {
-      roleIds.push(role._id);
+      roleIds.push(role._id.toString());
     });
   }
   return (obj = {
