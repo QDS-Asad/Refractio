@@ -497,7 +497,6 @@ exports.verifyEmailInvite = async (req, res) => {
           teamId,
           teamName: teamInfo.name,
           isVerified: user.isVerified,
-          
         };
         return successResp(res, {
           msg: SUCCESS_MESSAGE.DATA_FETCHED,
@@ -689,12 +688,16 @@ exports.selectTeam = async (req, res) => {
     const teamOwnerDetail = await UserService.getUserById(
       teamDetail.createdById
     );
-    const ownerTeamInfo = TeamService.getUserSelectedTeamByTeamId(teamOwnerDetail, team);
+    const ownerTeamInfo = TeamService.getUserSelectedTeamByTeamId(
+      teamOwnerDetail,
+      team
+    );
     if (
       ownerTeamInfo.stripeDetails.subscription.status ==
         SUBSCRIPTION_STATUS.CANCELED &&
-        ownerTeamInfo.stripeDetails.subscription.canceledDate <
-        getCurrentTimeStamp() && userInfo._id.toString() !== teamOwnerDetail._id.toString()
+      ownerTeamInfo.stripeDetails.subscription.canceledDate <
+        getCurrentTimeStamp() &&
+      userInfo._id.toString() !== teamOwnerDetail._id.toString()
     ) {
       return errorResp(res, {
         msg: ERROR_MESSAGE.SUBSCRIBED_CANCELED,
@@ -880,18 +883,19 @@ exports.getUserTeams = async (req, res, next) => {
         let teamsList = [];
         await Promise.all(
           userInfo.teams.map(async (team, key) => {
-            const teamData = await TeamService.getTeamById(team.teamId);
-            const member = teamData.members.find(
-              (member) => member.userId.toString() === userId
-            );
-            teamsList.push({
-              teamId: team.teamId,
-              status: team.status,
-              name: teamData.name,
-              roleId: member.roleId,
-              totalMembers: teamData.members.length
-            });
-            console.log(teamsList);
+            if (team.status !== USER_STATUS.DISABLED) {
+              const teamData = await TeamService.getTeamById(team.teamId);
+              const member = teamData.members.find(
+                (member) => member.userId.toString() === userId
+              );
+              teamsList.push({
+                teamId: team.teamId,
+                status: team.status,
+                name: teamData.name,
+                roleId: member.roleId,
+                totalMembers: teamData.members.length,
+              });
+            }
           })
         );
         const activeTeamList = teamsList.filter(
@@ -928,7 +932,7 @@ const getTeamByRole = async (obj) => {
     roles.map((role) => {
       roleIds.push(role._id);
     });
-  }else{
+  } else {
     roles = await RoleService.getRolesByRoleIds([]);
     roles.map((role) => {
       roleIds.push(role._id);
@@ -1175,13 +1179,12 @@ exports.applyCoupon = async (req, res, next) => {
         couponRes = {
           currency: couponRes.currency,
           duration: couponRes.duration,
-          valid: couponRes.valid, 
+          valid: couponRes.valid,
           name: couponRes.name,
           times_redeemed: couponRes.times_redeemed,
           percent_off: couponRes.percent_off,
           amount_off: convertDollerToCent(couponRes.amount_off),
-
-        }
+        };
         return successResp(res, {
           msg: SUCCESS_MESSAGE.DATA_FETCHED,
           code: HTTP_STATUS.SUCCESS.CODE,
