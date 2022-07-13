@@ -7,9 +7,10 @@ import {
   inviteMember,
 } from '../../../features/team/inviteMemberSlice';
 import { fetchRoles, roleListSelector } from '../../../features/roles/roleList';
+import { ROLES } from '../../../common/constants';
 
 const InviteTeamMember = ({ inviteTeamMember, setInviteTeamMember }) => {
-  const { register, setValue, handleSubmit, errors, trigger } = useForm({
+  const { register, setValue, handleSubmit, errors, trigger, watch } = useForm({
     mode: 'onBlur',
     defaultValues: {
       email: '',
@@ -123,10 +124,19 @@ const InviteTeamMember = ({ inviteTeamMember, setInviteTeamMember }) => {
                 <Message error content={errors.role.message} />
               )}
             </Form.Field>
-            <p>
-              Participants can respond to opportunities and evaluate submitted
-              ideas.
-            </p>
+
+            {watch('role') === ROLES.PARTICIPANT && (
+              <p>
+                Participants can respond to opportunities and evaluate submitted
+                ideas.
+              </p>
+            )}
+
+            {watch('role') === ROLES.ORGANIZER && (
+              <p>
+                Organizers can publish opportunities and invite Team Members.
+              </p>
+            )}
           </Modal.Description>
         </Form>
       </Modal.Content>

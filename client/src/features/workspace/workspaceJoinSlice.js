@@ -5,58 +5,55 @@ import refractioApi from '../../common/refractioApi';
 export const initialState = {
   loading: false,
   error: null,
-  registerMember: null,
+  joinWorkspace: null,
 };
 
 // our slice
-const authRegisterMemberSlice = createSlice({
-  name: 'authRegisterMember',
+const workspaceJoinSlice = createSlice({
+  name: 'workspaceJoin',
   initialState,
   reducers: {
     setLoading: (state) => {
       state.loading = true;
     },
-    setRegisterMember: (state, { payload }) => {
+    setJoinWorkspace: (state, { payload }) => {
       state.loading = false;
       state.error = null;
-      state.registerMember = payload;
+      state.workspaceJoin = payload;
     },
     setError: (state, { payload }) => {
       state.loading = false;
       state.error = payload;
-      state.registerMember = null;
+      state.workspaceJoin = null;
     },
     reset: (state) => {
       state.loading = false;
       state.error = null;
-      state.registerMember = null;
+      state.workspaceJoin = null;
     },
   },
 });
 // export the actions
 export const {
   setLoading,
-  setRegisterMember,
+  setJoinWorkspace,
   setError,
   reset,
-} = authRegisterMemberSlice.actions;
+} = workspaceJoinSlice.actions;
 
-export const authRegisterMemberSelector = (state) => state.authRegisterMember;
+export const workspaceJoinSelector = (state) => state.workspaceJoin;
 
 // export the default reducer
-export default authRegisterMemberSlice.reducer;
+export default workspaceJoinSlice.reducer;
 
-// code Verification
-export const memberRegistration = (userId, teamId, body) => async (
-  dispatch
-) => {
+// login user
+export const joinNewWorkspace = (userId, teamId) => async (dispatch) => {
   try {
     dispatch(setLoading());
     let { data: response } = await refractioApi.put(
-      `/users/register-invite-account/${userId}/${teamId}`,
-      body
+      `/users/join-team/${userId}/${teamId}`
     );
-    dispatch(setRegisterMember(response.message));
+    dispatch(setJoinWorkspace(response.message));
   } catch (error) {
     const errorMessage =
       error.response && error.response.data
@@ -66,6 +63,6 @@ export const memberRegistration = (userId, teamId, body) => async (
   }
 };
 
-export const resetRegisterMember = () => (dispatch) => {
+export const resetJoinWorkspace = () => (dispatch) => {
   dispatch(reset());
 };

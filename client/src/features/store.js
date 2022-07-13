@@ -26,6 +26,9 @@ import subscriptionDetailSlice from './subscriptions/subscriptionDetailSlice';
 import changeCardSlice from './billing/changeCardSlice';
 import subscriptionCancelSlice from './subscriptions/subscriptionCancelSlice';
 import subscriptionResumeSlice from './subscriptions/subscriptionResumeSlice';
+import workspaceListSlice from './workspace/workspaceListSlice';
+import workspaceSelectSlice from './workspace/workspaceSelectSlice';
+import workspaceJoinSlice from './workspace/workspaceJoinSlice';
 
 export default configureStore({
   reducer: {
@@ -56,5 +59,8 @@ export default configureStore({
     changeCard: changeCardSlice,
     subscriptionCancel: subscriptionCancelSlice,
     subscriptionResume: subscriptionResumeSlice,
+    workspaceList: workspaceListSlice,
+    workspaceSelect: workspaceSelectSlice,
+    workspaceJoin: workspaceJoinSlice,
   },
 });

@@ -24,6 +24,8 @@ import ManageOrders from './pages/admin/manage-orders/ManageOrders';
 import ManageSubscriptions from './pages/admin/manage-subscriptions/ManageSubscriptions';
 import ManageOpportunities from './pages/admin/manage-opportunities/ManageOpportunities';
 import ManageContent from './pages/admin/manage-content/ManageContent';
+import WorkspaceLayout from './layouts/WorkspaceLayout';
+import WorkspaceSelection from './pages/workspaces/WorkspaceSelection';
 const App = () => {
   return (
     <Routes>
@@ -34,10 +36,13 @@ const App = () => {
         <Route path='new-password/:token' element={<NewPassword />} />
         <Route path='password-recover' element={<PasswordRecover />} />
         <Route path='verify-code' element={<VerificationCode />} />
-        <Route path='invite-account/:token' element={<InviteAccount />} />
+        <Route path='invite-account/:token/:team' element={<InviteAccount />} />
       </Route>
       <Route path='subscription' element={<SubscriptionLayout />}>
         <Route path='' element={<Subscription />} />
+      </Route>
+      <Route path='workspaces' element={<WorkspaceLayout />}>
+        <Route path='' element={<WorkspaceSelection />} />
       </Route>
       <Route path='' element={<AppLayout />}>
         <Route

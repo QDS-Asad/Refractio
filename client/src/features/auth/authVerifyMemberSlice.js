@@ -47,11 +47,11 @@ export const authVerifyMemberSelector = (state) => state.authVerifyMember;
 export default authVerifyMemberSlice.reducer;
 
 // code Verification
-export const memberVerification = (token) => async (dispatch) => {
+export const memberVerification = (token, team) => async (dispatch) => {
   try {
     dispatch(setLoading());
     let { data: response } = await refractioApi.get(
-      `/users/verify-invite-account/${token}`
+      `/users/verify-invite-account/${token}/${team}`
     );
     dispatch(setVerifyMember(response.data));
   } catch (error) {
