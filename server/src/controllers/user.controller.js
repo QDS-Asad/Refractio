@@ -928,6 +928,11 @@ const getTeamByRole = async (obj) => {
     roles.map((role) => {
       roleIds.push(role._id);
     });
+  }else{
+    roles = await RoleService.getRolesByRoleIds([]);
+    roles.map((role) => {
+      roleIds.push(role._id);
+    });
   }
   return (obj = {
     ...obj,
