@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import refractioApi from '../../common/refractioApi';
+import { logoutWorkspace } from '../workspace/workspaceSelectSlice';
 
 let userInfoFromStorage = window.localStorage.getItem('userInfo')
   ? window.localStorage.getItem('userInfo')
@@ -85,12 +86,13 @@ export const loginUser = (email, password, rememberMe = false) => async (
 // logout user
 export const logoutUser = () => async (dispatch) => {
   dispatch(setLogout());
+  dispatch(logoutWorkspace());
   window.localStorage.removeItem('userInfo');
 };
 
-export const updateUserStatus = (status) => async (dispatch, getState) => {
+export const updateUserStatus = () => async (dispatch, getState) => {
   let userInfo = Object.assign({}, getState().authLogin.userLogin);
-  userInfo.status = status;
+  userInfo.isRegistered = false;
   dispatch(setUserLogin(userInfo));
   window.localStorage.setItem('userInfo', JSON.stringify(userInfo));
 };
