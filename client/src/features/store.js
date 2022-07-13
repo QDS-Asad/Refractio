@@ -29,6 +29,8 @@ import subscriptionResumeSlice from './subscriptions/subscriptionResumeSlice';
 import workspaceListSlice from './workspace/workspaceListSlice';
 import workspaceSelectSlice from './workspace/workspaceSelectSlice';
 import workspaceJoinSlice from './workspace/workspaceJoinSlice';
+import orderListSlice from './orders/orderListSlice';
+import opportunityManageListSlice from './opportunities/opportunityManageListSlice';
 
 export default configureStore({
   reducer: {
@@ -62,5 +64,7 @@ export default configureStore({
     workspaceList: workspaceListSlice,
     workspaceSelect: workspaceSelectSlice,
     workspaceJoin: workspaceJoinSlice,
+    orderList: orderListSlice,
+    opportunityManageList: opportunityManageListSlice,
   },
 });
