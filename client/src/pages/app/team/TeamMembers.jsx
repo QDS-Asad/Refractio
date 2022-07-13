@@ -173,7 +173,7 @@ const TeamMembers = () => {
                     <Table.Cell>
                       {user.status === 'invite_sent'
                         ? 'Pending Invitation'
-                        : user.fullName}
+                        : user.firstName + ' ' + user.lastName}
                     </Table.Cell>
                     <Table.Cell>{user.email}</Table.Cell>
                     {(userLogin.role.roleId === ROLES.ADMIN ||
@@ -185,7 +185,7 @@ const TeamMembers = () => {
                           }
                           fluid
                           selection
-                          disabled={userLogin.id === user._id}
+                          disabled={userLogin.id === user._id || user.isOwner}
                           defaultValue={user.role.roleId}
                           options={roles.map((role) => {
                             return {
@@ -200,6 +200,7 @@ const TeamMembers = () => {
                     {userLogin.role.roleId === ROLES.ADMIN && (
                       <Table.Cell className='clearfix'>
                         {userLogin.id !== user._id &&
+                          !user.isOwner &&
                           user.status === USER_STATUS.ACTIVE && (
                             <Button
                               className='btn-link'
@@ -228,6 +229,7 @@ const TeamMembers = () => {
                           </>
                         )}
                         {userLogin.id === user._id &&
+                          user.isOwner &&
                           user.role.roleId === ROLES.ADMIN && (
                             <Button
                               className='btn-link-danger'

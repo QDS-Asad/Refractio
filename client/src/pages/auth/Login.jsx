@@ -14,7 +14,6 @@ import {
   loginUser,
 } from '../../features/auth/authLoginSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { ROLES } from '../../common/constants';
 
 const Login = () => {
   const { register, setValue, handleSubmit, errors, trigger } = useForm({
@@ -75,7 +74,7 @@ const Login = () => {
 
   useEffect(() => {
     if (userLogin) {
-      if (userLogin.role.roleId === ROLES.SUPER_ADMIN) {
+      if (userLogin.isSuperAdmin === true) {
         navigate('/admin');
       } else {
         navigate('/');

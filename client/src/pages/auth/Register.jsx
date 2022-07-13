@@ -21,8 +21,8 @@ const Register = () => {
   // fetch data from our store
   const { loading, error, userRegister } = useSelector(authRegisterSelector);
 
-  const handleSignup = ({ fullName, email, password }) => {
-    dispatch(registerUser(fullName, email, password));
+  const handleSignup = ({ firstName, lastName, email, password }) => {
+    dispatch(registerUser(firstName, lastName, email, password));
   };
 
   const handleChange = (e) => {
@@ -46,11 +46,18 @@ const Register = () => {
   }, [userRegister]);
 
   const signupOptions = {
-    fullName: {
-      required: 'Full Name is required',
+    firstName: {
+      required: 'First Name is required',
       pattern: {
         value: /^[a-zA-Z ]*$/,
-        message: 'Invalid Full Name. Only letters are allowed.',
+        message: 'Invalid First Name. Only letters are allowed.',
+      },
+    },
+    lastName: {
+      required: 'Last Name is required',
+      pattern: {
+        value: /^[a-zA-Z ]*$/,
+        message: 'Invalid Last Name. Only letters are allowed.',
       },
     },
     email: {
@@ -74,7 +81,8 @@ const Register = () => {
   };
 
   useEffect(() => {
-    register({ name: 'fullName' }, signupOptions.fullName);
+    register({ name: 'firstName' }, signupOptions.firstName);
+    register({ name: 'lastName' }, signupOptions.lastName);
     register({ name: 'email' }, signupOptions.email);
     register({ name: 'password' }, signupOptions.password);
     register({ name: 'agreement' }, signupOptions.agreement);
@@ -92,17 +100,31 @@ const Register = () => {
       )}
       <Form onSubmit={handleSubmit(handleSignup)} loading={loading} error>
         <Form.Field className='mb-3'>
-          <label>Full Name </label>
+          <label>First Name </label>
           <Form.Input
-            name='fullName'
+            name='firstName'
             fluid
-            placeholder='Enter your Name'
-            error={!!errors.fullName}
+            placeholder='Enter your First Name'
+            error={!!errors.firstName}
             onBlur={handleBlur}
             onChange={handleChange}
           />
-          {errors && errors.fullName && (
-            <Message error content={errors.fullName.message} />
+          {errors && errors.firstName && (
+            <Message error content={errors.firstName.message} />
+          )}
+        </Form.Field>
+        <Form.Field className='mb-3'>
+          <label>Last Name </label>
+          <Form.Input
+            name='lastName'
+            fluid
+            placeholder='Enter your Last Name'
+            error={!!errors.lastName}
+            onBlur={handleBlur}
+            onChange={handleChange}
+          />
+          {errors && errors.lastName && (
+            <Message error content={errors.lastName.message} />
           )}
         </Form.Field>
         <Form.Field className='mb-3'>

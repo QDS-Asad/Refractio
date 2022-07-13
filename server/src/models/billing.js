@@ -8,6 +8,10 @@ const BillingSchema = new Schema(
       type: String,
       required: true,
     },
+    teamId: {
+      type: String,
+      required: true,
+    },
     status: {
       type: String,
       required: true,
