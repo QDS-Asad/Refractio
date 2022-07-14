@@ -1,5 +1,5 @@
 import axios from 'axios';
-
+import { logoutUser } from '../features/auth/authLoginSlice';
 let baseURL = process.env.REACT_APP_URL;
 if (process.env.REACT_APP_NODE_ENV === 'production') {
   baseURL = '';
@@ -21,10 +21,27 @@ const http = axios.create({
   },
 });
 
-http.interceptors.request.use(function(config) {
-  config.headers = authHeader();
-  return config;
-});
+export const interceptor = (store) => {
+  http.interceptors.request.use((config) => {
+    config.headers = authHeader();
+    return config;
+  });
+  http.interceptors.response.use(
+    (response) => {
+      return response;
+    },
+    (error) => {
+      const code =
+        error.response && error.response.data
+          ? error.response.data.code
+          : error.response.status;
+      if (code === 401) {
+        store.dispatch(logoutUser());
+      }
+      return error;
+    }
+  );
+};
 
 export default http;
 
