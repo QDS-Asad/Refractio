@@ -6,12 +6,13 @@ import {
 } from "../../../features/opportunities/opportunityResponseSlice";
 import { Button, Form, Grid, Header, Message } from "semantic-ui-react";
 import { useParams } from "react-router-dom";
-import PublishOpportunity from "./PublishOpportunity";
 import { useForm } from "react-hook-form";
 import ResponseForm from "../../../components/ResponseForm";
+import PublishResponse from "./PublishResponse";
 
 const OpportunityResponse = () => {
-  const [viewPublish, setViewPublish] = useState(false);
+  const [viewSubmit, setViewSubmit] = useState(false);
+  const [viewMessage, setViewMessage] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(1);
   const { id } = useParams();
   const { register, setValue, handleSubmit, errors, trigger, watch } = useForm({
@@ -54,14 +55,27 @@ const OpportunityResponse = () => {
   }, [opportunity]);
 
   const handleEdit = (data) => {
+    setViewSubmit(true);
     console.log(data);
   };
-
+  const onSubmittion = async () => {
+    setViewMessage(true);
+    setTimeout(() => {
+      setViewMessage(false);
+    }, 3000);
+  };
   return (
     <>
       {opportunity && (
         <Grid stretched>
           <Grid.Column width={11}>
+            {viewMessage && (
+              <Message
+                positive
+                content="Your response has been saved."
+                className="error-message mb-3"
+              />
+            )}
             <Header as="h3" className="primary-dark-color">
               {opportunity.name}
               <Button
@@ -70,15 +84,20 @@ const OpportunityResponse = () => {
                 form="create-opportunity"
                 className="btn-secondary"
                 floated="right"
-                // onClick={() => setViewPublish(true)}
               >
                 Submit
               </Button>
-              <PublishOpportunity
-                viewPublish={viewPublish}
-                setViewPublish={setViewPublish}
+              <PublishResponse
+                viewSubmit={viewSubmit}
+                setViewSubmit={setViewSubmit}
+                onSubmittion={onSubmittion}
               />
-              <Button primary className="btn-outline me-3" floated="right">
+              <Button
+                onClick={onSubmittion}
+                primary
+                className="btn-outline me-3"
+                floated="right"
+              >
                 Save as Draft
               </Button>
             </Header>

@@ -30,7 +30,6 @@ import opportunityResponseSlice from "./opportunities/opportunityResponseSlice";
 
 export default configureStore({
   reducer: {
-    opportunityResponse: opportunityResponseSlice,
     authLogin: authLoginSlice,
     authRegister: authRegisterSlice,
     authVerifyCode: authVerifyCodeSlice,
@@ -58,5 +57,6 @@ export default configureStore({
     changeCard: changeCardSlice,
     subscriptionCancel: subscriptionCancelSlice,
     subscriptionResume: subscriptionResumeSlice,
+    opportunityResponse: opportunityResponseSlice,
   },
 });
