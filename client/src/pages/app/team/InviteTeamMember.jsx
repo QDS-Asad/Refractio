@@ -79,7 +79,7 @@ const InviteTeamMember = ({ inviteTeamMember, setInviteTeamMember }) => {
           loading={loading}
           error
         >
-          <Modal.Description>
+          <Modal.Description className='py-3'>
             {error && (
               <Message color='red' className='error-message mb-3'>
                 {error}
