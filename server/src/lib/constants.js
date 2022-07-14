@@ -87,7 +87,7 @@ module.exports = Object.freeze({
     },
     ERROR_MESSAGE:{
         INVALID_EMAIL: "Invalid email",
-        INVALID_TOKEN: "Invalid OTP",
+        INVALID_TOKEN: "Invalid Token",
         INVALID_CREDS: "Invalid Credentials",
         USER_NOT_VERIFIED: "User not verified.",
         DB_NOT_CONNECTED: "Cannot Connect to the Databases.",
@@ -166,7 +166,7 @@ module.exports = Object.freeze({
         </div>
       </div>`
     },
-    INVTE_USER_EMAIL_SUBJECT: "Join your Team at Refractio",
+    INVTE_USER_EMAIL_SUBJECT: "Invitation: Join your Team at Refractio",
     INVTE_USER_EMAIL_TEMPLATE: (params) => {
         return `<div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
         <div style="margin:50px auto;width:70%;padding:20px 0">

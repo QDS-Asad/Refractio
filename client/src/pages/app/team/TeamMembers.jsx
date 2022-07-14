@@ -179,22 +179,31 @@ const TeamMembers = () => {
                     {(userLogin.role.roleId === ROLES.ADMIN ||
                       userLogin.role.roleId === ROLES.ORGANIZER) && (
                       <Table.Cell>
-                        <Dropdown
-                          onChange={(e, { value }) =>
-                            handleRoleChange(value, user._id)
-                          }
-                          fluid
-                          selection
-                          disabled={userLogin.id === user._id || user.isOwner}
-                          defaultValue={user.role.roleId}
-                          options={roles.map((role) => {
-                            return {
-                              key: role.roleId,
-                              text: role.name,
-                              value: role.roleId,
-                            };
-                          })}
-                        />
+                        {userLogin.role.roleId === ROLES.ORGANIZER &&
+                        user.role.roleId === ROLES.ADMIN ? (
+                          <Dropdown disabled={true} fluid>
+                            <Dropdown.Item selected value={user.role.roleId}>
+                              {user.role.name}
+                            </Dropdown.Item>
+                          </Dropdown>
+                        ) : (
+                          <Dropdown
+                            onChange={(e, { value }) =>
+                              handleRoleChange(value, user._id)
+                            }
+                            fluid
+                            selection
+                            disabled={userLogin.id === user._id || user.isOwner}
+                            defaultValue={user.role.roleId}
+                            options={roles.map((role) => {
+                              return {
+                                key: role.roleId,
+                                text: role.name,
+                                value: role.roleId,
+                              };
+                            })}
+                          />
+                        )}
                       </Table.Cell>
                     )}
                     {userLogin.role.roleId === ROLES.ADMIN && (

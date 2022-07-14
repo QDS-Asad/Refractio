@@ -138,6 +138,9 @@ const VerificationCode = () => {
               className='error-message mb-3'
             />
           )}
+          {error && (
+            <Message negative content={error} className='error-message mb-3' />
+          )}
           <Form
             onSubmit={handleSubmit(handleVerification)}
             loading={loading}

@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require("../controllers/user.controller");
 const { validateAcceptInvite } = require("../middlewares/acceptInvite");
 const Auth = require("../middlewares/auth");
+const { validateChangeName } = require("../middlewares/changeName");
 const { validateInvite } = require("../middlewares/inviteUser");
 const { validateLogin } = require("../middlewares/login");
 const { validateChangePaymentMethod } = require("../middlewares/paymentMethod");
@@ -1380,6 +1381,94 @@ router.delete("/cancel-invite-account/:userId", Auth, User.cancelUserInvite);
  */
 router.get("/team", Auth, User.getTeam);
 
+/**
+ * @swagger
+ *   /api/users/change-name:
+ *   put:
+ *     description: update user role
+ *     tags: [Team]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *       - in: path
+ *         name: roleId
+ *     schema:
+ *        type: stirng
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/changeName'
+ *     responses:
+ *        '200':
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                   success: true
+ *                   code: 200
+ *                   message: Operation successfull.
+ *        '404':
+ *           description: Operation Failed
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 404,"message": "Operation Failed."}
+ *
+ *        '422':
+ *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
+ * components:
+ *  schemas:
+ *   changeName:
+ *    type: object
+ *    required:
+ *      - firstName
+ *      - lastName
+ *    properties:
+ *      firstName:
+ *        type: string
+ *      lastName:
+ *        type: string
+ */
+router.put("/change-name", Auth, validateChangeName, User.changeName);
 
 //subscription
 
