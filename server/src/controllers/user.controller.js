@@ -713,7 +713,7 @@ exports.selectTeam = async (req, res) => {
         email: user.email,
         teamId: teamInfo.teamId,
         roleId: roleInfo._id,
-        isOwner: user._id.toString() === teamDetail.createdById.toString()
+        isOwner: user._id.toString() === teamDetail.createdById.toString(),
       },
       JWT_KEY,
       {
@@ -823,7 +823,7 @@ exports.getTeam = async (req, res, next) => {
       page_size,
       roleId: role.roleId,
       teamId: user.teamId,
-      OwnerId: teamDetail.createdById
+      OwnerId: teamDetail.createdById,
     };
     // const filterData = await getTeamByRole(teamData);
     // console.log(filterData);
@@ -838,27 +838,25 @@ exports.getTeam = async (req, res, next) => {
               user.teamId
             );
             // if (teamInfo.status !== USER_STATUS.DISABLED) {
-              await RoleService.getRoleById(teamInfo.roleId).then(
-                async (role) => {
-                  const teamData = await TeamService.getTeamById(
-                    teamInfo.teamId
-                  );
-                  delete userObj._doc.teams;
-                  docs[key] = {
-                    ...userObj._doc,
-                    isOwner:
-                      userObj._doc._id.toString() ===
-                      teamData.createdById.toString(),
-                    role: {
-                      _id: role._id,
-                      roleId: role.roleId,
-                      name: role.name,
-                    },
-                    teamId: teamInfo.teamId,
-                    status: teamInfo.status,
-                  };
-                }
-              );
+            await RoleService.getRoleById(teamInfo.roleId).then(
+              async (role) => {
+                const teamData = await TeamService.getTeamById(teamInfo.teamId);
+                delete userObj._doc.teams;
+                docs[key] = {
+                  ...userObj._doc,
+                  isOwner:
+                    userObj._doc._id.toString() ===
+                    teamData.createdById.toString(),
+                  role: {
+                    _id: role._id,
+                    roleId: role.roleId,
+                    name: role.name,
+                  },
+                  teamId: teamInfo.teamId,
+                  status: teamInfo.status,
+                };
+              }
+            );
             // }
           })
         );
@@ -1894,6 +1892,29 @@ exports.resumeSubscription = async (req, res, next) => {
             code: HTTP_STATUS.NOT_FOUND.CODE,
           });
         }
+      })
+      .catch((error) => {
+        errorResp(res, {
+          msg: ERROR_MESSAGE.NOT_FOUND,
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+        });
+      });
+  } catch (error) {
+    console.log(error);
+    serverError(res, error);
+  }
+};
+
+exports.changeName = async (req, res, next) => {
+  try {
+    const { user, firstName, lastName } = req.body;
+    await UserService.updateUserById(user._id, { firstName, lastName })
+      .then((userRes) => {
+        return successResp(res, {
+          msg: SUCCESS_MESSAGE.UPDATED,
+          code: HTTP_STATUS.SUCCESS.CODE,
+          data: {firstName, lastName}
+        });        
       })
       .catch((error) => {
         errorResp(res, {
