@@ -38,6 +38,10 @@ module.exports = Object.freeze({
       INVITE_SENT: "invite_sent",
       SUBSCRIPTION_PENDING: "subscription_pending",
     },
+    TEAM_STATUS: {
+      ACTIVE: "active",
+      DISABLED: "disabled"
+    },
     SUBSCRIPTION_STATUS: {
       SUCCESS: "success",
       FAILED: "failed",
@@ -167,7 +171,7 @@ module.exports = Object.freeze({
         </div>
       </div>`
     },
-    INVTE_USER_EMAIL_SUBJECT: "Join your Team at Refractio",
+    INVTE_USER_EMAIL_SUBJECT: "Invitation: Join your Team at Refractio",
     INVTE_USER_EMAIL_TEMPLATE: (params) => {
         return `<div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
         <div style="margin:50px auto;width:70%;padding:20px 0">

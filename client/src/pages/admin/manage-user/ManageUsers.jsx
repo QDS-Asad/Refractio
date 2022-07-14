@@ -38,12 +38,12 @@ const ManageUsers = () => {
   return (
     <>
       <Grid>
-        <Grid.Column width={8}>
+        <Grid.Column computer={12} tablet={10} mobile={16}>
           <Header as='h3' className='primary-dark-color' floated='left'>
             User management
           </Header>
         </Grid.Column>
-        <Grid.Column width={8}>
+        <Grid.Column computer={4} tablet={6} mobile={16}>
           <Button
             primary
             className='btn'
@@ -152,7 +152,7 @@ const ManageUsers = () => {
 
               <Table.Footer>
                 <Table.Row>
-                  <Table.HeaderCell colSpan='4' className='clearfix'>
+                  <Table.HeaderCell colSpan='5' className='clearfix'>
                     <Pagination
                       floated='right'
                       boundaryRange={0}

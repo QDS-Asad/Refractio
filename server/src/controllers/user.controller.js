@@ -42,6 +42,7 @@ const {
   TOTAL_TEAM_ORGANIZER,
   PAYMENT_STATUS,
   SUBSCRIPTION_STATUS,
+  TEAM_STATUS,
 } = require("../lib/constants");
 
 // register admin user
@@ -497,7 +498,6 @@ exports.verifyEmailInvite = async (req, res) => {
           teamId,
           teamName: teamInfo.name,
           isVerified: user.isVerified,
-          
         };
         return successResp(res, {
           msg: SUCCESS_MESSAGE.DATA_FETCHED,
@@ -688,12 +688,16 @@ exports.selectTeam = async (req, res) => {
     const teamOwnerDetail = await UserService.getUserById(
       teamDetail.createdById
     );
-    const ownerTeamInfo = TeamService.getUserSelectedTeamByTeamId(teamOwnerDetail, team);
+    const ownerTeamInfo = TeamService.getUserSelectedTeamByTeamId(
+      teamOwnerDetail,
+      team
+    );
     if (
       ownerTeamInfo.stripeDetails.subscription.status ==
         SUBSCRIPTION_STATUS.CANCELED &&
-        ownerTeamInfo.stripeDetails.subscription.canceledDate <
-        getCurrentTimeStamp() && userInfo._id.toString() !== teamOwnerDetail._id.toString()
+      ownerTeamInfo.stripeDetails.subscription.canceledDate <
+        getCurrentTimeStamp() &&
+      userInfo._id.toString() !== teamOwnerDetail._id.toString()
     ) {
       return errorResp(res, {
         msg: ERROR_MESSAGE.SUBSCRIBED_CANCELED,
@@ -709,6 +713,7 @@ exports.selectTeam = async (req, res) => {
         email: user.email,
         teamId: teamInfo.teamId,
         roleId: roleInfo._id,
+        isOwner: user._id.toString() === teamDetail.createdById.toString(),
       },
       JWT_KEY,
       {
@@ -809,6 +814,7 @@ exports.getTeam = async (req, res, next) => {
     const { page, page_size } = req.query;
     const { user } = req.body;
     console.log(user);
+    const teamDetail = await TeamService.getTeamById(user.teamId);
     const role = await RoleService.getRoleById(user.roleId);
     const teamData = {
       user,
@@ -816,10 +822,11 @@ exports.getTeam = async (req, res, next) => {
       page_size,
       roleId: role.roleId,
       teamId: user.teamId,
+      OwnerId: teamDetail.createdById,
     };
-    const filterData = await getTeamByRole(teamData);
-    console.log(filterData);
-    await TeamService.getTeam(filterData)
+    // const filterData = await getTeamByRole(teamData);
+    // console.log(filterData);
+    await TeamService.getTeam(teamData)
       .then(async (teamRes) => {
         console.log(teamRes);
         let docs = [];
@@ -829,6 +836,7 @@ exports.getTeam = async (req, res, next) => {
               userObj,
               user.teamId
             );
+            // if (teamInfo.status !== USER_STATUS.DISABLED) {
             await RoleService.getRoleById(teamInfo.roleId).then(
               async (role) => {
                 const teamData = await TeamService.getTeamById(teamInfo.teamId);
@@ -838,14 +846,21 @@ exports.getTeam = async (req, res, next) => {
                   isOwner:
                     userObj._doc._id.toString() ===
                     teamData.createdById.toString(),
-                  role: { _id: role._id, roleId: role.roleId, name: role.name },
+                  role: {
+                    _id: role._id,
+                    roleId: role.roleId,
+                    name: role.name,
+                  },
                   teamId: teamInfo.teamId,
                   status: teamInfo.status,
                 };
               }
             );
+            // }
           })
         );
+        // !user.isOwner && (docs = docs.filter((obj) => !obj.isOwner))
+
         teamRes = {
           ...teamRes,
           docs,
@@ -878,18 +893,19 @@ exports.getUserTeams = async (req, res, next) => {
         let teamsList = [];
         await Promise.all(
           userInfo.teams.map(async (team, key) => {
-            const teamData = await TeamService.getTeamById(team.teamId);
-            const member = teamData.members.find(
-              (member) => member.userId.toString() === userId
-            );
-            teamsList.push({
-              teamId: team.teamId,
-              status: team.status,
-              name: teamData.name,
-              roleId: member.roleId,
-              totalMembers: teamData.members.length
-            });
-            console.log(teamsList);
+            if (team.status !== USER_STATUS.DISABLED) {
+              const teamData = await TeamService.getTeamById(team.teamId);
+              const member = teamData.members.find(
+                (member) => member.userId.toString() === userId
+              );
+              teamsList.push({
+                teamId: team.teamId,
+                status: team.status,
+                name: teamData.name,
+                roleId: member.roleId,
+                totalMembers: teamData.members.length,
+              });
+            }
           })
         );
         const activeTeamList = teamsList.filter(
@@ -922,9 +938,17 @@ const getTeamByRole = async (obj) => {
   let roles;
   let roleIds = [];
   if (obj.roleId !== ROLES.ADMIN) {
-    roles = await RoleService.getRolesByRoleIds([ROLES.ADMIN]);
+    roles = await RoleService.getRolesByRoleIds([
+      ROLES.ADMIN,
+      ROLES.SUPER_ADMIN,
+    ]);
     roles.map((role) => {
       roleIds.push(role._id);
+    });
+  } else {
+    roles = await RoleService.getRolesByRoleIds([ROLES.SUPER_ADMIN]);
+    roles.map((role) => {
+      roleIds.push(role._id.toString());
     });
   }
   return (obj = {
@@ -1168,13 +1192,12 @@ exports.applyCoupon = async (req, res, next) => {
         couponRes = {
           currency: couponRes.currency,
           duration: couponRes.duration,
-          valid: couponRes.valid, 
+          valid: couponRes.valid,
           name: couponRes.name,
           times_redeemed: couponRes.times_redeemed,
           percent_off: couponRes.percent_off,
           amount_off: convertDollerToCent(couponRes.amount_off),
-
-        }
+        };
         return successResp(res, {
           msg: SUCCESS_MESSAGE.DATA_FETCHED,
           code: HTTP_STATUS.SUCCESS.CODE,
@@ -1881,11 +1904,47 @@ exports.resumeSubscription = async (req, res, next) => {
   }
 };
 
+const usersByTeam = async (teamId) => {
+  return await TeamService.getUsersByTeamId(teamId);
+}
+
+exports.deleteTeam = async (req, res, next) => {
+  try {
+    const {user} = req.body;
+    const teamUsers = await usersByTeam(user.teamId);
+    Promise.all(
+      teamUsers.map(async (userInfo) => {
+        const userTeamIndex = userInfo.teams.findIndex(
+          (obj) => obj.teamId.toString() == user.teamId
+        );
+        console.log(userTeamIndex);
+        if (userTeamIndex >= 0) {
+          userInfo.teams[userTeamIndex] = {
+            teamId: userInfo.teams[userTeamIndex].teamId,
+            roleId: userInfo.teams[userTeamIndex].roleId,
+            status: USER_STATUS.DISABLED,
+          };
+          const userData = {
+            teams: userInfo.teams
+          };
+          await UserService.updateUserById(userId, userData);
+        }
+      })
+    )
+    const teamRes = await TeamService.updateTeamMembers(user.teamId, { members: [], status: TEAM_STATUS.DISABLED})
+  } catch (error) {
+    console.log(error);
+    serverError(res, error);
+  }
+};
+
 exports.transferTeamOwnerShip = async (req, res, next) => {
   try {
-    const {userId} = req.params;
-    const {user} = req.body;
-    const team = await TeamService.updateTeamMembers(user.teamId, {createdById: userId}); 
+    const { userId } = req.params;
+    const { user } = req.body;
+    const team = await TeamService.updateTeamMembers(user.teamId, {
+      createdById: userId,
+    });
     //disable previous owner
     const userInfo = await UserService.getUserById(user._id);
     const userTeamIndex = userInfo.teams.findIndex(
@@ -1927,7 +1986,29 @@ exports.transferTeamOwnerShip = async (req, res, next) => {
         code: HTTP_STATUS.NOT_FOUND.CODE,
       });
     }
-    
+  } catch (error) {
+    console.log(error);
+    serverError(res, error);
+  }
+};
+
+exports.changeName = async (req, res, next) => {
+  try {8
+    const { user, firstName, lastName } = req.body;
+    await UserService.updateUserById(user._id, { firstName, lastName })
+      .then((userRes) => {
+        return successResp(res, {
+          msg: SUCCESS_MESSAGE.UPDATED,
+          code: HTTP_STATUS.SUCCESS.CODE,
+          data: { firstName, lastName },
+        });
+      })
+      .catch((error) => {
+        errorResp(res, {
+          msg: ERROR_MESSAGE.NOT_FOUND,
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+        });
+      });
   } catch (error) {
     console.log(error);
     serverError(res, error);

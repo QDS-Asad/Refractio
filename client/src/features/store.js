@@ -29,8 +29,11 @@ import subscriptionResumeSlice from './subscriptions/subscriptionResumeSlice';
 import workspaceListSlice from './workspace/workspaceListSlice';
 import workspaceSelectSlice from './workspace/workspaceSelectSlice';
 import workspaceJoinSlice from './workspace/workspaceJoinSlice';
+import orderListSlice from './orders/orderListSlice';
+import opportunityManageListSlice from './opportunities/opportunityManageListSlice';
+import { interceptor } from '../common/refractioApi';
 
-export default configureStore({
+const store = configureStore({
   reducer: {
     authLogin: authLoginSlice,
     authRegister: authRegisterSlice,
@@ -62,5 +65,10 @@ export default configureStore({
     workspaceList: workspaceListSlice,
     workspaceSelect: workspaceSelectSlice,
     workspaceJoin: workspaceJoinSlice,
+    orderList: orderListSlice,
+    opportunityManageList: opportunityManageListSlice,
   },
 });
+
+interceptor(store);
+export default store;
