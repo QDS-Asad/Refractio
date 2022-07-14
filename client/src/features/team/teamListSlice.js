@@ -49,6 +49,10 @@ export const fetchTeamList = (pageNumber, pageSize) => async (dispatch) => {
     );
     dispatch(setTeamList(data.data));
   } catch (error) {
-    dispatch(setError(error.message));
+    const errorMessage =
+      error.response && error.response.data
+        ? error.response.data.message
+        : error.message;
+    dispatch(setError(errorMessage));
   }
 };

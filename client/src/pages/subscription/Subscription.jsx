@@ -26,6 +26,7 @@ import {
   planListSelector,
 } from '../../features/plans/planListSlice';
 import {
+  resetUserSubscription,
   subscriptionSelector,
   userSubscription,
 } from '../../features/subscriptions/subscriptionSlice';
@@ -141,6 +142,7 @@ const Subscription = () => {
 
   const handleGoToApplication = () => {
     navigate('/');
+    dispatch(resetUserSubscription());
   };
 
   const cancelNewWorkspace = () => {
@@ -451,7 +453,12 @@ const Subscription = () => {
                             floated='right'
                             className='fw-bold fs-4'
                           >
-                            $7
+                            $
+                            {prices &&
+                            prices.find((a) => a.id === watch('priceId'))
+                              ? prices.find((a) => a.id === watch('priceId'))
+                                  .amount
+                              : 0}
                           </List.Content>
                           <span className='fw-bold fs-4'>Total:</span>
                           <p className='mt-5'>
