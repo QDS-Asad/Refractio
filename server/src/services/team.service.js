@@ -39,7 +39,7 @@ exports.getTeam = async (obj) => {
   };
   return await User.paginate(
     {
-      ...(!user.isOwner && {_id: {$nin: OwnerId}}),
+      // ...(!user.isOwner && {_id: {$nin: OwnerId}}),
       "teams": { $elemMatch: {teamId: ObjectId(teamId), status: { $nin: USER_STATUS.DISABLED }}},
       // "teams.teamId": ObjectId(teamId),
       // "teams.roleId": { $in: roleIds },
