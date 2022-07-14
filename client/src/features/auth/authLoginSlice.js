@@ -1,9 +1,9 @@
-import { createSlice } from '@reduxjs/toolkit';
-import refractioApi from '../../common/refractioApi';
-import { logoutWorkspace } from '../workspace/workspaceSelectSlice';
+import { createSlice } from "@reduxjs/toolkit";
+import refractioApi from "../../common/refractioApi";
+import { logoutWorkspace } from "../workspace/workspaceSelectSlice";
 
-let userInfoFromStorage = window.localStorage.getItem('userInfo')
-  ? window.localStorage.getItem('userInfo')
+let userInfoFromStorage = window.localStorage.getItem("userInfo")
+  ? window.localStorage.getItem("userInfo")
   : null;
 
 try {
@@ -22,7 +22,7 @@ export const initialState = {
 
 // our slice
 const authLoginSlice = createSlice({
-  name: 'authLogin',
+  name: "authLogin",
   initialState,
   reducers: {
     setLoading: (state) => {
@@ -67,13 +67,18 @@ export const loginUser = (email, password, rememberMe = false) => async (
 ) => {
   try {
     dispatch(setLoading());
-    let { data: response } = await refractioApi.post('/users/login', {
+    let { response } = await refractioApi.post("/users/login", {
       email,
       password,
       rememberMe,
     });
-    dispatch(setUserLogin(response.data));
-    window.localStorage.setItem('userInfo', JSON.stringify(response.data));
+    response = response.data;
+    if (response.success) {
+      dispatch(setUserLogin(response.data));
+      window.localStorage.setItem("userInfo", JSON.stringify(response.data));
+    } else {
+      dispatch(setError(response.message));
+    }
   } catch (error) {
     const errorMessage =
       error.response && error.response.data
@@ -87,12 +92,12 @@ export const loginUser = (email, password, rememberMe = false) => async (
 export const logoutUser = () => async (dispatch) => {
   dispatch(setLogout());
   dispatch(logoutWorkspace());
-  window.localStorage.removeItem('userInfo');
+  window.localStorage.removeItem("userInfo");
 };
 
 export const updateUserStatus = () => async (dispatch, getState) => {
   let userInfo = Object.assign({}, getState().authLogin.userLogin);
   userInfo.isRegistered = false;
   dispatch(setUserLogin(userInfo));
-  window.localStorage.setItem('userInfo', JSON.stringify(userInfo));
+  window.localStorage.setItem("userInfo", JSON.stringify(userInfo));
 };
