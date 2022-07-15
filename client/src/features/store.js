@@ -32,6 +32,7 @@ import workspaceJoinSlice from './workspace/workspaceJoinSlice';
 import orderListSlice from './orders/orderListSlice';
 import opportunityManageListSlice from './opportunities/opportunityManageListSlice';
 import { interceptor } from '../common/refractioApi';
+import editProfileSlice from './team/editProfileSlice';
 
 const store = configureStore({
   reducer: {
@@ -67,6 +68,7 @@ const store = configureStore({
     workspaceJoin: workspaceJoinSlice,
     orderList: orderListSlice,
     opportunityManageList: opportunityManageListSlice,
+    editProfile: editProfileSlice,
   },
 });
 

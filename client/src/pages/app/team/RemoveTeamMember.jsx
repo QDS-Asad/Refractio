@@ -27,9 +27,15 @@ const RemoveTeamMember = ({
       dispatch(resetRemoveTeamMember());
     }
   }, [success]);
+
+  const closeModel = () => {
+    setRemoveTeamMember(false);
+    dispatch(resetRemoveTeamMember());
+  };
+
   return (
     <Modal
-      onClose={() => setRemoveTeamMember(false)}
+      onClose={closeModel}
       onOpen={() => setRemoveTeamMember(true)}
       open={removeTeamMember}
       dimmer='blurring'
@@ -48,7 +54,7 @@ const RemoveTeamMember = ({
         </Modal.Description>
       </Modal.Content>
       <Modal.Actions>
-        <Button content='Cancel' onClick={() => setRemoveTeamMember(false)} />
+        <Button content='Cancel' onClick={closeModel} />
         <Button
           content='Remove'
           className='btn-danger'
