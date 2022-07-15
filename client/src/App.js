@@ -25,6 +25,7 @@ import ManageSubscriptions from "./pages/admin/manage-subscriptions/ManageSubscr
 import ManageOpportunities from "./pages/admin/manage-opportunities/ManageOpportunities";
 import ManageContent from "./pages/admin/manage-content/ManageContent";
 import OpportunityResponse from "./pages/app/Opportunities/OpportunityResponse";
+import OpportunityEvaluate from "./pages/app/Opportunities/OpportunityEvaluate";
 const App = () => {
   return (
     <Routes>
@@ -62,6 +63,16 @@ const App = () => {
               roles={[ROLES.ADMIN, ROLES.ORGANIZER, ROLES.PARTICIPANT]}
             >
               <OpportunityResponse />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="opportunityevaluate/:id"
+          element={
+            <ProtectedRoute
+              roles={[ROLES.ADMIN, ROLES.ORGANIZER, ROLES.PARTICIPANT]}
+            >
+              <OpportunityEvaluate />
             </ProtectedRoute>
           }
         />

@@ -46,6 +46,7 @@ const ResponseForm = memo(
               <Button
                 onClick={() => setCurrentQuestion((prev) => prev + 1)}
                 primary
+                disabled={watchAnswer.length <= 0}
                 className="btn float-end"
                 content="Next"
               />

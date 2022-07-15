@@ -1,7 +1,7 @@
 import React from "react";
 import { Button, Modal } from "semantic-ui-react";
 
-const PublishResponse = ({ viewSubmit, setViewSubmit, onSubmittion }) => {
+const PublishEvaluation = ({ viewSubmit, setViewSubmit, onSubmittion }) => {
   return (
     <Modal
       onClose={() => setViewSubmit(false)}
@@ -10,11 +10,10 @@ const PublishResponse = ({ viewSubmit, setViewSubmit, onSubmittion }) => {
       dimmer="blurring"
       size="tiny"
     >
-      <Modal.Header>Submit Response</Modal.Header>
+      <Modal.Header>Submit Evaluation</Modal.Header>
       <Modal.Content scrolling>
         <Modal.Description>
-          Once your response is submitted it cannot be edited. Are you sure you
-          want to submit?
+          Once you submit your evaluation, you won't be able to edit them.
         </Modal.Description>
       </Modal.Content>
       <Modal.Actions>
@@ -32,4 +31,4 @@ const PublishResponse = ({ viewSubmit, setViewSubmit, onSubmittion }) => {
   );
 };
 
-export default PublishResponse;
+export default PublishEvaluation;

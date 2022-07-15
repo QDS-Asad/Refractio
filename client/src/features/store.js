@@ -27,6 +27,7 @@ import changeCardSlice from "./billing/changeCardSlice";
 import subscriptionCancelSlice from "./subscriptions/subscriptionCancelSlice";
 import subscriptionResumeSlice from "./subscriptions/subscriptionResumeSlice";
 import opportunityResponseSlice from "./opportunities/opportunityResponseSlice";
+import opportunityEvaluateSlice from "./opportunities/opportunityEvaluateSlice";
 
 export default configureStore({
   reducer: {
@@ -58,5 +59,6 @@ export default configureStore({
     subscriptionCancel: subscriptionCancelSlice,
     subscriptionResume: subscriptionResumeSlice,
     opportunityResponse: opportunityResponseSlice,
+    opportunityEvaluate: opportunityEvaluateSlice,
   },
 });

@@ -2,71 +2,39 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchOpportunity,
-  opportunityResponseSelector,
-} from "../../../features/opportunities/opportunityResponseSlice";
-import { Button, Form, Grid, Header, Message } from "semantic-ui-react";
+  opportunityEvaluateSelector,
+} from "../../../features/opportunities/opportunityEvaluateSlice";
+import { Button, Grid, Header, Message } from "semantic-ui-react";
 import { useParams } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import ResponseForm from "../../../components/ResponseForm";
-import PublishResponse from "./PublishResponse";
+import EvaluateForm from "../../../components/EvaluateForm";
+import PublishEvaluation from "./PublishEvaluation";
 
-const OpportunityResponse = () => {
+const OpportunityEvaluate = () => {
   const [viewSubmit, setViewSubmit] = useState(false);
   const [viewMessage, setViewMessage] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(1);
-  const [allQuestions, setAllQuestions] = useState([]);
+  const [comprehensionRating, setComprehensionRating] = useState("1");
+  const [ideaRating, setIdeaRating] = useState("1");
   const { id } = useParams();
-  const { register, setValue, handleSubmit, errors, trigger, watch } = useForm({
-    mode: "onBlur",
-  });
 
   // set up dispatch
   const dispatch = useDispatch();
 
   // fetch data from our store
   const { loading, error, opportunity } = useSelector(
-    opportunityResponseSelector
+    opportunityEvaluateSelector
   );
-  const handleChange = (e) => {
-    e.persist();
-    setValue(e.target.name, e.target.value);
-    trigger(e.target.name);
+  const handleComprehensionChange = (e, { value }) => {
+    setComprehensionRating(value);
   };
-
+  const handleIdeaChange = (e, { value }) => {
+    setIdeaRating(value);
+  };
   // hook to fetch items
   useEffect(() => {
     dispatch(fetchOpportunity(id));
   }, [dispatch, id]);
-  useEffect(() => {
-    if (opportunity && opportunity.questions) {
-      setAllQuestions([
-        ...opportunity.questions.quality,
-        ...opportunity.questions.comprehension,
-      ]);
-    }
-  }, [opportunity]);
-  useEffect(() => {
-    if (allQuestions.length > 0) {
-      for (let i = 1; i <= allQuestions.length; i++) {
-        register(
-          { name: `q${i}` },
-          {
-            required: "Answer is required",
-            maxLength: {
-              value: 600,
-              message: "Maximum characters are 600.",
-            },
-          }
-        );
-        setValue((`q${i}`, ""));
-      }
-    }
-  }, [allQuestions]);
 
-  const handleEdit = (data) => {
-    setViewSubmit(true);
-    console.log(data);
-  };
   const onSubmittion = async () => {
     setViewMessage(true);
     setTimeout(() => {
@@ -88,15 +56,13 @@ const OpportunityResponse = () => {
             <Header as="h3" className="primary-dark-color">
               {opportunity.name}
               <Button
-                primary
-                type="submit"
-                form="create-opportunity"
+                onClick={() => setViewSubmit(true)}
                 className="btn-secondary"
                 floated="right"
               >
                 Submit
               </Button>
-              <PublishResponse
+              <PublishEvaluation
                 viewSubmit={viewSubmit}
                 setViewSubmit={setViewSubmit}
                 onSubmittion={onSubmittion}
@@ -111,34 +77,46 @@ const OpportunityResponse = () => {
               </Button>
             </Header>
             <div style={{ padding: "1em" }}>
-              <Form
-                id="create-opportunity"
-                error
-                size="small"
-                onSubmit={handleSubmit(handleEdit)}
-                loading={loading}
-              >
-                {error && (
-                  <Message color="red" className="error-message">
-                    {error}
-                  </Message>
-                )}
-                {allQuestions.map((o, index) => (
-                  <div key={index}>
-                    {currentQuestion === index + 1 && (
-                      <ResponseForm
-                        opportunity={o}
-                        index={index}
-                        handleChange={handleChange}
-                        errors={errors}
-                        watch={watch}
-                        allQuestions={allQuestions.length}
-                        setCurrentQuestion={setCurrentQuestion}
-                      />
-                    )}
-                  </div>
-                ))}
-              </Form>
+              {error && (
+                <Message color="red" className="error-message">
+                  {error}
+                </Message>
+              )}
+              {currentQuestion === 1 ? (
+                <EvaluateForm
+                  handleIdeaChange={handleIdeaChange}
+                  ideaRating={ideaRating}
+                  comprehensionRating={comprehensionRating}
+                  setCurrentQuestion={setCurrentQuestion}
+                  currentQuestion={currentQuestion}
+                  handleComprehensionChange={handleComprehensionChange}
+                  quality={opportunity.questions.quality}
+                  comprehension={opportunity.questions.comprehension}
+                  allQuestions={
+                    [
+                      ...opportunity.questions.quality,
+                      ...opportunity.questions.comprehension,
+                    ].length
+                  }
+                />
+              ) : (
+                <EvaluateForm
+                  handleIdeaChange={handleIdeaChange}
+                  ideaRating={ideaRating}
+                  comprehensionRating={comprehensionRating}
+                  setCurrentQuestion={setCurrentQuestion}
+                  currentQuestion={currentQuestion}
+                  handleComprehensionChange={handleComprehensionChange}
+                  quality={opportunity.questions.quality}
+                  comprehension={opportunity.questions.comprehension}
+                  allQuestions={
+                    [
+                      ...opportunity.questions.quality,
+                      ...opportunity.questions.comprehension,
+                    ].length
+                  }
+                />
+              )}
             </div>
           </Grid.Column>
           <>
@@ -149,7 +127,6 @@ const OpportunityResponse = () => {
               <div className="clearfix">
                 <Header floated="left">Opportunity Information</Header>
               </div>
-
               <Header size="small">
                 Opportunity Name
                 <Header.Subheader className="mt-3">
@@ -170,4 +147,4 @@ const OpportunityResponse = () => {
   );
 };
 
-export default OpportunityResponse;
+export default OpportunityEvaluate;
