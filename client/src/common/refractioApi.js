@@ -38,7 +38,7 @@ export const interceptor = (store) => {
       if (code === 401) {
         store.dispatch(logoutUser());
       }
-      return error;
+      return Promise.reject(error);
     }
   );
 };

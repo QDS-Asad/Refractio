@@ -92,7 +92,7 @@ module.exports = Object.freeze({
     },
     ERROR_MESSAGE:{
         INVALID_EMAIL: "Invalid email",
-        INVALID_TOKEN: "Invalid OTP",
+        INVALID_TOKEN: "Invalid Token",
         INVALID_CREDS: "Invalid Credentials",
         USER_NOT_VERIFIED: "User not verified.",
         DB_NOT_CONNECTED: "Cannot Connect to the Databases.",

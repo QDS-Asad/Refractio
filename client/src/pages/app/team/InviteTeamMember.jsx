@@ -5,6 +5,7 @@ import { Button, Form, Message, Modal } from 'semantic-ui-react';
 import {
   inviteMemberSelector,
   inviteMember,
+  resetInviteTeamMember,
 } from '../../../features/team/inviteMemberSlice';
 import { fetchRoles, roleListSelector } from '../../../features/roles/roleList';
 import { ROLES } from '../../../common/constants';
@@ -59,12 +60,18 @@ const InviteTeamMember = ({ inviteTeamMember, setInviteTeamMember }) => {
   useEffect(() => {
     if (success) {
       setInviteTeamMember(false);
+      dispatch(resetInviteTeamMember());
     }
   }, [success]);
 
+  const closeModel = () => {
+    setInviteTeamMember(false);
+    dispatch(resetInviteTeamMember());
+  };
+
   return (
     <Modal
-      onClose={() => setInviteTeamMember(false)}
+      onClose={closeModel}
       onOpen={() => setInviteTeamMember(true)}
       open={inviteTeamMember}
       dimmer='blurring'

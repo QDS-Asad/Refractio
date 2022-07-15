@@ -161,7 +161,8 @@ const TeamMembers = () => {
                     userLogin.role.roleId === ROLES.ORGANIZER) && (
                     <Table.HeaderCell>Role</Table.HeaderCell>
                   )}
-                  {userLogin.role.roleId === ROLES.ADMIN && (
+                  {(userLogin.role.roleId === ROLES.ADMIN ||
+                    userLogin.role.roleId === ROLES.ORGANIZER) && (
                     <Table.HeaderCell></Table.HeaderCell>
                   )}
                 </Table.Row>
@@ -206,9 +207,11 @@ const TeamMembers = () => {
                         )}
                       </Table.Cell>
                     )}
-                    {userLogin.role.roleId === ROLES.ADMIN && (
+                    {(userLogin.role.roleId === ROLES.ADMIN ||
+                      userLogin.role.roleId === ROLES.ORGANIZER) && (
                       <Table.Cell className='clearfix'>
-                        {userLogin.id !== user._id &&
+                        {userLogin.role.roleId === ROLES.ADMIN &&
+                          userLogin.id !== user._id &&
                           !user.isOwner &&
                           user.status === USER_STATUS.ACTIVE && (
                             <Button
@@ -219,24 +222,29 @@ const TeamMembers = () => {
                               Remove
                             </Button>
                           )}
-                        {user.status === USER_STATUS.INVITE_SENT && (
-                          <>
-                            <Button
-                              className='btn-link'
-                              floated='right'
-                              onClick={() => resendInvitationHandler(user._id)}
-                            >
-                              Resend invitation
-                            </Button>
-                            <Button
-                              className='btn-link'
-                              floated='right'
-                              onClick={() => cancelInvitationHandler(user._id)}
-                            >
-                              Cancel invitation
-                            </Button>
-                          </>
-                        )}
+                        {user.role.roleId >= userLogin.role.roleId &&
+                          user.status === USER_STATUS.INVITE_SENT && (
+                            <>
+                              <Button
+                                className='btn-link'
+                                floated='right'
+                                onClick={() =>
+                                  resendInvitationHandler(user._id)
+                                }
+                              >
+                                Resend invitation
+                              </Button>
+                              <Button
+                                className='btn-link'
+                                floated='right'
+                                onClick={() =>
+                                  cancelInvitationHandler(user._id)
+                                }
+                              >
+                                Cancel invitation
+                              </Button>
+                            </>
+                          )}
                         {userLogin.id === user._id &&
                           user.isOwner &&
                           user.role.roleId === ROLES.ADMIN && (

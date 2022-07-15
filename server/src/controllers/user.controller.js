@@ -762,7 +762,7 @@ exports.forgetPassword = async (req, res) => {
       })
       .catch((error) => {
         return errorResp(res, {
-          msg: ERROR_MESSAGE.NOT_FOUND,
+          msg: ERROR_MESSAGE.INVALID_EMAIL,
           code: HTTP_STATUS.NOT_FOUND.CODE,
         });
       });
@@ -799,7 +799,7 @@ exports.resetPassword = async (req, res) => {
       })
       .catch((error) => {
         errorResp(res, {
-          msg: ERROR_MESSAGE.NOT_FOUND,
+          msg: ERROR_MESSAGE.INVALID_TOKEN,
           code: HTTP_STATUS.NOT_FOUND.CODE,
         });
       });

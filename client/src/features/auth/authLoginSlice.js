@@ -72,6 +72,7 @@ export const loginUser = (email, password, rememberMe = false) => async (
       password,
       rememberMe,
     });
+
     dispatch(setUserLogin(response.data));
     window.localStorage.setItem('userInfo', JSON.stringify(response.data));
   } catch (error) {
@@ -93,6 +94,17 @@ export const logoutUser = () => async (dispatch) => {
 export const updateUserStatus = () => async (dispatch, getState) => {
   let userInfo = Object.assign({}, getState().authLogin.userLogin);
   userInfo.isRegistered = false;
+  dispatch(setUserLogin(userInfo));
+  window.localStorage.setItem('userInfo', JSON.stringify(userInfo));
+};
+
+export const updateUserProfile = (firstName, lastName) => async (
+  dispatch,
+  getState
+) => {
+  let userInfo = Object.assign({}, getState().authLogin.userLogin);
+  userInfo.firstName = firstName;
+  userInfo.lastName = lastName;
   dispatch(setUserLogin(userInfo));
   window.localStorage.setItem('userInfo', JSON.stringify(userInfo));
 };

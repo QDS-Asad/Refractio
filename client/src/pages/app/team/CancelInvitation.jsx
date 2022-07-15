@@ -4,6 +4,7 @@ import { Button, Message, Modal } from 'semantic-ui-react';
 import {
   cancelMember,
   cancelMemberSelector,
+  resetCancelInvite,
 } from '../../../features/team/cancelMemberSlice';
 
 const CancelInvitation = ({
@@ -23,12 +24,18 @@ const CancelInvitation = ({
   useEffect(() => {
     if (success) {
       setCancelInvitation(false);
+      dispatch(resetCancelInvite());
     }
   }, [success]);
 
+  const closeModel = () => {
+    setCancelInvitation(false);
+    dispatch(resetCancelInvite());
+  };
+
   return (
     <Modal
-      onClose={() => setCancelInvitation(false)}
+      onClose={closeModel}
       onOpen={() => setCancelInvitation(true)}
       open={cancelInvitation}
       dimmer='blurring'
@@ -47,7 +54,7 @@ const CancelInvitation = ({
         </Modal.Description>
       </Modal.Content>
       <Modal.Actions>
-        <Button content='No' onClick={() => setCancelInvitation(false)} />
+        <Button content='No' onClick={closeModel} />
         <Button
           content='Yes'
           className='btn-danger'
