@@ -15,6 +15,7 @@ const authVerifyMemberSlice = createSlice({
   reducers: {
     setLoading: (state) => {
       state.loading = true;
+      state.error = null;
     },
     setVerifyMember: (state, { payload }) => {
       state.loading = false;

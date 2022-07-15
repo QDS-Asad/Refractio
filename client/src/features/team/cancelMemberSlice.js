@@ -15,6 +15,8 @@ const cancelMemberSlice = createSlice({
   reducers: {
     setLoading: (state) => {
       state.loading = true;
+      state.error = null;
+      state.success = false;
     },
     setSuccess: (state, { payload }) => {
       state.loading = false;
@@ -27,7 +29,7 @@ const cancelMemberSlice = createSlice({
     },
     reset: (state) => {
       state.loading = false;
-      state.error = false;
+      state.error = null;
       state.success = false;
     },
   },
@@ -61,4 +63,8 @@ export const cancelMember = (member) => async (dispatch) => {
         : error.message;
     dispatch(setError(errorMessage));
   }
+};
+
+export const resetCancelInvite = () => async (dispatch) => {
+  dispatch(reset());
 };

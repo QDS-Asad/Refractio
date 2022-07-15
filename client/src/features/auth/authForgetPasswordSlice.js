@@ -15,6 +15,7 @@ const authForgetPasswordSlice = createSlice({
   reducers: {
     setLoading: (state) => {
       state.loading = true;
+      state.error = null;
     },
     setForgetPassword: (state, { payload }) => {
       state.loading = false;

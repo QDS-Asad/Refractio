@@ -4,6 +4,7 @@ import { Button, Message, Modal } from 'semantic-ui-react';
 import {
   cancelMember,
   cancelMemberSelector,
+  resetCancelInvite,
 } from '../../../features/team/cancelMemberSlice';
 
 const CancelInvitation = ({
@@ -23,6 +24,7 @@ const CancelInvitation = ({
   useEffect(() => {
     if (success) {
       setCancelInvitation(false);
+      dispatch(resetCancelInvite());
     }
   }, [success]);
 
