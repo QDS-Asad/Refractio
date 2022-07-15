@@ -28,9 +28,14 @@ const CancelInvitation = ({
     }
   }, [success]);
 
+  const closeModel = () => {
+    setCancelInvitation(false);
+    dispatch(resetCancelInvite());
+  };
+
   return (
     <Modal
-      onClose={() => setCancelInvitation(false)}
+      onClose={closeModel}
       onOpen={() => setCancelInvitation(true)}
       open={cancelInvitation}
       dimmer='blurring'
@@ -49,7 +54,7 @@ const CancelInvitation = ({
         </Modal.Description>
       </Modal.Content>
       <Modal.Actions>
-        <Button content='No' onClick={() => setCancelInvitation(false)} />
+        <Button content='No' onClick={closeModel} />
         <Button
           content='Yes'
           className='btn-danger'

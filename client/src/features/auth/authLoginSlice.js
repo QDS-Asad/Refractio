@@ -97,3 +97,14 @@ export const updateUserStatus = () => async (dispatch, getState) => {
   dispatch(setUserLogin(userInfo));
   window.localStorage.setItem('userInfo', JSON.stringify(userInfo));
 };
+
+export const updateUserProfile = (firstName, lastName) => async (
+  dispatch,
+  getState
+) => {
+  let userInfo = Object.assign({}, getState().authLogin.userLogin);
+  userInfo.firstName = firstName;
+  userInfo.lastName = lastName;
+  dispatch(setUserLogin(userInfo));
+  window.localStorage.setItem('userInfo', JSON.stringify(userInfo));
+};
