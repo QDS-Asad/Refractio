@@ -18,6 +18,8 @@ const teamListSlice = createSlice({
   reducers: {
     setLoading: (state) => {
       state.loading = true;
+      state.members = [];
+      state.error = null;
     },
     setTeamList: (state, { payload }) => {
       state.loading = false;

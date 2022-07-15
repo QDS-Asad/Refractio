@@ -25,6 +25,7 @@ const authRegisterSlice = createSlice({
   reducers: {
     setLoading: (state) => {
       state.loading = true;
+      state.error = null;
     },
     setUserRegister: (state, { payload }) => {
       state.loading = false;

@@ -1,7 +1,11 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Message, Modal } from 'semantic-ui-react';
-import { removeMember, removeMemberSelector } from '../../../features/team/removeMemberSlice';
+import {
+  removeMember,
+  removeMemberSelector,
+  resetRemoveTeamMember,
+} from '../../../features/team/removeMemberSlice';
 
 const RemoveTeamMember = ({
   removeTeamMember,
@@ -20,6 +24,7 @@ const RemoveTeamMember = ({
   useEffect(() => {
     if (success) {
       setRemoveTeamMember(false);
+      dispatch(resetRemoveTeamMember());
     }
   }, [success]);
   return (
