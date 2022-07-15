@@ -27,9 +27,14 @@ const ChangeRole = ({
     }
   }, [success]);
 
+  const closeModel = () => {
+    setChangeMemberRole(false);
+    dispatch(resetChangeRole());
+  };
+
   return (
     <Modal
-      onClose={() => setChangeMemberRole(false)}
+      onClose={closeModel}
       onOpen={() => setChangeMemberRole(true)}
       open={changeMemberRole}
       dimmer='blurring'
@@ -48,7 +53,7 @@ const ChangeRole = ({
         </Modal.Description>
       </Modal.Content>
       <Modal.Actions>
-        <Button content='Cancel' onClick={() => setChangeMemberRole(false)} />
+        <Button content='Cancel' onClick={closeModel} />
         <Button
           content='Change'
           className='btn'

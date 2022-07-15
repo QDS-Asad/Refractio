@@ -64,9 +64,14 @@ const InviteTeamMember = ({ inviteTeamMember, setInviteTeamMember }) => {
     }
   }, [success]);
 
+  const closeModel = () => {
+    setInviteTeamMember(false);
+    dispatch(resetInviteTeamMember());
+  };
+
   return (
     <Modal
-      onClose={() => setInviteTeamMember(false)}
+      onClose={closeModel}
       onOpen={() => setInviteTeamMember(true)}
       open={inviteTeamMember}
       dimmer='blurring'

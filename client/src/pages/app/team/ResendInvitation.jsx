@@ -27,9 +27,15 @@ const ResendInvitation = ({
       dispatch(resetResendInvite());
     }
   }, [success]);
+
+  const closeModel = () => {
+    setResendInvitation(false);
+    dispatch(resetResendInvite());
+  };
+
   return (
     <Modal
-      onClose={() => setResendInvitation(false)}
+      onClose={closeModel}
       onOpen={() => setResendInvitation(true)}
       open={resendInvitation}
       dimmer='blurring'
@@ -48,7 +54,7 @@ const ResendInvitation = ({
         </Modal.Description>
       </Modal.Content>
       <Modal.Actions>
-        <Button content='No' onClick={() => setResendInvitation(false)} />
+        <Button content='No' onClick={closeModel} />
         <Button
           content='Yes'
           className='btn'
