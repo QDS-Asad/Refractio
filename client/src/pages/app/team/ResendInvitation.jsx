@@ -4,6 +4,7 @@ import { Button, Message, Modal } from 'semantic-ui-react';
 import {
   resendInviteMember,
   resendInviteMemberSelector,
+  resetResendInvite,
 } from '../../../features/team/resendInviteMemberSlice';
 
 const ResendInvitation = ({
@@ -23,6 +24,7 @@ const ResendInvitation = ({
   useEffect(() => {
     if (success) {
       setResendInvitation(false);
+      dispatch(resetResendInvite());
     }
   }, [success]);
   return (

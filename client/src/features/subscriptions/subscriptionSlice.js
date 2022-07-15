@@ -50,7 +50,9 @@ export default subscriptionSlice.reducer;
 export const userSubscription = (userId, body) => async (dispatch) => {
   try {
     dispatch(setLoading());
-    await refractioApi.put(`/users/subscribe/${userId}`, body);
+    await refractioApi.put(`/users/subscribe/${userId}`, {
+      ...body,
+    });
     dispatch(setSubscription(true));
   } catch (error) {
     const errorMessage =

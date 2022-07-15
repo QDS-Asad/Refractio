@@ -119,7 +119,7 @@ const Subscription = () => {
     cardExpiry: {
       required: 'Card expiry is required',
       pattern: {
-        value: /^(0[1-9]|1[0-2])\/?([0-9]{2})$/,
+        value: /^(0[1-9]|1[0-2])\/([0-9]{2})$/,
         message: 'Invalid expiry date.',
       },
     },
@@ -354,6 +354,7 @@ const Subscription = () => {
                         label='Autorenewal subscription'
                         name='autoRenew'
                         onBlur={handleChangeCheckBox}
+                        defaultChecked={true}
                       />
                     </Form.Field>
                     <Button type='submit' fluid primary className='mt-3 btn'>

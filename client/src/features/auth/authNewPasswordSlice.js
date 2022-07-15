@@ -15,6 +15,7 @@ const authNewPasswordSlice = createSlice({
   reducers: {
     setLoading: (state) => {
       state.loading = true;
+      state.error = null;
     },
     setNewPassword: (state, { payload }) => {
       state.loading = false;

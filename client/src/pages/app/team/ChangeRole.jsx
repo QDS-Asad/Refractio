@@ -4,6 +4,7 @@ import { Button, Message, Modal } from 'semantic-ui-react';
 import {
   changeMemberRoleSelector,
   changeRole,
+  resetChangeRole,
 } from '../../../features/team/changeMemberRoleSlice';
 
 const ChangeRole = ({
@@ -22,6 +23,7 @@ const ChangeRole = ({
   useEffect(() => {
     if (success) {
       setChangeMemberRole(false);
+      dispatch(resetChangeRole());
     }
   }, [success]);
 
