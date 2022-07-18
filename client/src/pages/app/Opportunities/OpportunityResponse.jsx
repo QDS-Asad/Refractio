@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchOpportunity,
   opportunityResponseSelector,
-} from "../../../features/opportunities/opportunityResponseSlice";
-import { Button, Form, Grid, Header, Message } from "semantic-ui-react";
-import { useParams } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import ResponseForm from "../../../components/ResponseForm";
-import PublishResponse from "./PublishResponse";
+} from '../../../features/opportunities/opportunityResponseSlice';
+import { Button, Form, Grid, Header, Message } from 'semantic-ui-react';
+import { useParams } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import ResponseForm from '../../../components/ResponseForm';
+import PublishResponse from './PublishResponse';
 
 const OpportunityResponse = () => {
   const [viewSubmit, setViewSubmit] = useState(false);
@@ -17,7 +17,7 @@ const OpportunityResponse = () => {
   const [allQuestions, setAllQuestions] = useState([]);
   const { id } = useParams();
   const { register, setValue, handleSubmit, errors, trigger, watch } = useForm({
-    mode: "onBlur",
+    mode: 'onBlur',
   });
 
   // set up dispatch
@@ -51,14 +51,14 @@ const OpportunityResponse = () => {
         register(
           { name: `q${i}` },
           {
-            required: "Answer is required",
+            required: 'Answer is required',
             maxLength: {
               value: 600,
-              message: "Maximum characters are 600.",
+              message: 'Maximum characters are 600.',
             },
           }
         );
-        setValue((`q${i}`, ""));
+        setValue((`q${i}`, ''));
       }
     }
   }, [allQuestions]);
@@ -81,18 +81,18 @@ const OpportunityResponse = () => {
             {viewMessage && (
               <Message
                 positive
-                content="Your response has been saved."
-                className="error-message mb-3"
+                content='Your response has been saved.'
+                className='error-message mb-3'
               />
             )}
-            <Header as="h3" className="primary-dark-color">
+            <Header as='h3' className='primary-dark-color'>
               {opportunity.name}
               <Button
                 primary
-                type="submit"
-                form="create-opportunity"
-                className="btn-secondary"
-                floated="right"
+                type='submit'
+                form='create-opportunity'
+                className='btn-secondary'
+                floated='right'
               >
                 Submit
               </Button>
@@ -104,22 +104,22 @@ const OpportunityResponse = () => {
               <Button
                 onClick={onSubmittion}
                 primary
-                className="btn-outline me-3"
-                floated="right"
+                className='btn-outline me-3'
+                floated='right'
               >
                 Save as Draft
               </Button>
             </Header>
-            <div style={{ padding: "1em" }}>
+            <div style={{ padding: '1em' }}>
               <Form
-                id="create-opportunity"
+                id='create-opportunity'
                 error
-                size="small"
+                size='small'
                 onSubmit={handleSubmit(handleEdit)}
                 loading={loading}
               >
                 {error && (
-                  <Message color="red" className="error-message">
+                  <Message color='red' className='error-message'>
                     {error}
                   </Message>
                 )}
@@ -144,21 +144,21 @@ const OpportunityResponse = () => {
           <>
             <Grid.Column
               width={5}
-              style={{ backgroundColor: "#EDF1F6", height: "100%" }}
+              style={{ backgroundColor: '#EDF1F6', height: '100%' }}
             >
-              <div className="clearfix">
-                <Header floated="left">Opportunity Information</Header>
+              <div className='clearfix'>
+                <Header floated='left'>Opportunity Information</Header>
               </div>
 
-              <Header size="small">
+              <Header size='small'>
                 Opportunity Name
-                <Header.Subheader className="mt-3">
+                <Header.Subheader className='mt-3'>
                   {opportunity.name}
                 </Header.Subheader>
               </Header>
-              <Header size="small">
+              <Header size='small'>
                 Description
-                <Header.Subheader className="mt-3">
+                <Header.Subheader className='mt-3'>
                   {opportunity.description}
                 </Header.Subheader>
               </Header>

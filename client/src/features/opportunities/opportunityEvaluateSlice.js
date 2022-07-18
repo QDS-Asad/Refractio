@@ -1,5 +1,5 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { localAPI } from "../../common/refractioApi";
+import { createSlice } from '@reduxjs/toolkit';
+import { localAPI } from '../../common/refractioApi';
 
 // initial state
 export const initialState = {
@@ -10,7 +10,7 @@ export const initialState = {
 
 // our slice
 const opportunityEvaluateSlice = createSlice({
-  name: "opportunityEvaluate",
+  name: 'opportunityEvaluate',
   initialState,
   reducers: {
     setLoading: (state) => {
@@ -28,8 +28,11 @@ const opportunityEvaluateSlice = createSlice({
   },
 });
 // export the actions
-export const { setLoading, setOpportunity, setError } =
-  opportunityEvaluateSlice.actions;
+export const {
+  setLoading,
+  setOpportunity,
+  setError,
+} = opportunityEvaluateSlice.actions;
 
 // export the selector (".items" being same as in slices/index.js's "items: something")
 export const opportunityEvaluateSelector = (state) => state.opportunityEvaluate;
@@ -41,7 +44,7 @@ export default opportunityEvaluateSlice.reducer;
 export const fetchOpportunity = (id) => async (dispatch) => {
   try {
     dispatch(setLoading());
-    let { data } = await localAPI.get("/opportunities.json");
+    let { data } = await localAPI.get('/opportunities.json');
     let opportunity = data.find((o) => o._id === id);
     if (opportunity) {
       setTimeout(() => {
@@ -49,7 +52,7 @@ export const fetchOpportunity = (id) => async (dispatch) => {
       }, 1500);
     } else {
       setTimeout(() => {
-        dispatch(setError("Opportunity not found."));
+        dispatch(setError('Opportunity not found.'));
       }, 1500);
     }
   } catch (error) {

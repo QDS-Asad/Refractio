@@ -1,5 +1,5 @@
-import React from "react";
-import { Button, Modal } from "semantic-ui-react";
+import React from 'react';
+import { Button, Modal } from 'semantic-ui-react';
 
 const PublishResponse = ({ viewSubmit, setViewSubmit, onSubmittion }) => {
   return (
@@ -7,8 +7,8 @@ const PublishResponse = ({ viewSubmit, setViewSubmit, onSubmittion }) => {
       onClose={() => setViewSubmit(false)}
       onOpen={() => setViewSubmit(true)}
       open={viewSubmit}
-      dimmer="blurring"
-      size="tiny"
+      dimmer='blurring'
+      size='tiny'
     >
       <Modal.Header>Submit Response</Modal.Header>
       <Modal.Content scrolling>
@@ -18,14 +18,14 @@ const PublishResponse = ({ viewSubmit, setViewSubmit, onSubmittion }) => {
         </Modal.Description>
       </Modal.Content>
       <Modal.Actions>
-        <Button content="Cancel" onClick={() => setViewSubmit(false)} />
+        <Button content='Cancel' onClick={() => setViewSubmit(false)} />
         <Button
-          content="Submit"
+          content='Submit'
           onClick={() => {
             setViewSubmit(false);
             onSubmittion();
           }}
-          className="btn"
+          className='btn'
         />
       </Modal.Actions>
     </Modal>

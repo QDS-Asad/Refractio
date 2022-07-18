@@ -1,58 +1,58 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import React from "react";
-import Login from "./pages/auth/Login";
-import Register from "./pages/auth/Register";
-import InviteAccount from "./pages/auth/InviteAccount";
-import VerificationCode from "./pages/auth/VerificationCode";
-import PasswordRecover from "./pages/auth/PasswordRecover";
-import NewPassword from "./pages/auth/NewPassword";
-import Auth from "./pages/auth/Auth";
-import AppLayout from "./layouts/AppLayout";
-import Opportunities from "./pages/app/Opportunities/Opportunities";
-import OpportunityDetail from "./pages/app/Opportunities/OpportunityDetail";
-import OpportunityEdit from "./pages/app/Opportunities/OpportunityEdit";
-import SubscriptionLayout from "./layouts/SubscriptionLayout";
-import Subscription from "./pages/subscription/Subscription";
-import TeamMembers from "./pages/app/team/TeamMembers";
-import Billing from "./pages/app/billing/Billing";
-import Forbidden from "./pages/misc/Forbidden";
-import NotFound from "./pages/misc/NotFound";
-import { ROLES } from "./common/constants";
-import ProtectedRoute from "./components/ProtectedRoute";
-import ManageUsers from "./pages/admin/manage-user/ManageUsers";
-import ManageOrders from "./pages/admin/manage-orders/ManageOrders";
-import ManageSubscriptions from "./pages/admin/manage-subscriptions/ManageSubscriptions";
-import ManageOpportunities from "./pages/admin/manage-opportunities/ManageOpportunities";
-import ManageContent from "./pages/admin/manage-content/ManageContent";
-import OpportunityResponse from "./pages/app/Opportunities/OpportunityResponse";
-import OpportunityEvaluate from "./pages/app/Opportunities/OpportunityEvaluate";
-import WorkspaceLayout from "./layouts/WorkspaceLayout";
-import WorkspaceSelection from "./pages/workspaces/WorkspaceSelection";
+import { Routes, Route, Navigate } from 'react-router-dom';
+import React from 'react';
+import Login from './pages/auth/Login';
+import Register from './pages/auth/Register';
+import InviteAccount from './pages/auth/InviteAccount';
+import VerificationCode from './pages/auth/VerificationCode';
+import PasswordRecover from './pages/auth/PasswordRecover';
+import NewPassword from './pages/auth/NewPassword';
+import Auth from './pages/auth/Auth';
+import AppLayout from './layouts/AppLayout';
+import Opportunities from './pages/app/Opportunities/Opportunities';
+import OpportunityDetail from './pages/app/Opportunities/OpportunityDetail';
+import OpportunityEdit from './pages/app/Opportunities/OpportunityEdit';
+import SubscriptionLayout from './layouts/SubscriptionLayout';
+import Subscription from './pages/subscription/Subscription';
+import TeamMembers from './pages/app/team/TeamMembers';
+import Billing from './pages/app/billing/Billing';
+import Forbidden from './pages/misc/Forbidden';
+import NotFound from './pages/misc/NotFound';
+import { ROLES } from './common/constants';
+import ProtectedRoute from './components/ProtectedRoute';
+import ManageUsers from './pages/admin/manage-user/ManageUsers';
+import ManageOrders from './pages/admin/manage-orders/ManageOrders';
+import ManageSubscriptions from './pages/admin/manage-subscriptions/ManageSubscriptions';
+import ManageOpportunities from './pages/admin/manage-opportunities/ManageOpportunities';
+import ManageContent from './pages/admin/manage-content/ManageContent';
+import OpportunityResponse from './pages/app/Opportunities/OpportunityResponse';
+import OpportunityEvaluate from './pages/app/Opportunities/OpportunityEvaluate';
+import WorkspaceLayout from './layouts/WorkspaceLayout';
+import WorkspaceSelection from './pages/workspaces/WorkspaceSelection';
 const App = () => {
   return (
     <Routes>
-      <Route path="auth" element={<Auth />}>
-        <Route path="" element={<Navigate replace to="login" />} />
-        <Route path="login" element={<Login />} />
-        <Route path="register" element={<Register />} />
-        <Route path="new-password/:token" element={<NewPassword />} />
-        <Route path="password-recover" element={<PasswordRecover />} />
-        <Route path="verify-code" element={<VerificationCode />} />
-        <Route path="invite-account/:token" element={<InviteAccount />} />
+      <Route path='auth' element={<Auth />}>
+        <Route path='' element={<Navigate replace to='login' />} />
+        <Route path='login' element={<Login />} />
+        <Route path='register' element={<Register />} />
+        <Route path='new-password/:token' element={<NewPassword />} />
+        <Route path='password-recover' element={<PasswordRecover />} />
+        <Route path='verify-code' element={<VerificationCode />} />
+        <Route path='invite-account/:token' element={<InviteAccount />} />
       </Route>
-      <Route path="subscription" element={<SubscriptionLayout />}>
-        <Route path="" element={<Subscription />} />
+      <Route path='subscription' element={<SubscriptionLayout />}>
+        <Route path='' element={<Subscription />} />
       </Route>
-      <Route path="workspaces" element={<WorkspaceLayout />}>
-        <Route path="" element={<WorkspaceSelection />} />
+      <Route path='workspaces' element={<WorkspaceLayout />}>
+        <Route path='' element={<WorkspaceSelection />} />
       </Route>
-      <Route path="" element={<AppLayout />}>
+      <Route path='' element={<AppLayout />}>
         <Route
-          path=""
-          element={<Navigate replace to="opportunities" />}
+          path=''
+          element={<Navigate replace to='opportunities' />}
         ></Route>
         <Route
-          path="opportunities"
+          path='opportunities'
           element={
             <ProtectedRoute
               roles={[ROLES.ADMIN, ROLES.ORGANIZER, ROLES.PARTICIPANT]}
@@ -62,7 +62,7 @@ const App = () => {
           }
         />
         <Route
-          path="opportunityresponse/:id"
+          path='opportunityresponse/:id'
           element={
             <ProtectedRoute
               roles={[ROLES.ADMIN, ROLES.ORGANIZER, ROLES.PARTICIPANT]}
@@ -72,7 +72,7 @@ const App = () => {
           }
         />
         <Route
-          path="opportunityevaluate/:id"
+          path='opportunityevaluate/:id'
           element={
             <ProtectedRoute
               roles={[ROLES.ADMIN, ROLES.ORGANIZER, ROLES.PARTICIPANT]}
@@ -82,7 +82,7 @@ const App = () => {
           }
         />
         <Route
-          path="opportunities/:id"
+          path='opportunities/:id'
           element={
             <ProtectedRoute
               roles={[ROLES.ADMIN, ROLES.ORGANIZER, ROLES.PARTICIPANT]}
@@ -92,7 +92,7 @@ const App = () => {
           }
         />
         <Route
-          path="opportunities/:id/edit"
+          path='opportunities/:id/edit'
           element={
             <ProtectedRoute
               roles={[ROLES.ADMIN, ROLES.ORGANIZER, ROLES.PARTICIPANT]}
@@ -102,7 +102,7 @@ const App = () => {
           }
         />
         <Route
-          path="team"
+          path='team'
           element={
             <ProtectedRoute
               roles={[ROLES.ADMIN, ROLES.ORGANIZER, ROLES.PARTICIPANT]}
@@ -112,7 +112,7 @@ const App = () => {
           }
         />
         <Route
-          path="billing"
+          path='billing'
           element={
             <ProtectedRoute roles={[ROLES.ADMIN]}>
               <Billing />
@@ -120,10 +120,10 @@ const App = () => {
           }
         />
       </Route>
-      <Route path="admin" element={<AppLayout />}>
-        <Route path="" element={<Navigate replace to="users" />} />
+      <Route path='admin' element={<AppLayout />}>
+        <Route path='' element={<Navigate replace to='users' />} />
         <Route
-          path="users"
+          path='users'
           element={
             <ProtectedRoute roles={[ROLES.SUPER_ADMIN]}>
               <ManageUsers />
@@ -131,7 +131,7 @@ const App = () => {
           }
         />
         <Route
-          path="orders"
+          path='orders'
           element={
             <ProtectedRoute roles={[ROLES.SUPER_ADMIN]}>
               <ManageOrders />
@@ -139,7 +139,7 @@ const App = () => {
           }
         />
         <Route
-          path="subscriptions"
+          path='subscriptions'
           element={
             <ProtectedRoute roles={[ROLES.SUPER_ADMIN]}>
               <ManageSubscriptions />
@@ -147,7 +147,7 @@ const App = () => {
           }
         />
         <Route
-          path="opportunities"
+          path='opportunities'
           element={
             <ProtectedRoute roles={[ROLES.SUPER_ADMIN]}>
               <ManageOpportunities />
@@ -155,7 +155,7 @@ const App = () => {
           }
         />
         <Route
-          path="content"
+          path='content'
           element={
             <ProtectedRoute roles={[ROLES.SUPER_ADMIN]}>
               <ManageContent />
@@ -163,8 +163,8 @@ const App = () => {
           }
         />
       </Route>
-      <Route path="forbidden" element={<Forbidden />} />
-      <Route path="notfound" element={<NotFound />} />
+      <Route path='forbidden' element={<Forbidden />} />
+      <Route path='notfound' element={<NotFound />} />
     </Routes>
   );
 };

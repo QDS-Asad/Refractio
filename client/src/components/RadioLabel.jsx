@@ -1,5 +1,5 @@
-import React, { memo } from "react";
-import { Radio } from "semantic-ui-react";
+import React, { memo } from 'react';
+import { Radio } from 'semantic-ui-react';
 
 function RadioLabel({
   options,
@@ -10,16 +10,16 @@ function RadioLabel({
   handleIdeaChange,
 }) {
   return (
-    <div style={{ display: "flex", justifyContent: "space-around" }}>
+    <div style={{ display: 'flex', justifyContent: 'space-around' }}>
       {options.map((option, index) => (
         <div
           style={{
-            display: "flex",
-            flexDirection: "column",
+            display: 'flex',
+            flexDirection: 'column',
           }}
           key={index}
         >
-          <div style={{ alignSelf: "center" }}>
+          <div style={{ alignSelf: 'center' }}>
             {currentQuestion === 1 ? (
               <Radio
                 key={option.key}
@@ -36,7 +36,7 @@ function RadioLabel({
               />
             )}
           </div>
-          <div style={{ alignSelf: "center" }}>{option.text}</div>
+          <div style={{ alignSelf: 'center' }}>{option.text}</div>
           <div>{option.subText}</div>
         </div>
       ))}
