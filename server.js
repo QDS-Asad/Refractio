@@ -9,6 +9,7 @@ const constants = require('./server/src/lib/constants');
 const swagger = require('./server/src/lib/swagger');
 const plans = require('./server/src/routes/plan.routes');
 const users = require('./server/src/routes/user.routes');
+const opportunities = require('./server/src/routes/opportunity.routes');
 const roles = require('./server/src/routes/role.routes');
 const { HTTP_STATUS, ERROR_MESSAGE } = require('./server/src/lib/constants');
 const { errorResp } = require('./server/src/helpers/error_helper');
@@ -33,6 +34,7 @@ app.get('/api/status', (req, res) => {
 });
 
 app.use('/api/users', users);
+app.use('/api/opportunities', opportunities);
 app.use('/api/roles', roles);
 app.use('/api', plans);
 

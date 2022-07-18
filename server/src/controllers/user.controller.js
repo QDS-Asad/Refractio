@@ -2107,6 +2107,29 @@ exports.getTeamAdmins = async (req, res, next) => {
 }
 };
 
+exports.getTeamMembers = async (req, res, next) => {
+  try {
+    const {user} = req.body;
+    await TeamService.getTeamMembers(user).then((userRes) => {
+      console.log(userRes);
+    return successResp(res, {
+      msg: SUCCESS_MESSAGE.DATA_FETCHED,
+      code: HTTP_STATUS.SUCCESS.CODE,
+      data: userRes
+    });
+    }).catch((error) => {
+      errorResp(res, {
+        msg: ERROR_MESSAGE.NOT_FOUND,
+        code: HTTP_STATUS.NOT_FOUND.CODE,
+      });
+    });
+    
+} catch (error) {
+  console.log(error);
+  serverError(res, error);
+}
+};
+
 const usersByTeam = async (teamId) => {
   return await TeamService.getUsersByTeamId(teamId);
 };
