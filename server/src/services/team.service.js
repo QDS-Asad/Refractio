@@ -30,18 +30,23 @@ exports.getTeam = async (obj) => {
     },
     select: {
       stripeDetails: 0,
-      password:0,
-      token:0,
-      autoRenew:0,
-      tokenExpiry:0,
-      createdBy:0,
-      updatedBy:0
+      password: 0,
+      token: 0,
+      autoRenew: 0,
+      tokenExpiry: 0,
+      createdBy: 0,
+      updatedBy: 0,
     },
   };
   return await User.paginate(
     {
       // ...(!user.isOwner && {_id: {$nin: OwnerId}}),
-      "teams": { $elemMatch: {teamId: ObjectId(teamId), status: { $nin: USER_STATUS.DISABLED }}},
+      teams: {
+        $elemMatch: {
+          teamId: ObjectId(teamId),
+          status: { $nin: USER_STATUS.DISABLED },
+        },
+      },
       // "teams.teamId": ObjectId(teamId),
       // "teams.roleId": { $in: roleIds },
       // "teams.status": { $nin: USER_STATUS.DISABLED },
@@ -51,9 +56,29 @@ exports.getTeam = async (obj) => {
 };
 
 exports.getUsersByTeamId = async (teamId) => {
-  return await user.find({"teams": { $elemMatch: {teamId: ObjectId(teamId), status: { $nin: USER_STATUS.DISABLED }}}});
-}
+  return await User.find({
+    teams: {
+      $elemMatch: {
+        teamId: ObjectId(teamId),
+        status: { $nin: USER_STATUS.DISABLED },
+      },
+    },
+  });
+};
+
+exports.getUsersByTeamIdRoleId = async (user) => {
+  return await User.find({
+    _id: { $nin: user._id },
+    teams: {
+      $elemMatch: {
+        teamId: ObjectId(user.teamId),
+        roleId: ObjectId(user.roleId),
+        status: { $nin: USER_STATUS.DISABLED },
+      },
+    },
+  }).select({ _id: 1, firstName: 1, lastName: 1, email: 1 });
+};
 
 exports.getUserSelectedTeamByTeamId = (user, teamId) => {
   return user.teams.find((obj) => obj.teamId.toString() === teamId);
-}
+};

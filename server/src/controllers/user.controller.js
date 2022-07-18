@@ -1353,6 +1353,118 @@ exports.changePaymentMethod = async (req, res, next) => {
   }
 };
 
+// add payment method
+exports.addPaymentMethod = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const { user } = req.body;
+    const userInfo = await UserService.getUserById(userId);
+    BillingService.paymentMethod(req.body)
+      .then(async (paymentMethodRes) => {
+        const paymentMethod = {
+          paymentMethodId: paymentMethodRes.id,
+          type: paymentMethodRes.type,
+          brand: paymentMethodRes.card.brand,
+          expMonth: paymentMethodRes.card.exp_month,
+          expYear: paymentMethodRes.card.exp_year,
+          last4Digits: paymentMethodRes.card.last4,
+        };
+        console.log(userInfo, "customer id - ", userInfo.customerId);
+        if (!userInfo.customerId) {
+          console.log("in update customer");
+          BillingService.createStripeCustomer({
+            request: req.body,
+            paymentMethod: paymentMethodRes,
+            userInfo,
+          })
+            .then(async (stripeCustomerRes) => {
+              const teamInfo = await TeamService.getUserSelectedTeamByTeamId(
+                userInfo,
+                user.teamId
+              );
+              const reqBody = {
+                priceId: teamInfo.stripeDetails.subscription.priceId,
+                autoRenew: req.body.autoRenew,
+              };
+              await BillingService.createSubscription({
+                request: reqBody,
+                customerId: stripeCustomerRes.customerId,
+              })
+                .then(async (subscriptionRes) => {
+                  console.log(subscriptionRes);
+                  const subscription = {
+                    subscriptionId: subscriptionRes.id,
+                    planId: teamInfo.stripeDetails.subscription.planId,
+                    priceId: teamInfo.stripeDetails.subscription.priceId,
+                    startDate: subscriptionRes.current_period_start,
+                    endDate: subscriptionRes.current_period_end,
+                    canceledDate: subscriptionRes.cancel_at,
+                    status:
+                      (subscriptionRes.cancel_at &&
+                        SUBSCRIPTION_STATUS.CANCELED) ||
+                      subscriptionRes.status,
+                    autoRenew: req.body.autoRenew,
+                  };
+                  const userTeamIndex = userInfo.teams.findIndex(
+                    (team) => team.teamId.toString() == user.teamId
+                  );
+                  if (userTeamIndex >= 0) {
+                    const stripeDetails = {
+                      ...teamInfo.stripeDetails,
+                      subscription,
+                    };
+                    console.log(subscription, stripeDetails, "---");
+                    userInfo.teams[userTeamIndex] = {
+                      teamId: userInfo.teams[userTeamIndex].teamId,
+                      status: userInfo.teams[userTeamIndex].status,
+                      roleId: userInfo.teams[userTeamIndex].roleId,
+                      stripeDetails,
+                    };
+                    await UserService.updateUserById(userId, {
+                      teams: userInfo.teams,
+                    });
+                    return successResp(res, {
+                      msg: SUCCESS_MESSAGE.SUBSCRIBED,
+                      code: HTTP_STATUS.SUCCESS.CODE,
+                    });
+                  } else {
+                    errorResp(res, {
+                      msg: error.message,
+                      code: HTTP_STATUS.NOT_FOUND.CODE,
+                    });
+                  }
+                })
+                .catch((error) => {
+                  errorResp(res, {
+                    msg: error.message,
+                    code: HTTP_STATUS.NOT_FOUND.CODE,
+                  });
+                });
+            })
+            .catch((error) => {
+              errorResp(res, {
+                msg: error.message,
+                code: HTTP_STATUS.NOT_FOUND.CODE,
+              });
+            });
+        } else {
+          return errorResp(res, {
+            msg: ERROR_MESSAGE.NOT_FOUND,
+            code: HTTP_STATUS.NOT_FOUND.CODE,
+          });
+        }
+      })
+      .catch((error) => {
+        errorResp(res, {
+          msg: error.message,
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+        });
+      });
+  } catch (error) {
+    serverError(res, error);
+  }
+};
+
 // renew user subscription
 exports.renewSubscription = async (req, res, next) => {
   try {
@@ -1904,13 +2016,36 @@ exports.resumeSubscription = async (req, res, next) => {
   }
 };
 
+exports.getTeamAdmins = async (req, res, next) => {
+  try {
+    const {user} = req.body;
+    await TeamService.getUsersByTeamIdRoleId(user).then((userRes) => {
+      console.log(userRes);
+    return successResp(res, {
+      msg: SUCCESS_MESSAGE.DATA_FETCHED,
+      code: HTTP_STATUS.SUCCESS.CODE,
+      data: userRes
+    });
+    }).catch((error) => {
+      errorResp(res, {
+        msg: ERROR_MESSAGE.NOT_FOUND,
+        code: HTTP_STATUS.NOT_FOUND.CODE,
+      });
+    });
+    
+} catch (error) {
+  console.log(error);
+  serverError(res, error);
+}
+};
+
 const usersByTeam = async (teamId) => {
   return await TeamService.getUsersByTeamId(teamId);
-}
+};
 
 exports.deleteTeam = async (req, res, next) => {
   try {
-    const {user} = req.body;
+    const { user } = req.body;
     const teamUsers = await usersByTeam(user.teamId);
     Promise.all(
       teamUsers.map(async (userInfo) => {
@@ -1925,13 +2060,16 @@ exports.deleteTeam = async (req, res, next) => {
             status: USER_STATUS.DISABLED,
           };
           const userData = {
-            teams: userInfo.teams
+            teams: userInfo.teams,
           };
           await UserService.updateUserById(userId, userData);
         }
       })
-    )
-    const teamRes = await TeamService.updateTeamMembers(user.teamId, { members: [], status: TEAM_STATUS.DISABLED})
+    );
+    const teamRes = await TeamService.updateTeamMembers(user.teamId, {
+      members: [],
+      status: TEAM_STATUS.DISABLED,
+    });
   } catch (error) {
     console.log(error);
     serverError(res, error);
@@ -1942,11 +2080,55 @@ exports.transferTeamOwnerShip = async (req, res, next) => {
   try {
     const { userId } = req.params;
     const { user } = req.body;
+
+    // current owner
+    const userInfo = await UserService.getUserById(user._id);
+    const userTeam = await TeamService.getUserSelectedTeamByTeamId(
+      userInfo,
+      user.teamId
+    );
+    if (userTeam.status === USER_STATUS.DISABLED) {
+      return errorResp(res, {
+        msg: ERROR_MESSAGE.NOT_FOUND,
+        code: HTTP_STATUS.NOT_FOUND.CODE,
+      });
+    }
+    const cancelSubscription = await BillingService.cancelResumeSubscription(
+      userTeam.stripeDetails.subscription.subscriptionId,
+      true
+    );
+    const stripeDetails = {
+      ...userTeam.stripeDetails,
+      subscription: {
+        ...userTeam.stripeDetails.subscription,
+        canceledDate: cancelSubscription.cancel_at,
+        status: SUBSCRIPTION_STATUS.CANCELED,
+        autoRenew: false,
+      },
+      paymentMethod: {},
+    };
+
+    //new owner
+    const newUserInfo = await UserService.getUserById(userId);
+    const newUserTeamIndex = newUserInfo.teams.findIndex(
+      (obj) => obj.teamId.toString() == user.teamId
+    );
+    if (newUserTeamIndex >= 0) {
+      newUserInfo.teams[newUserTeamIndex] = {
+        teamId: newUserInfo.teams[newUserTeamIndex].teamId,
+        roleId: newUserInfo.teams[newUserTeamIndex].roleId,
+        staus: USER_STATUS.ACTIVE,
+        stripeDetails,
+      };
+      const newUserData = {
+        teams: newUserInfo.teams,
+      };
+      await UserService.updateUserById(userId, newUserData);
+    }
     const team = await TeamService.updateTeamMembers(user.teamId, {
       createdById: userId,
     });
     //disable previous owner
-    const userInfo = await UserService.getUserById(user._id);
     const userTeamIndex = userInfo.teams.findIndex(
       (obj) => obj.teamId.toString() == user.teamId
     );
@@ -1960,7 +2142,7 @@ exports.transferTeamOwnerShip = async (req, res, next) => {
         teams: userInfo.teams,
       };
       await UserService.updateUserById(user._id, userData)
-        .then(async (user) => {
+        .then(async (userRes) => {
           const team = await TeamService.getTeamById(user.teamId);
           const filterTeamMembers = team.members.filter((obj) => {
             return obj.userId.toString() !== user._id;
@@ -1993,7 +2175,8 @@ exports.transferTeamOwnerShip = async (req, res, next) => {
 };
 
 exports.changeName = async (req, res, next) => {
-  try {8
+  try {
+    8;
     const { user, firstName, lastName } = req.body;
     await UserService.updateUserById(user._id, { firstName, lastName })
       .then((userRes) => {
