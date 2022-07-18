@@ -33,6 +33,7 @@ import orderListSlice from "./orders/orderListSlice";
 import opportunityManageListSlice from "./opportunities/opportunityManageListSlice";
 import opportunityResponseSlice from "./opportunities/opportunityResponseSlice";
 import opportunityEvaluateSlice from "./opportunities/opportunityEvaluateSlice";
+import editProfileSlice from "./opportunities/opportunityEvaluateSlice";
 
 const store = configureStore({
   reducer: {
@@ -70,7 +71,7 @@ const store = configureStore({
     workspaceJoin: workspaceJoinSlice,
     orderList: orderListSlice,
     opportunityManageList: opportunityManageListSlice,
-    // editProfile: editProfileSlice,
+    editProfile: editProfileSlice,
   },
 });
 
