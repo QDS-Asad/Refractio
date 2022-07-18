@@ -1,4 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
+import { interceptor } from '../common/refractioApi';
 import authForgetPasswordSlice from './auth/authForgetPasswordSlice';
 import authLoginSlice from './auth/authLoginSlice';
 import authNewPasswordSlice from './auth/authNewPasswordSlice';
