@@ -23,12 +23,14 @@ import RemoveTeamMember from './RemoveTeamMember';
 import ResendInvitation from './ResendInvitation';
 import { ROLES, USER_STATUS } from '../../../common/constants';
 import { authLoginSelector } from '../../../features/auth/authLoginSlice';
+import OwnershipTransfer from './OwnershipTransfer';
 
 const TeamMembers = () => {
   const [inviteTeamMember, setInviteTeamMember] = useState(false);
   const [removeTeamMember, setRemoveTeamMember] = useState(false);
   const [cancelInvitation, setCancelInvitation] = useState(false);
   const [resendInvitation, setResendInvitation] = useState(false);
+  const [transferOwner, setTransferOwner] = useState(false);
   const [deleteAccount, setDeleteAccount] = useState(false);
   const [changeMemberRole, setChangeMemberRole] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
@@ -52,6 +54,7 @@ const TeamMembers = () => {
       !resendInvitation &&
       !changeMemberRole &&
       !removeTeamMember &&
+      !deleteAccount &&
       dispatch(fetchTeamList(page, limit)) &&
       dispatch(fetchRoles());
   }, [
@@ -60,6 +63,7 @@ const TeamMembers = () => {
     resendInvitation,
     changeMemberRole,
     removeTeamMember,
+    deleteAccount,
   ]);
 
   const removeTeamMemberHandler = (id) => {
@@ -90,6 +94,11 @@ const TeamMembers = () => {
     setSelectedMember(userId);
     setSelectedRole(newRoleId);
     setChangeMemberRole(true);
+  };
+
+  const transferOwnership = () => {
+    setDeleteAccount(false);
+    setTransferOwner(true);
   };
 
   return (
@@ -133,6 +142,12 @@ const TeamMembers = () => {
             <DeleteAccount
               deleteAccount={deleteAccount}
               setDeleteAccount={setDeleteAccount}
+              member={selectedMember}
+              transferOwnership={transferOwnership}
+            />
+            <OwnershipTransfer
+              transferOwner={transferOwner}
+              setTransferOwner={setTransferOwner}
               member={selectedMember}
             />
             <ChangeRole
