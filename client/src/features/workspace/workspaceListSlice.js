@@ -5,57 +5,51 @@ import refractioApi from '../../common/refractioApi';
 export const initialState = {
   loading: false,
   error: null,
-  success: false,
+  workspaces: {
+    activeTeamList: [],
+    invitedTeamList: [],
+  },
 };
 
 // our slice
-const resendInviteMemberSlice = createSlice({
-  name: 'resendInviteMember',
+const workspaceListSlice = createSlice({
+  name: 'workspaceList',
   initialState,
   reducers: {
     setLoading: (state) => {
       state.loading = true;
-      state.error = null;
-      state.success = false;
+      state.workspaces = initialState.workspaces;
     },
-    setSuccess: (state, { payload }) => {
+    setWorkspaceList: (state, { payload }) => {
       state.loading = false;
       state.error = false;
-      state.success = payload;
+      state.workspaces = payload;
     },
     setError: (state, { payload }) => {
       state.loading = false;
       state.error = payload;
-    },
-    reset: (state) => {
-      state.loading = false;
-      state.error = null;
-      state.success = false;
     },
   },
 });
 // export the actions
 export const {
   setLoading,
-  setSuccess,
+  setWorkspaceList,
   setError,
-  reset,
-} = resendInviteMemberSlice.actions;
+} = workspaceListSlice.actions;
 
 // export the selector (".items" being same as in slices/index.js's "items: something")
-export const resendInviteMemberSelector = (state) => {
-  return state.resendInviteMember;
-};
+export const workspaceListSelector = (state) => state.workspaceList;
 
 // export the default reducer
-export default resendInviteMemberSlice.reducer;
+export default workspaceListSlice.reducer;
 
-// fetch all opportunities
-export const resendInviteMember = (member) => async (dispatch) => {
+// fetch all roles
+export const fetchWorkspaces = () => async (dispatch) => {
   try {
     dispatch(setLoading());
-    await refractioApi.put(`/users/resend-invite-account/${member}`);
-    dispatch(setSuccess(true));
+    let { data: response } = await refractioApi.get(`/users/user-teams`);
+    dispatch(setWorkspaceList(response.data));
   } catch (error) {
     const errorMessage =
       error.response && error.response.data
@@ -63,8 +57,4 @@ export const resendInviteMember = (member) => async (dispatch) => {
         : error.message;
     dispatch(setError(errorMessage));
   }
-};
-
-export const resetResendInvite = () => async (dispatch) => {
-  dispatch(reset());
 };

@@ -21,6 +21,9 @@ module.exports.validateSubscribe = [
     check('cardCvv')
     .exists().bail().withMessage(ERROR_MESSAGE.REQUIRED)
     .notEmpty().bail().withMessage(ERROR_MESSAGE.NOT_EMPTY),
+    check('teamName')
+    .exists().bail().withMessage(ERROR_MESSAGE.REQUIRED)
+    .notEmpty().bail().withMessage(ERROR_MESSAGE.NOT_EMPTY),
     check('autoRenew')
     .exists().bail().withMessage(ERROR_MESSAGE.REQUIRED)
     .notEmpty().bail().withMessage(ERROR_MESSAGE.NOT_EMPTY)

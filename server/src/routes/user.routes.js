@@ -3,11 +3,13 @@ const router = express.Router();
 const User = require("../controllers/user.controller");
 const { validateAcceptInvite } = require("../middlewares/acceptInvite");
 const Auth = require("../middlewares/auth");
+const { validateChangeName } = require("../middlewares/changeName");
 const { validateInvite } = require("../middlewares/inviteUser");
 const { validateLogin } = require("../middlewares/login");
 const { validateChangePaymentMethod } = require("../middlewares/paymentMethod");
 const { validateRegister } = require("../middlewares/register");
 const { validateResetPassword } = require("../middlewares/resetPassword");
+const { validatePostLogin } = require("../middlewares/selectTeam");
 const { validateSubscribe } = require("../middlewares/subscribe");
 
 /**
@@ -83,11 +85,14 @@ const { validateSubscribe } = require("../middlewares/subscribe");
  *   Register:
  *    type: object
  *    required:
- *      - fullName
+ *      - firstName
+ *      - lastName
  *      - email
  *      - password
  *    properties:
- *      fullName:
+ *      firstName:
+ *        type: string
+ *      lastName:
  *        type: string
  *      email:
  *        type: string
@@ -347,6 +352,150 @@ router.post("/resend-verify-code", User.resendToken);
  *        type: boolen
  */
 router.post("/login", validateLogin, User.login);
+
+/**
+ * @swagger
+ *   /api/users/user-teams:
+ *   get:
+ *     description: get user team list
+ *     tags: [User]
+ *     responses:
+ *        '200':
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                   success: true
+ *                   code: 200
+ *                   message: Operation successfull.
+ *        '404':
+ *           description: Operation Failed
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 404,"message": "Operation Failed."}
+ *
+ *        '422':
+ *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
+ */
+router.get("/user-teams", Auth, User.getUserTeams);
+
+/**
+ * @swagger
+ *   /api/users/select-team:
+ *   post:
+ *     description: select login user team
+ *     tags: [User]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/PostLogin'
+ *     responses:
+ *        '200':
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                   success: true
+ *                   code: 200
+ *                   message: Operation successfull.
+ *        '404':
+ *           description: Operation Failed
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 404,"message": "Operation Failed."}
+ *
+ *        '422':
+ *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
+ *
+ * components:
+ *  schemas:
+ *   PostLogin:
+ *    type: object
+ *    required:
+ *      - team
+ *    properties:
+ *      team:
+ *        type: string
+ */
+router.post("/select-team", Auth, validatePostLogin, User.selectTeam);
 
 /**
  * @swagger
@@ -672,13 +821,15 @@ router.post("/invite-account", Auth, validateInvite, User.inviteUser);
 
 /**
  * @swagger
- *   /api/users/verify-invite-account/{token}:
+ *   /api/users/verify-invite-account/{token}/{teamId}:
  *   get:
  *     description: get invited user info
  *     tags: [Team]
  *     parameters:
  *       - in: path
  *         name: token
+ *       - in: path
+ *         name: teamId
  *     schema:
  *        type: integer
  *     responses:
@@ -738,17 +889,19 @@ router.post("/invite-account", Auth, validateInvite, User.inviteUser);
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
  *
  */
-router.get("/verify-invite-account/:token", User.verifyEmailInvite);
+router.get("/verify-invite-account/:token/:teamId", User.verifyEmailInvite);
 
 /**
  * @swagger
- *   /api/users/register-invite-account/{userId}:
+ *   /api/users/register-invite-account/{userId}/{teamId}:
  *   put:
  *     description: accept user invite and register
  *     tags: [Team]
  *     parameters:
  *       - in: path
  *         name: userId
+ *       - in: path
+ *         name: teamId
  *     schema:
  *        type: integer
  *     requestBody:
@@ -819,20 +972,122 @@ router.get("/verify-invite-account/:token", User.verifyEmailInvite);
  *    type: object
  *    required:
  *      - email
- *      - fullName
+ *      - firstName
+ *      - lastName
  *      - newPassword
  *      - confirmPassword
  *    properties:
  *      email:
  *        type: string
- *      fullName:
+ *      firstName:
+ *        type: string
+ *      lastName:
  *        type: string
  *      newPassword:
  *        type: string
  *      confirmPassword:
  *        type: string
  */
-router.put("/register-invite-account/:userId", validateAcceptInvite, User.inviteRegister);
+router.put("/register-invite-account/:userId/:teamId", validateAcceptInvite, User.inviteRegister);
+
+/**
+ * @swagger
+ *   /api/users/join-team/{userId}/{teamId}:
+ *   put:
+ *     description: join team
+ *     tags: [Team]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *       - in: path
+ *         name: teamId
+ *     schema:
+ *        type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/AcceptUserInvite'
+ *     responses:
+ *        '200':
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                   success: true
+ *                   code: 200
+ *                   message: Operation successfull.
+ *        '404':
+ *           description: Operation Failed
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 404,"message": "Operation Failed."}
+ *
+ *        '422':
+ *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
+ *
+ * components:
+ *  schemas:
+ *   AcceptUserInvite:
+ *    type: object
+ *    required:
+ *      - email
+ *      - firstName
+ *      - lastName
+ *      - newPassword
+ *      - confirmPassword
+ *    properties:
+ *      email:
+ *        type: string
+ *      firstName:
+ *        type: string
+ *      lastName:
+ *        type: string
+ *      newPassword:
+ *        type: string
+ *      confirmPassword:
+ *        type: string
+ */
+router.put("/join-team/:userId/:teamId", User.joinTeam);
 
 /**
  * @swagger
@@ -901,7 +1156,7 @@ router.put("/register-invite-account/:userId", validateAcceptInvite, User.invite
  *                 example:
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
  */
-router.put("/resend-invite-account/:userId", User.resendInvite);
+router.put("/resend-invite-account/:userId", Auth, User.resendInvite);
 
 /**
  * @swagger
@@ -1126,8 +1381,171 @@ router.delete("/cancel-invite-account/:userId", Auth, User.cancelUserInvite);
  */
 router.get("/team", Auth, User.getTeam);
 
+/**
+ * @swagger
+ *   /api/users/change-name:
+ *   put:
+ *     description: update user role
+ *     tags: [Team]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *       - in: path
+ *         name: roleId
+ *     schema:
+ *        type: stirng
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/changeName'
+ *     responses:
+ *        '200':
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                   success: true
+ *                   code: 200
+ *                   message: Operation successfull.
+ *        '404':
+ *           description: Operation Failed
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 404,"message": "Operation Failed."}
+ *
+ *        '422':
+ *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
+ * components:
+ *  schemas:
+ *   changeName:
+ *    type: object
+ *    required:
+ *      - firstName
+ *      - lastName
+ *    properties:
+ *      firstName:
+ *        type: string
+ *      lastName:
+ *        type: string
+ */
+router.put("/change-name", Auth, validateChangeName, User.changeName);
 
 //subscription
+
+/**
+ * @swagger
+ *   /api/users/apply-coupon/{couponCode}:
+ *   get:
+ *     description: coupon for user
+ *     tags: [User]
+ *     parameters:
+ *       - in: path
+ *         name: couponCode
+ *     schema:
+ *        type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/coupon'
+ *     responses:
+ *        '200':
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                   success: true
+ *                   code: 200
+ *                   message: Operation successfull.
+ *        '404':
+ *           description: Operation Failed
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 404,"message": "Operation Failed."}
+ *
+ *        '422':
+ *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
+ */
+router.get("/apply-coupon/:couponCode", User.applyCoupon);
 
 /**
  * @swagger
@@ -1213,6 +1631,7 @@ router.get("/team", Auth, User.getTeam);
  *      - cardNumber
  *      - cardExpiry
  *      - cardCvv
+ *      - teamName
  *      - autoRenew
  *      - couponCode
  *    properties:
@@ -1227,6 +1646,8 @@ router.get("/team", Auth, User.getTeam);
  *      cardExpiry:
  *         type: string
  *      cardCvv:
+ *         type: string
+ *      teamName:
  *         type: string
  *      autoRenew:
  *         type: string
@@ -1330,7 +1751,7 @@ router.put("/subscribe/:userId", Auth, validateSubscribe, User.subscribe);
   *      autoRenew:
   *         type: string
   */
-router.put("/change-payment-method/:userId", Auth, validateChangePaymentMethod, User.subscribe);
+router.put("/change-payment-method/:userId", Auth, validateChangePaymentMethod, User.changePaymentMethod);
 
 /**
  * @swagger
@@ -1528,7 +1949,7 @@ router.get("/subscription-details", Auth, User.getSubscriptionDetails);
  *                 example:
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
  */
- router.delete("/cancel-subscription", Auth, User.cancelSubscription);
+router.delete("/cancel-subscription", Auth, User.cancelSubscription);
 
 /**
  * @swagger

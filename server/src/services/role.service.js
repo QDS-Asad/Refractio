@@ -17,7 +17,7 @@ exports.getRoleByRoleId = (roleId) => {
 };
 
 exports.getRolesByRoleIds = (roleIds) => {
-  return Role.find({ roleId: roleIds }).select({ _id: 1 });
+  return Role.find({ roleId: {$nin: roleIds} }).select({ _id: 1 });
 };
 
 exports.deleteDefaultRoles = () => {

@@ -5,11 +5,13 @@ import { Button, Form, Message, Modal } from 'semantic-ui-react';
 import {
   inviteMemberSelector,
   inviteMember,
+  resetInviteTeamMember,
 } from '../../../features/team/inviteMemberSlice';
 import { fetchRoles, roleListSelector } from '../../../features/roles/roleList';
+import { ROLES } from '../../../common/constants';
 
 const InviteTeamMember = ({ inviteTeamMember, setInviteTeamMember }) => {
-  const { register, setValue, handleSubmit, errors, trigger } = useForm({
+  const { register, setValue, handleSubmit, errors, trigger, watch } = useForm({
     mode: 'onBlur',
     defaultValues: {
       email: '',
@@ -58,12 +60,18 @@ const InviteTeamMember = ({ inviteTeamMember, setInviteTeamMember }) => {
   useEffect(() => {
     if (success) {
       setInviteTeamMember(false);
+      dispatch(resetInviteTeamMember());
     }
   }, [success]);
 
+  const closeModel = () => {
+    setInviteTeamMember(false);
+    dispatch(resetInviteTeamMember());
+  };
+
   return (
     <Modal
-      onClose={() => setInviteTeamMember(false)}
+      onClose={closeModel}
       onOpen={() => setInviteTeamMember(true)}
       open={inviteTeamMember}
       dimmer='blurring'
@@ -78,7 +86,7 @@ const InviteTeamMember = ({ inviteTeamMember, setInviteTeamMember }) => {
           loading={loading}
           error
         >
-          <Modal.Description>
+          <Modal.Description className='py-3'>
             {error && (
               <Message color='red' className='error-message mb-3'>
                 {error}
@@ -123,10 +131,19 @@ const InviteTeamMember = ({ inviteTeamMember, setInviteTeamMember }) => {
                 <Message error content={errors.role.message} />
               )}
             </Form.Field>
-            <p>
-              Participants can respond to opportunities and evaluate submitted
-              ideas.
-            </p>
+
+            {watch('role') === ROLES.PARTICIPANT && (
+              <p>
+                Participants can respond to opportunities and evaluate submitted
+                ideas.
+              </p>
+            )}
+
+            {watch('role') === ROLES.ORGANIZER && (
+              <p>
+                Organizers can publish opportunities and invite Team Members.
+              </p>
+            )}
           </Modal.Description>
         </Form>
       </Modal.Content>

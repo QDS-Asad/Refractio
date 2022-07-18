@@ -1,61 +1,64 @@
 import { createSlice } from '@reduxjs/toolkit';
 import refractioApi from '../../common/refractioApi';
+import { updateUserProfile } from '../auth/authLoginSlice';
 
 // initial state
 export const initialState = {
   loading: false,
   error: null,
-  newPassword: null,
+  success: false,
 };
 
 // our slice
-const authNewPasswordSlice = createSlice({
-  name: 'authNewPassword',
+const editProfileSlice = createSlice({
+  name: 'editProfile',
   initialState,
   reducers: {
     setLoading: (state) => {
       state.loading = true;
       state.error = null;
+      state.success = false;
     },
-    setNewPassword: (state, { payload }) => {
+    setSuccess: (state, { payload }) => {
       state.loading = false;
-      state.error = null;
-      state.newPassword = payload;
+      state.error = false;
+      state.success = payload;
     },
     setError: (state, { payload }) => {
       state.loading = false;
       state.error = payload;
-      state.newPassword = null;
     },
     reset: (state) => {
       state.loading = false;
       state.error = null;
-      state.newPassword = null;
+      state.success = false;
     },
   },
 });
 // export the actions
 export const {
   setLoading,
-  setNewPassword,
+  setSuccess,
   setError,
   reset,
-} = authNewPasswordSlice.actions;
+} = editProfileSlice.actions;
 
-export const authNewPasswordSelector = (state) => state.authNewPassword;
+// export the selector (".items" being same as in slices/index.js's "items: something")
+export const editProfileSelector = (state) => state.editProfile;
 
 // export the default reducer
-export default authNewPasswordSlice.reducer;
+export default editProfileSlice.reducer;
 
-// new password
-export const userNewPassword = (token, body) => async (dispatch) => {
+// fetch all opportunities
+export const editUserProfile = (body) => async (dispatch) => {
   try {
     dispatch(setLoading());
-    let { data: response } = await refractioApi.put(
-      `/users/reset-password/${token}`,
-      body
-    );
-    dispatch(setNewPassword(response.success));
+    await refractioApi.put('/users/change-name', {
+      ...body,
+    });
+    let { firstName, lastName } = body;
+    dispatch(updateUserProfile(firstName, lastName));
+    dispatch(setSuccess(true));
   } catch (error) {
     const errorMessage =
       error.response && error.response.data
@@ -65,6 +68,6 @@ export const userNewPassword = (token, body) => async (dispatch) => {
   }
 };
 
-export const resetNewPassword = () => (dispatch) => {
+export const resetEditProfile = () => async (dispatch) => {
   dispatch(reset());
 };

@@ -20,7 +20,7 @@ exports.getTeamById = async (teamId) => {
 };
 
 exports.getTeam = async (obj) => {
-  const { page, page_size, user, teamId, roleIds } = obj;
+  const { page, page_size, teamId, user, OwnerId } = obj;
   const options = {
     page: page || DEFAULT_PAGE_NO,
     limit: page_size || DEFAULT_PAGE_SIZE,
@@ -39,10 +39,16 @@ exports.getTeam = async (obj) => {
   };
   return await User.paginate(
     {
-      teamId,
-      roleId: { $nin: roleIds },
-      status: { $nin: USER_STATUS.DISABLED },
+      // ...(!user.isOwner && {_id: {$nin: OwnerId}}),
+      "teams": { $elemMatch: {teamId: ObjectId(teamId), status: { $nin: USER_STATUS.DISABLED }}},
+      // "teams.teamId": ObjectId(teamId),
+      // "teams.roleId": { $in: roleIds },
+      // "teams.status": { $nin: USER_STATUS.DISABLED },
     },
     options
   );
 };
+
+exports.getUserSelectedTeamByTeamId = (user, teamId) => {
+  return user.teams.find((obj) => obj.teamId.toString() === teamId);
+}

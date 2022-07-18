@@ -17,7 +17,6 @@ import {
   Radio,
   Segment,
 } from 'semantic-ui-react';
-import { USER_STATUS } from '../../common/constants';
 import {
   authLoginSelector,
   updateUserStatus,
@@ -27,21 +26,27 @@ import {
   planListSelector,
 } from '../../features/plans/planListSlice';
 import {
+  resetUserSubscription,
   subscriptionSelector,
   userSubscription,
 } from '../../features/subscriptions/subscriptionSlice';
+import {
+  cancelWorkspace,
+  workspaceSelectSelector,
+} from '../../features/workspace/workspaceSelectSlice';
 
 const Subscription = () => {
   const { register, setValue, handleSubmit, errors, trigger, watch } = useForm({
     mode: 'onBlur',
     defaultValues: {
-      autoRenew: false,
-      couponCode: '6546',
+      autoRenew: true,
     },
   });
   const [prices, setPrices] = useState([]);
 
   const { userLogin } = useSelector(authLoginSelector);
+
+  const { userWorkspace } = useSelector(workspaceSelectSelector);
 
   const { loading, error, plans } = useSelector(planListSelector);
 
@@ -78,7 +83,6 @@ const Subscription = () => {
   };
 
   const handleChangeCheckBox = (e) => {
-    debugger;
     e.persist();
     setValue(e.target.name, e.target.checked);
     trigger(e.target.name);
@@ -91,6 +95,21 @@ const Subscription = () => {
     priceId: {
       required: 'Pricing is required',
     },
+    teamName: {
+      required: 'Team name is required',
+      maxLength: {
+        value: 50,
+        message: "Team name can't exceed from 50 characters",
+      },
+      minLength: {
+        value: 5,
+        message: 'Enter at least 5 characters',
+      },
+      pattern: {
+        value: /^[A-Za-z]+$/,
+        message: 'Only alalphabets are allowed',
+      },
+    },
     nameOnCard: {
       required: 'Name on card is required',
     },
@@ -100,7 +119,7 @@ const Subscription = () => {
     cardExpiry: {
       required: 'Card expiry is required',
       pattern: {
-        value: /^(0[1-9]|1[0-2])\/?([0-9]{2})$/,
+        value: /^(0[1-9]|1[0-2])\/([0-9]{2})$/,
         message: 'Invalid expiry date.',
       },
     },
@@ -123,11 +142,18 @@ const Subscription = () => {
 
   const handleGoToApplication = () => {
     navigate('/');
+    dispatch(resetUserSubscription());
+  };
+
+  const cancelNewWorkspace = () => {
+    dispatch(cancelWorkspace());
+    navigate('/workspaces');
   };
 
   useEffect(() => {
     register({ name: 'planId' }, createOptions.planId);
     register({ name: 'priceId' }, createOptions.priceId);
+    register({ name: 'teamName' }, createOptions.teamName);
     register({ name: 'nameOnCard' }, createOptions.nameOnCard);
     register({ name: 'cardNumber' }, createOptions.cardNumber);
     register({ name: 'cardExpiry' }, createOptions.cardExpiry);
@@ -139,12 +165,18 @@ const Subscription = () => {
 
   useEffect(() => {
     if (success) {
-      dispatch(updateUserStatus(USER_STATUS.ACTIVE));
+      dispatch(updateUserStatus());
     }
   }, [success]);
 
   return (
     <Container>
+      {userWorkspace && userWorkspace.isRegistered && (
+        <Button className='btn' onClick={cancelNewWorkspace}>
+          Back
+        </Button>
+      )}
+
       <Card fluid>
         <Card.Content>
           {success ? (
@@ -246,6 +278,20 @@ const Subscription = () => {
                     error
                   >
                     <Form.Field className='mb-3'>
+                      <label>Team Name</label>
+                      <Form.Input
+                        name='teamName'
+                        fluid
+                        placeholder='Enter team name'
+                        error={!!errors.teamName}
+                        onBlur={handleChange}
+                      />
+
+                      {errors && errors.teamName && (
+                        <Message error content={errors.teamName.message} />
+                      )}
+                    </Form.Field>
+                    <Form.Field className='mb-3'>
                       <label>Name on card</label>
                       <Form.Input
                         name='nameOnCard'
@@ -308,6 +354,7 @@ const Subscription = () => {
                         label='Autorenewal subscription'
                         name='autoRenew'
                         onBlur={handleChangeCheckBox}
+                        defaultChecked={true}
                       />
                     </Form.Field>
                     <Button type='submit' fluid primary className='mt-3 btn'>
@@ -407,7 +454,12 @@ const Subscription = () => {
                             floated='right'
                             className='fw-bold fs-4'
                           >
-                            $7
+                            $
+                            {prices &&
+                            prices.find((a) => a.id === watch('priceId'))
+                              ? prices.find((a) => a.id === watch('priceId'))
+                                  .amount
+                              : 0}
                           </List.Content>
                           <span className='fw-bold fs-4'>Total:</span>
                           <p className='mt-5'>

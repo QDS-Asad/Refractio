@@ -1,7 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
-import { ROLES, USER_STATUS } from '../common/constants';
 import SideBar from '../components/Sidebar';
 import { authLoginSelector } from '../features/auth/authLoginSlice';
 
@@ -17,14 +16,12 @@ const AppLayout = () => {
     return <Navigate to='/auth/verify-code' />;
   }
 
-  // TODO: This will be uncommented as will complete subscription screen
-  if (
-    userLogin &&
-    userLogin.role &&
-    userLogin.role.roleId === ROLES.ADMIN &&
-    userLogin.status === USER_STATUS.SUBSCRIPTION_PENDING
-  ) {
+  if (userLogin && userLogin.isRegistered) {
     return <Navigate to='/subscription' />;
+  }
+
+  if (userLogin && !userLogin.isRegistered && userLogin.role === undefined) {
+    return <Navigate to='/workspaces' />;
   }
 
   return <SideBar />;

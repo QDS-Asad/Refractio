@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Header, Menu } from 'semantic-ui-react';
+import { Dropdown, Header, Menu } from 'semantic-ui-react';
 import { authLoginSelector } from '../features/auth/authLoginSlice';
+import EditProfile from './EditProfile';
 const NavBar = ({ showLogo = false }) => {
+  const [editProfile, setEditProfile] = useState(false);
   const { userLogin } = useSelector(authLoginSelector);
   return (
     <>
@@ -22,16 +24,27 @@ const NavBar = ({ showLogo = false }) => {
         )}
 
         <Menu.Menu position='right'>
-          <Menu.Item
-            as='a'
-            name={userLogin.fullName}
+          <Dropdown
+            item
+            text={`${userLogin.firstName} ${userLogin.lastName} `}
             className='me-4'
             style={{ color: '#98A6AD', minHeight: '4.5rem' }}
           >
-            {userLogin.fullName}
-          </Menu.Item>
+            <Dropdown.Menu>
+              <Dropdown.Item
+                icon='edit'
+                text='Edit Profile'
+                onClick={() => setEditProfile(true)}
+              />
+            </Dropdown.Menu>
+          </Dropdown>
         </Menu.Menu>
       </Menu>
+      <EditProfile
+        editProfile={editProfile}
+        setEditProfile={setEditProfile}
+        userInfo={userLogin}
+      />
     </>
   );
 };

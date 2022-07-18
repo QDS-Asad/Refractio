@@ -25,6 +25,7 @@ const authRegisterSlice = createSlice({
   reducers: {
     setLoading: (state) => {
       state.loading = true;
+      state.error = null;
     },
     setUserRegister: (state, { payload }) => {
       state.loading = false;
@@ -57,11 +58,14 @@ export const authRegisterSelector = (state) => state.authRegister;
 export default authRegisterSlice.reducer;
 
 // register user
-export const registerUser = (fullName, email, password) => async (dispatch) => {
+export const registerUser = (firstName, lastName, email, password) => async (
+  dispatch
+) => {
   try {
     dispatch(setLoading());
     let { data: response } = await refractioApi.post('/users/register', {
-      fullName,
+      firstName,
+      lastName,
       email,
       password,
     });

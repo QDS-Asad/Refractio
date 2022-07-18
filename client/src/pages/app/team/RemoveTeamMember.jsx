@@ -1,7 +1,11 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Message, Modal } from 'semantic-ui-react';
-import { removeMember, removeMemberSelector } from '../../../features/team/removeMemberSlice';
+import {
+  removeMember,
+  removeMemberSelector,
+  resetRemoveTeamMember,
+} from '../../../features/team/removeMemberSlice';
 
 const RemoveTeamMember = ({
   removeTeamMember,
@@ -20,11 +24,18 @@ const RemoveTeamMember = ({
   useEffect(() => {
     if (success) {
       setRemoveTeamMember(false);
+      dispatch(resetRemoveTeamMember());
     }
   }, [success]);
+
+  const closeModel = () => {
+    setRemoveTeamMember(false);
+    dispatch(resetRemoveTeamMember());
+  };
+
   return (
     <Modal
-      onClose={() => setRemoveTeamMember(false)}
+      onClose={closeModel}
       onOpen={() => setRemoveTeamMember(true)}
       open={removeTeamMember}
       dimmer='blurring'
@@ -43,7 +54,7 @@ const RemoveTeamMember = ({
         </Modal.Description>
       </Modal.Content>
       <Modal.Actions>
-        <Button content='Cancel' onClick={() => setRemoveTeamMember(false)} />
+        <Button content='Cancel' onClick={closeModel} />
         <Button
           content='Remove'
           className='btn-danger'

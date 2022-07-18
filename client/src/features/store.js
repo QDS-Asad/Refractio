@@ -26,10 +26,15 @@ import subscriptionDetailSlice from "./subscriptions/subscriptionDetailSlice";
 import changeCardSlice from "./billing/changeCardSlice";
 import subscriptionCancelSlice from "./subscriptions/subscriptionCancelSlice";
 import subscriptionResumeSlice from "./subscriptions/subscriptionResumeSlice";
+import workspaceListSlice from "./workspace/workspaceListSlice";
+import workspaceSelectSlice from "./workspace/workspaceSelectSlice";
+import workspaceJoinSlice from "./workspace/workspaceJoinSlice";
+import orderListSlice from "./orders/orderListSlice";
+import opportunityManageListSlice from "./opportunities/opportunityManageListSlice";
 import opportunityResponseSlice from "./opportunities/opportunityResponseSlice";
 import opportunityEvaluateSlice from "./opportunities/opportunityEvaluateSlice";
 
-export default configureStore({
+const store = configureStore({
   reducer: {
     authLogin: authLoginSlice,
     authRegister: authRegisterSlice,
@@ -60,5 +65,14 @@ export default configureStore({
     subscriptionResume: subscriptionResumeSlice,
     opportunityResponse: opportunityResponseSlice,
     opportunityEvaluate: opportunityEvaluateSlice,
+    workspaceList: workspaceListSlice,
+    workspaceSelect: workspaceSelectSlice,
+    workspaceJoin: workspaceJoinSlice,
+    orderList: orderListSlice,
+    opportunityManageList: opportunityManageListSlice,
+    // editProfile: editProfileSlice,
   },
 });
+
+interceptor(store);
+export default store;

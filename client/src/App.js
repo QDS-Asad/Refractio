@@ -26,6 +26,8 @@ import ManageOpportunities from "./pages/admin/manage-opportunities/ManageOpport
 import ManageContent from "./pages/admin/manage-content/ManageContent";
 import OpportunityResponse from "./pages/app/Opportunities/OpportunityResponse";
 import OpportunityEvaluate from "./pages/app/Opportunities/OpportunityEvaluate";
+import WorkspaceLayout from "./layouts/WorkspaceLayout";
+import WorkspaceSelection from "./pages/workspaces/WorkspaceSelection";
 const App = () => {
   return (
     <Routes>
@@ -40,6 +42,9 @@ const App = () => {
       </Route>
       <Route path="subscription" element={<SubscriptionLayout />}>
         <Route path="" element={<Subscription />} />
+      </Route>
+      <Route path="workspaces" element={<WorkspaceLayout />}>
+        <Route path="" element={<WorkspaceSelection />} />
       </Route>
       <Route path="" element={<AppLayout />}>
         <Route

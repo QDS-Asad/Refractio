@@ -15,6 +15,8 @@ const changeMemberRoleSlice = createSlice({
   reducers: {
     setLoading: (state) => {
       state.loading = true;
+      state.error = null;
+      state.success = false;
     },
     setSuccess: (state, { payload }) => {
       state.loading = false;
@@ -26,6 +28,11 @@ const changeMemberRoleSlice = createSlice({
       state.error = payload;
       state.success = false;
     },
+    reset: (state, { payload }) => {
+      state.loading = false;
+      state.error = null;
+      state.success = false;
+    },
   },
 });
 // export the actions
@@ -33,6 +40,7 @@ export const {
   setLoading,
   setSuccess,
   setError,
+  reset,
 } = changeMemberRoleSlice.actions;
 
 // export the selector (".items" being same as in slices/index.js's "items: something")
@@ -55,4 +63,8 @@ export const changeRole = (userId, roleId) => async (dispatch) => {
         : error.message;
     dispatch(setError(errorMessage));
   }
+};
+
+export const resetChangeRole = () => async (dispatch) => {
+  dispatch(reset());
 };

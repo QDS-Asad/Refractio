@@ -6,7 +6,7 @@ module.exports = Object.freeze({
     CRYPTO_KEY: `${process.env.CRYPTO_KEY}`,
     JWT_KEY: `${process.env.JWT_KEY}`,
     CONNECTION_STRING: `${process.env.DB_URI}`,
-    MIGRATION_STRING: 'mongodb+srv://qdsravi:iBQFBbRGpVOgbkSQ@cluster0.mt4zc.mongodb.net/refractio_db_new?retryWrites=true&w=majority',
+    MIGRATION_STRING: 'mongodb+srv://qdsravi:iBQFBbRGpVOgbkSQ@cluster0.mt4zc.mongodb.net/refractio_db_v2?retryWrites=true&w=majority',
     STRIPE_KEY: `${process.env.STRIPE_KEY}`,
     SESSION_SECRET: `${process.env.SESSION_SECRET}`,
     CLIENT_HOST: `${process.env.CLIENT_HOST}`,
@@ -87,12 +87,13 @@ module.exports = Object.freeze({
     },
     ERROR_MESSAGE:{
         INVALID_EMAIL: "Invalid email",
-        INVALID_TOKEN: "Invalid OTP",
+        INVALID_TOKEN: "Invalid Token",
         INVALID_CREDS: "Invalid Credentials",
         USER_NOT_VERIFIED: "User not verified.",
         DB_NOT_CONNECTED: "Cannot Connect to the Databases.",
         PLAN_USED: "Cannot delete this plan.It is subscribed by user(s)",
         SUBSCRIBED: "Already Subscribed!",
+        SUBSCRIBED_CANCELED: "Subscription Canceled or Expired!",
         UNAUTHORIZED: "authorization denied.",
         NO_DATA: "No data available.",
         NOT_FOUND: "Not found.",
@@ -165,7 +166,7 @@ module.exports = Object.freeze({
         </div>
       </div>`
     },
-    INVTE_USER_EMAIL_SUBJECT: "Join your Team at Refractio",
+    INVTE_USER_EMAIL_SUBJECT: "Invitation: Join your Team at Refractio",
     INVTE_USER_EMAIL_TEMPLATE: (params) => {
         return `<div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
         <div style="margin:50px auto;width:70%;padding:20px 0">

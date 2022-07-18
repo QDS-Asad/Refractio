@@ -18,6 +18,8 @@ const teamListSlice = createSlice({
   reducers: {
     setLoading: (state) => {
       state.loading = true;
+      state.members = [];
+      state.error = null;
     },
     setTeamList: (state, { payload }) => {
       state.loading = false;
@@ -49,6 +51,10 @@ export const fetchTeamList = (pageNumber, pageSize) => async (dispatch) => {
     );
     dispatch(setTeamList(data.data));
   } catch (error) {
-    dispatch(setError(error.message));
+    const errorMessage =
+      error.response && error.response.data
+        ? error.response.data.message
+        : error.message;
+    dispatch(setError(errorMessage));
   }
 };

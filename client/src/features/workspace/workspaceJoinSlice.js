@@ -5,57 +5,55 @@ import refractioApi from '../../common/refractioApi';
 export const initialState = {
   loading: false,
   error: null,
-  newPassword: null,
+  joinWorkspace: null,
 };
 
 // our slice
-const authNewPasswordSlice = createSlice({
-  name: 'authNewPassword',
+const workspaceJoinSlice = createSlice({
+  name: 'workspaceJoin',
   initialState,
   reducers: {
     setLoading: (state) => {
       state.loading = true;
-      state.error = null;
     },
-    setNewPassword: (state, { payload }) => {
+    setJoinWorkspace: (state, { payload }) => {
       state.loading = false;
       state.error = null;
-      state.newPassword = payload;
+      state.workspaceJoin = payload;
     },
     setError: (state, { payload }) => {
       state.loading = false;
       state.error = payload;
-      state.newPassword = null;
+      state.workspaceJoin = null;
     },
     reset: (state) => {
       state.loading = false;
       state.error = null;
-      state.newPassword = null;
+      state.workspaceJoin = null;
     },
   },
 });
 // export the actions
 export const {
   setLoading,
-  setNewPassword,
+  setJoinWorkspace,
   setError,
   reset,
-} = authNewPasswordSlice.actions;
+} = workspaceJoinSlice.actions;
 
-export const authNewPasswordSelector = (state) => state.authNewPassword;
+export const workspaceJoinSelector = (state) => state.workspaceJoin;
 
 // export the default reducer
-export default authNewPasswordSlice.reducer;
+export default workspaceJoinSlice.reducer;
 
-// new password
-export const userNewPassword = (token, body) => async (dispatch) => {
+// login user
+export const joinNewWorkspace = (userId, teamId) => async (dispatch) => {
   try {
     dispatch(setLoading());
     let { data: response } = await refractioApi.put(
-      `/users/reset-password/${token}`,
-      body
+      `/users/join-team/${userId}/${teamId}`
     );
-    dispatch(setNewPassword(response.success));
+    dispatch(setJoinWorkspace(response.message));
   } catch (error) {
     const errorMessage =
       error.response && error.response.data
@@ -65,6 +63,6 @@ export const userNewPassword = (token, body) => async (dispatch) => {
   }
 };
 
-export const resetNewPassword = () => (dispatch) => {
+export const resetJoinWorkspace = () => (dispatch) => {
   dispatch(reset());
 };
