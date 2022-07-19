@@ -54,8 +54,12 @@ export const createOpportunity = (opportunity) => async (dispatch) => {
     );
     console.log(data);
     dispatch(setOpportunity(opportunity));
-    dispatch(fetchOpportunities())
+    dispatch(fetchOpportunities());
   } catch (error) {
-    dispatch(setError(error.message));
+    const errorMessage =
+      error.response && error.response.data
+        ? error.response.data.message
+        : error.message;
+    dispatch(setError(errorMessage));
   }
 };

@@ -44,18 +44,13 @@ export default opportunityDetailSlice.reducer;
 export const fetchOpportunity = (id) => async (dispatch) => {
   try {
     dispatch(setLoading());
-    let { data: response } = await refractioApi.get('/opportunities');
-    let opportunity = response.data.find((o) => o._id === id);
-    if (opportunity) {
-      setTimeout(() => {
-        dispatch(setOpportunity(opportunity));
-      }, 1500);
-    } else {
-      setTimeout(() => {
-        dispatch(setError('Opportunity not found.'));
-      }, 1500);
-    }
+    let { data: response } = await refractioApi.get(`/opportunities/${id}`);
+    dispatch(setOpportunity(response.data));
   } catch (error) {
-    dispatch(setError(error.message));
+    const errorMessage =
+      error.response && error.response.data
+        ? error.response.data.message
+        : error.message;
+    dispatch(setError(errorMessage));
   }
 };
