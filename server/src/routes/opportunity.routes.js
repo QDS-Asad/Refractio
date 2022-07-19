@@ -7,7 +7,7 @@ const { validateUpdateOpportunity } = require("../middlewares/updateOpportunity"
 
 /**
  * @swagger
- *   /api/opportunities/list:
+ *   /api/opportunities:
  *   get:
  *     description: get user opportunities list
  *     tags: [Opportunities]
@@ -67,7 +67,7 @@ const { validateUpdateOpportunity } = require("../middlewares/updateOpportunity"
  *                 example:
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
  */
- router.get("/", Auth, Opportunity.opportunitiesList);
+router.get("/", Auth, Opportunity.opportunitiesList);
 
 /**
  * @swagger
@@ -152,6 +152,463 @@ const { validateUpdateOpportunity } = require("../middlewares/updateOpportunity"
  */
 router.post("/create", Auth, validateCreateOpportunity, Opportunity.createOpportunity);
 
+/**
+ * @swagger
+ *   /api/opportunities/{opportunityId}:
+ *   get:
+ *     description: get opportunity by id
+ *     tags: [Opportunities]
+ *     parameters:
+ *       - in: path
+ *         name: opportunityId
+ *     responses:
+ *        '200':
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                   success: true
+ *                   code: 200
+ *                   message: Operation successfull.
+ *        '404':
+ *           description: Operation Failed
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 404,"message": "Operation Failed."}
+ *
+ *        '422':
+ *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
+ */
+router.get("/:opportunityId", Auth, Opportunity.getOpportunityById);
+
+// /**
+//  * @swagger
+//  *   /api/opportunities/update/{opportunityId}:
+//  *   put:
+//  *     description: update opportunity
+//  *     tags: [Opportunities]
+//  *     parameters:
+//  *       - in: path
+//  *         name: opportunityId
+//  *     schema:
+//  *        type: integer
+//  *     requestBody:
+//  *       required: true
+//  *       content:
+//  *         application/json:
+//  *           schema:
+//  *             $ref: '#/components/schemas/UpdateOpportunity'
+//  *     responses:
+//  *        '200':
+//  *           description: Success
+//  *           content:
+//  *             application/json:
+//  *               schema:
+//  *                 type: object
+//  *                 properties:
+//  *                   success:
+//  *                     type: string
+//  *                   code:
+//  *                     type: integer
+//  *                   message:
+//  *                     type: string
+//  *                   data:
+//  *                     type: object
+//  *                 example:
+//  *                   success: true
+//  *                   code: 200
+//  *                   message: Operation successfull.
+//  *        '404':
+//  *           description: Operation Failed
+//  *           content:
+//  *             application/json:
+//  *               schema:
+//  *                 type: object
+//  *                 properties:
+//  *                   success:
+//  *                     type: string
+//  *                   code:
+//  *                     type: integer
+//  *                   message:
+//  *                     type: string
+//  *                   data:
+//  *                     type: object
+//  *                 example:
+//  *                    {"success": false,"code": 404,"message": "Operation Failed."}
+//  *
+//  *        '422':
+//  *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
+//  *           content:
+//  *             application/json:
+//  *               schema:
+//  *                 type: object
+//  *                 properties:
+//  *                   success:
+//  *                     type: string
+//  *                   code:
+//  *                     type: integer
+//  *                   message:
+//  *                     type: string
+//  *                   data:
+//  *                     type: object
+//  *                 example:
+//  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
+//  *
+//  * components:
+//  *  schemas:
+//  *   UpdateOpportunity:
+//  *    type: object
+//  *    required:
+//  *      - status
+//  *      - comprehension
+//  *      - qualityOfIdea
+//  *    properties:
+//  *      status:
+//  *        type: string
+//  *        enum: ['publish', 'draft']
+//  *      comprehension:
+//  *        type: object
+//  *        questions:
+//  *          type: array
+//  *      qualityOfIdea:
+//  *        type: object
+//  */
+// router.put("/update/:opportunityId", Auth, validateUpdateOpportunity, Opportunity.updateOpportunity);
+
+/**
+ * @swagger
+ *   /api/opportunities/add-opportunity-member/{opportunityId}/{userId}:
+ *   put:
+ *     description: add member in opportunity
+ *     tags: [Opportunities]
+ *     parameters:
+ *       - in: path
+ *         name: opportunityId
+ *     schema:
+ *        type: integer
+ *     responses:
+ *        '200':
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                   success: true
+ *                   code: 200
+ *                   message: Operation successfull.
+ *        '404':
+ *           description: Operation Failed
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 404,"message": "Operation Failed."}
+ *
+ *        '422':
+ *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
+ */
+router.put("/add-opportunity-member/:opportunityId/:userId", Auth, Opportunity.addOpportunityMember);
+
+/**
+ * @swagger
+ *   /api/opportunities/remove-opportunity-member/{opportunityId}/{userId}:
+ *   delete:
+ *     description: remove member in opportunity
+ *     tags: [Opportunities]
+ *     parameters:
+ *       - in: path
+ *         name: opportunityId
+ *     schema:
+ *        type: integer
+ *     responses:
+ *        '200':
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                   success: true
+ *                   code: 200
+ *                   message: Operation successfull.
+ *        '404':
+ *           description: Operation Failed
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 404,"message": "Operation Failed."}
+ *
+ *        '422':
+ *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
+ */
+router.delete("/remove-opportunity-member/:opportunityId/:userId", Auth, Opportunity.removeOpportunityMember);
+
+// /**
+//  * @swagger
+//  *   /api/opportunities/delete/{opportunityId}:
+//  *   delete:
+//  *     description: delete Opportunity
+//  *     tags: [Opportunities]
+//  *     parameters:
+//  *       - in: path
+//  *         name: opportunityId
+//  *     schema:
+//  *        type: integer
+//  *     responses:
+//  *        '200':
+//  *           description: Success
+//  *           content:
+//  *             application/json:
+//  *               schema:
+//  *                 type: object
+//  *                 properties:
+//  *                   success:
+//  *                     type: string
+//  *                   code:
+//  *                     type: integer
+//  *                   message:
+//  *                     type: string
+//  *                   data:
+//  *                     type: object
+//  *                 example:
+//  *                   success: true
+//  *                   code: 200
+//  *                   message: Operation successfull.
+//  *        '404':
+//  *           description: Operation Failed
+//  *           content:
+//  *             application/json:
+//  *               schema:
+//  *                 type: object
+//  *                 properties:
+//  *                   success:
+//  *                     type: string
+//  *                   code:
+//  *                     type: integer
+//  *                   message:
+//  *                     type: string
+//  *                   data:
+//  *                     type: object
+//  *                 example:
+//  *                    {"success": false,"code": 404,"message": "Operation Failed."}
+//  *
+//  *        '422':
+//  *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
+//  *           content:
+//  *             application/json:
+//  *               schema:
+//  *                 type: object
+//  *                 properties:
+//  *                   success:
+//  *                     type: string
+//  *                   code:
+//  *                     type: integer
+//  *                   message:
+//  *                     type: string
+//  *                   data:
+//  *                     type: object
+//  *                 example:
+//  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
+//  */
+// router.delete("/delete/:opportunityId", Auth, Opportunity.deleteOpportunity);
+
+// /**
+//  * @swagger
+//  *   /api/opportunities/answer/{opportunityId}:
+//  *   put:
+//  *     description: answer opportunity
+//  *     tags: [Opportunities]
+//  *     parameters:
+//  *       - in: path
+//  *         name: opportunityId
+//  *     schema:
+//  *        type: integer
+//  *     requestBody:
+//  *       required: true
+//  *       content:
+//  *         application/json:
+//  *           schema:
+//  *             $ref: '#/components/schemas/UpdateOpportunity'
+//  *     responses:
+//  *        '200':
+//  *           description: Success
+//  *           content:
+//  *             application/json:
+//  *               schema:
+//  *                 type: object
+//  *                 properties:
+//  *                   success:
+//  *                     type: string
+//  *                   code:
+//  *                     type: integer
+//  *                   message:
+//  *                     type: string
+//  *                   data:
+//  *                     type: object
+//  *                 example:
+//  *                   success: true
+//  *                   code: 200
+//  *                   message: Operation successfull.
+//  *        '404':
+//  *           description: Operation Failed
+//  *           content:
+//  *             application/json:
+//  *               schema:
+//  *                 type: object
+//  *                 properties:
+//  *                   success:
+//  *                     type: string
+//  *                   code:
+//  *                     type: integer
+//  *                   message:
+//  *                     type: string
+//  *                   data:
+//  *                     type: object
+//  *                 example:
+//  *                    {"success": false,"code": 404,"message": "Operation Failed."}
+//  *
+//  *        '422':
+//  *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
+//  *           content:
+//  *             application/json:
+//  *               schema:
+//  *                 type: object
+//  *                 properties:
+//  *                   success:
+//  *                     type: string
+//  *                   code:
+//  *                     type: integer
+//  *                   message:
+//  *                     type: string
+//  *                   data:
+//  *                     type: object
+//  *                 example:
+//  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
+//  *
+//  * components:
+//  *  schemas:
+//  *   UpdateOpportunity:
+//  *    type: object
+//  *    required:
+//  *      - comprehension
+//  *      - qualityOfIdea
+//  *    properties:
+//  *      comprehension:
+//  *        type: object
+//  *        questions:
+//  *          type: array
+//  *      qualityOfIdea:
+//  *        type: object
+//  */
+// router.put("/answer/:opportunityId", Auth, validateUpdateOpportunity, Opportunity.updateOpportunity);
 
 
 module.exports = router;

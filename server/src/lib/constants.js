@@ -46,6 +46,7 @@ module.exports = Object.freeze({
       DISABLED: "disabled",
       COMPLETED: "completed",
       ANSWERING: "answering",
+      EVALUATING: "evaluating",
     },
     TEAM_STATUS: {
       ACTIVE: "active",
@@ -96,7 +97,8 @@ module.exports = Object.freeze({
         UPDATED: "Updated Successfully",
         DELETED: "Deleted Successfully",
         CANCELED: "Canceled Successfully",
-        TRANSFERED: "Transfered Succesfully"
+        TRANSFERED: "Transfered Succesfully",
+        ANSWERED: "Answered Sussefully",
 
     },
     ERROR_MESSAGE:{
@@ -207,5 +209,17 @@ module.exports = Object.freeze({
           </div>
         </div>
       </div>`
-    }
+    },
+    OPPORTUNITY_EMAIL_SUBJECT: "Available for you: we value your input",
+    OPPORTUNITY_EMAIL_TEMPLATE: (params) => {
+        return `<div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
+        <div style="margin:50px auto;width:70%;padding:20px 0">
+          <div style="border-bottom:1px solid #eee">
+            <a href="" style="font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600">Refractio</a>
+          </div>
+          <p style="font-size:1.1em">Hi,</p>
+          <p>We value your ideas. Please submit your thoughts on the opportunity listed. <a href="${params.link}" style="color:#ffff;text-decoration:none;">Click Here</a>.</p>
+        </div>
+      </div>`
+    },
 });

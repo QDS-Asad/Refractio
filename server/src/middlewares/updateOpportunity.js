@@ -9,9 +9,6 @@ module.exports.validateUpdateOpportunity = [
     check('qualityOfIdea')
     .exists().bail().withMessage(ERROR_MESSAGE.REQUIRED)
     .notEmpty().bail().withMessage(ERROR_MESSAGE.NOT_EMPTY),
-    check('status')
-    .exists().bail().withMessage(ERROR_MESSAGE.REQUIRED)
-    .notEmpty().bail().withMessage(ERROR_MESSAGE.NOT_EMPTY),
     (req, res, next) => {
         try {
             const errors = validationResult(req);

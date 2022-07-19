@@ -1,4 +1,5 @@
 const { Opportunity } = require("../models/opportunity");
+const { OpportunityResponse } = require("../models/opportunityResponses");
 const { ObjectId } = require('mongodb');
 const { OPPORTUNITY_STATUS } = require("../lib/constants");
 
@@ -9,7 +10,6 @@ exports.getOpportunitiesByUser = async (user) => {
       status: { $nin: OPPORTUNITY_STATUS.DISABLED},
    })
 }
-
 
 exports.getOpportunityById = async (id) => {
    return await Opportunity.findOne({_id: ObjectId(id)})
@@ -30,3 +30,13 @@ exports.deleteOpportunity = async (id) => {
     _id: ObjectId(id)
  }, {status: OPPORTUNITY_STATUS.DISABLED});
 }
+
+exports.answerOpportunity = async (obj) => {
+    return  await OpportunityResponse.creaet(obj);
+}
+
+exports.getOpportunityResponsesByOpportunityId = async (id) => {
+    return await Opportunity.find({
+       OpportunityId: ObjectId(id)
+    })
+ }
