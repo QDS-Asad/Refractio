@@ -15,6 +15,7 @@ const {
   TOTAL_OPPORTUNITIES,
   OPPORTUNITY_STATUS,
   REQUIRED_MEMBER_TO_PUBLISH,
+  OPPORTUNITY_EMAIL_TEMPLATE,
 } = require("../lib/constants");
 
 // opportunities List
@@ -24,6 +25,21 @@ exports.opportunitiesList = async (req, res, next) => {
     await OpportunityService.getOpportunitiesByUser(user).then(
       (opportunities) => {
         console.log(opportunities);
+        Promise.all(
+          opportunities.map(async (obj, key) => {
+            const opportunityResponses =
+              await OpportunityService.getOpportunityResponsesByOpportunityId(
+                obj._id
+              );
+            const filterParticipants = obj.participants.filter(
+              (el) => el !== obj.createdById
+            );
+            opportunities[key] = {
+              ...obj,
+              canEvaluate: opportunityResponses.length == filterParticipants,
+            };
+          })
+        );
         return successResp(res, {
           msg: SUCCESS_MESSAGE.DATA_FETCHED,
           code: HTTP_STATUS.SUCCESS.CODE,
@@ -89,8 +105,17 @@ exports.updateOpportunity = async (req, res, next) => {
         code: HTTP_STATUS.BAD_REQUEST.CODE,
       });
     }
-    const opportunityInfo = await OpportunityService.getOpportunityById(opportunityId);
-    if (req.body.status === OPPORTUNITY_STATUS.PUBLISH && opportunityInfo.participants.length < REQUIRED_MEMBER_TO_PUBLISH) {
+    const opportunityInfo = await OpportunityService.getOpportunityById(
+      opportunityId
+    );
+    const filterParticipants =
+      (opportunityInfo.createdById == user._id &&
+        opportunityInfo.participants.filter((obj) => obj !== user._id)) ||
+      opportunityInfo.participants;
+    if (
+      req.body.status === OPPORTUNITY_STATUS.PUBLISH &&
+      filterParticipants.length < REQUIRED_MEMBER_TO_PUBLISH
+    ) {
       return errorResp(res, {
         msg: ERROR_MESSAGE.REQUIRED_MEMBER_IN_OPPORTUNITY,
         code: HTTP_STATUS.BAD_REQUEST.CODE,
@@ -104,11 +129,36 @@ exports.updateOpportunity = async (req, res, next) => {
       qualityOfIdea: req.body.qualityOfIdea || undefined,
     };
     await OpportunityService.updateOpportunity(opportunityId, requestBody)
-      .then((opportunityRes) => {
-        return successResp(res, {
-          msg: SUCCESS_MESSAGE.UPDATED,
-          code: HTTP_STATUS.SUCCESS.CODE,
-        });
+      .then(async (opportunityRes) => {
+        if (req.body.status === OPPORTUNITY_STATUS.PUBLISH) {
+          const participantsEmails = await UserService.getParticipants(
+            opportunityRes.participants
+          );
+          const link = `${CLIENT_HOST}/opportunities/${opportunityId}`;
+          const emailObj = {
+            email: participantsEmails,
+            subjact: OPPORTUNITY_EMAIL_SUBJECT,
+            html: OPPORTUNITY_EMAIL_TEMPLATE({ link }),
+          };
+          await UserService.tokenVerificationEmail(emailObj)
+            .then((emailRes) => {
+              return successResp(res, {
+                msg: SUCCESS_MESSAGE.UPDATED,
+                code: HTTP_STATUS.SUCCESS.CODE,
+              });
+            })
+            .catch((error) => {
+              return errorResp(res, {
+                msg: ERROR_MESSAGE.NOT_FOUND,
+                code: HTTP_STATUS.BAD_REQUEST.CODE,
+              });
+            });
+        } else {
+          return successResp(res, {
+            msg: SUCCESS_MESSAGE.UPDATED,
+            code: HTTP_STATUS.SUCCESS.CODE,
+          });
+        }
       })
       .catch((error) => {
         return errorResp(res, {
@@ -128,17 +178,19 @@ exports.addOpportunityMember = async (req, res, next) => {
     const { user } = req.body;
     await OpportunityService.getOpportunityById(opportunityId)
       .then(async (opportunityInfo) => {
-        const participant = opportunityInfo.participants.find((part) => part.toString() == userId.toString());
-        if(participant){
+        const participant = opportunityInfo.participants.find(
+          (part) => part.toString() == userId.toString()
+        );
+        if (participant) {
           return errorResp(res, {
             msg: ERROR_MESSAGE.ALLREADY_IN_OPPORTUNITY,
             code: HTTP_STATUS.BAD_REQUEST.CODE,
           });
-        }else{
+        } else {
           let participants = opportunityInfo.participants;
           participants.push(userId);
           const requestBody = {
-            participants
+            participants,
           };
           await OpportunityService.updateOpportunity(opportunityId, requestBody)
             .then((opportunityRes) => {
@@ -166,6 +218,45 @@ exports.addOpportunityMember = async (req, res, next) => {
   }
 };
 
+// remove Opportunity member
+exports.removeOpportunityMember = async (req, res, next) => {
+  try {
+    const { opportunityId, userId } = req.params;
+    const { user } = req.body;
+    await OpportunityService.getOpportunityById(opportunityId)
+      .then(async (opportunityInfo) => {
+        const participants = opportunityInfo.participants.filter(
+          (part) => part.toString() !== userId.toString()
+        );
+        const requestBody = {
+          participants,
+        };
+        await OpportunityService.updateOpportunity(opportunityId, requestBody)
+          .then((opportunityRes) => {
+            return successResp(res, {
+              msg: SUCCESS_MESSAGE.UPDATED,
+              code: HTTP_STATUS.SUCCESS.CODE,
+            });
+          })
+          .catch((error) => {
+            return errorResp(res, {
+              msg: ERROR_MESSAGE.NOT_FOUND,
+              code: HTTP_STATUS.BAD_REQUEST.CODE,
+            });
+          });
+      })
+      .catch((error) => {
+        return errorResp(res, {
+          msg: ERROR_MESSAGE.NOT_FOUND,
+          code: HTTP_STATUS.BAD_REQUEST.CODE,
+        });
+      });
+  } catch (error) {
+    serverError(res, error);
+  }
+};
+
+//delete opportunity
 exports.deleteOpportunity = async (req, res, next) => {
   try {
     const { opportunityId } = req.params;
@@ -187,6 +278,7 @@ exports.deleteOpportunity = async (req, res, next) => {
   }
 };
 
+// get opportunity by id
 exports.getOpportunityById = async (req, res, next) => {
   try {
     const { opportunityId } = req.params;
@@ -205,6 +297,39 @@ exports.getOpportunityById = async (req, res, next) => {
         });
       });
   } catch (error) {}
+};
+
+// answer Opportunity
+exports.answerOpportunity = async (req, res, next) => {
+  try {
+    const { opportunityId } = req.params;
+    const { user } = req.body;
+    const requestBody = {
+      userId: user._id,
+      teamId: user.teamId,
+      opportunityId: opportunityId,
+      comprehension: req.body.comprehension || undefined,
+      qualityOfIdea: req.body.qualityOfIdea || undefined,
+    };
+    await OpportunityService.answerOpportunity(requestBody)
+      .then(async (opportunityRes) => {
+        await OpportunityService.updateOpportunity(opportunityId, {
+          stauts: OPPORTUNITY_STATUS.ANSWERING,
+        });
+        return successResp(res, {
+          msg: SUCCESS_MESSAGE.ANSWERED,
+          code: HTTP_STATUS.SUCCESS.CODE,
+        });
+      })
+      .catch((error) => {
+        return errorResp(res, {
+          msg: ERROR_MESSAGE.NOT_FOUND,
+          code: HTTP_STATUS.BAD_REQUEST.CODE,
+        });
+      });
+  } catch (error) {
+    serverError(res, error);
+  }
 };
 
 const getOpportunitiesByStatus = async (opportunities) => {
