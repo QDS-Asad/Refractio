@@ -100,6 +100,7 @@ const OpportunityDetail = () => {
               watchQualityOfIdeaQ3={watchQualityOfIdeaQ3}
               watchQualityOfIdeaQ4={watchQualityOfIdeaQ4}
               watchQualityOfIdeaQ5={watchQualityOfIdeaQ5}
+              opportunity={opportunity}
             />
           )}
         </Tab.Pane>
