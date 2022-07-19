@@ -2,12 +2,13 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { Button, Form, Message, Modal } from 'semantic-ui-react';
-import { fetchRoles, roleListSelector } from '../../../features/roles/roleList';
 import {
   transferOwnershipSelector,
   transferOwnershipCall,
   resetTransferOwner,
+  fetchAdmins,
 } from '../../../features/team/transferOwnerSlice';
+import { logoutUser } from '../../../features/auth/authLoginSlice';
 
 const OwnershipTransfer = ({ transferOwner, setTransferOwner, member }) => {
   const { register, setValue, handleSubmit, errors, trigger } = useForm({
@@ -21,15 +22,13 @@ const OwnershipTransfer = ({ transferOwner, setTransferOwner, member }) => {
   const dispatch = useDispatch();
 
   // fetch data from our store
-  const { loading, error, success } = useSelector(transferOwnershipSelector);
-
+  const { loading, error, success, admins } = useSelector(
+    transferOwnershipSelector
+  );
   const handleTransfer = (data) => {
     // dispatch team invite;
-    debugger;
-    // dispatch(transferOwnershipCall(data));
+    dispatch(transferOwnershipCall(data.owner));
   };
-
-  const { roles } = useSelector(roleListSelector);
 
   const createOptions = {
     owner: {
@@ -38,14 +37,14 @@ const OwnershipTransfer = ({ transferOwner, setTransferOwner, member }) => {
   };
 
   useEffect(() => {
-    dispatch(fetchRoles());
+    dispatch(fetchAdmins());
     register({ name: 'owner' }, createOptions.owner);
   }, []);
 
   useEffect(() => {
     if (success) {
       setTransferOwner(false);
-      dispatch(resetTransferOwner());
+      dispatch(logoutUser());
     }
   }, [success]);
 
@@ -84,11 +83,11 @@ const OwnershipTransfer = ({ transferOwner, setTransferOwner, member }) => {
               <Form.Select
                 fluid
                 selection
-                options={roles.map((role) => {
+                options={admins.map((user) => {
                   return {
-                    key: role.roleId,
-                    text: role.name,
-                    value: role.roleId,
+                    key: user._id,
+                    text: user.firstName + ' ' + user.lastName,
+                    value: user._id,
                   };
                 })}
                 name='owner'

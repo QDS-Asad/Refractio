@@ -82,41 +82,22 @@ const OpportunityEvaluate = () => {
                   {error}
                 </Message>
               )}
-              {currentQuestion === 1 ? (
-                <EvaluateForm
-                  handleIdeaChange={handleIdeaChange}
-                  ideaRating={ideaRating}
-                  comprehensionRating={comprehensionRating}
-                  setCurrentQuestion={setCurrentQuestion}
-                  currentQuestion={currentQuestion}
-                  handleComprehensionChange={handleComprehensionChange}
-                  quality={opportunity.questions.quality}
-                  comprehension={opportunity.questions.comprehension}
-                  allQuestions={
-                    [
-                      ...opportunity.questions.quality,
-                      ...opportunity.questions.comprehension,
-                    ].length
-                  }
-                />
-              ) : (
-                <EvaluateForm
-                  handleIdeaChange={handleIdeaChange}
-                  ideaRating={ideaRating}
-                  comprehensionRating={comprehensionRating}
-                  setCurrentQuestion={setCurrentQuestion}
-                  currentQuestion={currentQuestion}
-                  handleComprehensionChange={handleComprehensionChange}
-                  quality={opportunity.questions.quality}
-                  comprehension={opportunity.questions.comprehension}
-                  allQuestions={
-                    [
-                      ...opportunity.questions.quality,
-                      ...opportunity.questions.comprehension,
-                    ].length
-                  }
-                />
-              )}
+              <EvaluateForm
+                handleIdeaChange={handleIdeaChange}
+                ideaRating={ideaRating}
+                comprehensionRating={comprehensionRating}
+                setCurrentQuestion={setCurrentQuestion}
+                currentQuestion={currentQuestion}
+                handleComprehensionChange={handleComprehensionChange}
+                quality={opportunity.questions.quality}
+                comprehension={opportunity.questions.comprehension}
+                allQuestions={
+                  [
+                    ...opportunity.questions.quality,
+                    ...opportunity.questions.comprehension,
+                  ].length
+                }
+              />
             </div>
           </Grid.Column>
           <>

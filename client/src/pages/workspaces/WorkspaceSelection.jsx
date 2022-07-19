@@ -41,7 +41,6 @@ const WorkspaceSelection = () => {
   useEffect(() => {
     dispatch(fetchWorkspaces(userLogin.id));
     if (workspaceJoin) {
-      debugger;
       dispatch(resetJoinWorkspace());
     }
   }, [workspaceJoin]);

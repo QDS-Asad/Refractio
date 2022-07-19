@@ -6,8 +6,9 @@ import {
   createOpportunity,
   opportunityCreateSelector,
 } from '../../../features/opportunities/opportunityCreateSlice';
+import { opportunityDetailSelector } from '../../../features/opportunities/opportunityDetailSlice';
 
-const OpportunityCreate = ({ showCreate, setShowCreate, opportunityName }) => {
+const OpportunityCreate = ({ showCreate, setShowCreate, id }) => {
   const { register, setValue, handleSubmit, watch, errors, trigger } = useForm({
     mode: 'onBlur',
     defaultValues: {
@@ -21,7 +22,7 @@ const OpportunityCreate = ({ showCreate, setShowCreate, opportunityName }) => {
 
   // fetch data from our store
   const { loading, error, success } = useSelector(opportunityCreateSelector);
-
+  const { opportunity } = useSelector(opportunityDetailSelector);
   const handleCreate = (data) => {
     console.log(data);
     dispatch(createOpportunity(data));
@@ -54,9 +55,14 @@ const OpportunityCreate = ({ showCreate, setShowCreate, opportunityName }) => {
   useEffect(() => {
     register({ name: 'name' }, createOptions.name);
     register({ name: 'description' }, createOptions.description);
-    setValue('name', opportunityName || '');
-    trigger('name');
   }, []);
+
+  useEffect(() => {
+    if (id && opportunity) {
+      setValue('name', opportunity.name);
+      setValue('description', opportunity.description);
+    }
+  }, [id, opportunity]);
 
   useEffect(() => {
     if (success) {
@@ -100,6 +106,7 @@ const OpportunityCreate = ({ showCreate, setShowCreate, opportunityName }) => {
                 onChange={handleChange}
                 onBlur={handleChange}
                 error={!!errors.name}
+                value={watchName}
               />
               {errors && errors.name && (
                 <Message error content={errors.name.message} />
@@ -116,6 +123,7 @@ const OpportunityCreate = ({ showCreate, setShowCreate, opportunityName }) => {
                 onChange={handleChange}
                 onBlur={handleChange}
                 error={!!errors.description}
+                value={watchDescription}
               />
               {errors && errors.description && (
                 <Message error content={errors.description.message} />

@@ -142,7 +142,6 @@ const TeamMembers = () => {
             <DeleteAccount
               deleteAccount={deleteAccount}
               setDeleteAccount={setDeleteAccount}
-              member={selectedMember}
               transferOwnership={transferOwnership}
             />
             <OwnershipTransfer

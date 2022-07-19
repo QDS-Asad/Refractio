@@ -38,10 +38,10 @@ const OpportunityResponse = () => {
     dispatch(fetchOpportunity(id));
   }, [dispatch, id]);
   useEffect(() => {
-    if (opportunity && opportunity.questions) {
+    if (opportunity && opportunity.comprehension.questions) {
       setAllQuestions([
-        ...opportunity.questions.quality,
-        ...opportunity.questions.comprehension,
+        ...opportunity.comprehension.questions,
+        ...opportunity.qualityOfIdea.questions,
       ]);
     }
   }, [opportunity]);

@@ -1,0 +1,129 @@
+import React from 'react';
+import { Form, Header, Message } from 'semantic-ui-react';
+function QuestionsOpportunityForm({
+  handleChange,
+  errors,
+  watchComprehensionQ1,
+  watchComprehensionQ2,
+  watchQualityOfIdeaQ1,
+  watchQualityOfIdeaQ2,
+  watchQualityOfIdeaQ3,
+  watchQualityOfIdeaQ4,
+  watchQualityOfIdeaQ5,
+}) {
+  return (
+    <>
+      <Header>
+        Evaluation of Comprehension
+        <Header.Subheader>
+          Publish question or prompt that will measure comprehension of the
+          opportunity.
+        </Header.Subheader>
+      </Header>
+      <Form.Field>
+        <label>Question 1 (Required)</label>
+        <Form.Input
+          name='comprehensionQ1'
+          fluid
+          onChange={handleChange}
+          onBlur={handleChange}
+          error={!!errors.comprehensionQ1}
+          value={watchComprehensionQ1}
+          placeholder='e.g. What is the best reason for Team to pursue Opportunity'
+        />
+        {errors && errors.comprehensionQ1 && (
+          <Message error content={errors.comprehensionQ1.message} />
+        )}
+      </Form.Field>
+
+      <Form.Field>
+        <label>Question 2</label>
+        <Form.Input
+          name='comprehensionQ2'
+          fluid
+          onChange={handleChange}
+          onBlur={handleChange}
+          error={!!errors.comprehensionQ2}
+          value={watchComprehensionQ2}
+          placeholder='e.g. What is the best reason for Team to NOT pursue Opportunity'
+        />
+      </Form.Field>
+      <Header>
+        Evaluation of Quality of Idea-Response
+        <Header.Subheader>
+          Publish questions that will help participants structure their
+          responses.
+        </Header.Subheader>
+      </Header>
+      <Form.Field>
+        <label>Question 1 (Required)</label>
+        <Form.Input
+          name='qualityOfIdeaQ1'
+          fluid
+          onChange={handleChange}
+          onBlur={handleChange}
+          error={!!errors.qualityOfIdeaQ1}
+          value={watchQualityOfIdeaQ1}
+          placeholder='e.g. Describe the Stakeholders involved in the Idea you are submitting'
+        />
+        {errors && errors.qualityOfIdeaQ1 && (
+          <Message error content={errors.qualityOfIdeaQ1.message} />
+        )}
+      </Form.Field>
+
+      <Form.Field>
+        <label>Question 2</label>
+        <Form.Input
+          name='qualityOfIdeaQ2'
+          fluid
+          onChange={handleChange}
+          onBlur={handleChange}
+          error={!!errors.qualityOfIdeaQ2}
+          value={watchQualityOfIdeaQ2}
+          placeholder='e.g. Describe the EXPECTED RESULTS from action taken to pursue Opportunity'
+        />
+      </Form.Field>
+
+      <Form.Field>
+        <label>Question 3</label>
+        <Form.Input
+          name='qualityOfIdeaQ3'
+          fluid
+          onChange={handleChange}
+          onBlur={handleChange}
+          error={!!errors.qualityOfIdeaQ3}
+          value={watchQualityOfIdeaQ3}
+          placeholder='e.g. Describe the EXPECTED RESULTS from action taken to pursue Opportunity'
+        />
+      </Form.Field>
+
+      <Form.Field>
+        <label>Question 4</label>
+        <Form.Input
+          name='qualityOfIdeaQ4'
+          fluid
+          onChange={handleChange}
+          onBlur={handleChange}
+          error={!!errors.qualityOfIdeaQ4}
+          value={watchQualityOfIdeaQ4}
+          placeholder='e.g. Describe the RISKS from action taken to pursue Opportunity'
+        />
+      </Form.Field>
+
+      <Form.Field>
+        <label>Question 5</label>
+        <Form.Input
+          name='qualityOfIdeaQ5'
+          fluid
+          onChange={handleChange}
+          onBlur={handleChange}
+          error={!!errors.qualityOfIdeaQ5}
+          value={watchQualityOfIdeaQ5}
+          placeholder='e.g. WHEN can or should Team work on pursuing Opportunity? What are DEPENDENCIES?'
+        />
+      </Form.Field>
+    </>
+  );
+}
+
+export default QuestionsOpportunityForm;

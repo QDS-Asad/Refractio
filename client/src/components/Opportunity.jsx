@@ -10,9 +10,7 @@ const Opportunity = ({ opportunity }) => {
   const [showMore, setShowMore] = useState(false);
   const navigate = useNavigate();
   const { userLogin } = useSelector(authLoginSelector);
-  const application = opportunity.participants.filter(
-    (o) => o.email === userLogin.email
-  );
+  const application = opportunity.participants.includes(userLogin.id);
   return (
     <Card fluid>
       <Card.Content>

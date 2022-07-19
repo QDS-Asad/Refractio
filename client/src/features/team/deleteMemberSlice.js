@@ -35,8 +35,12 @@ const deleteMemberSlice = createSlice({
   },
 });
 // export the actions
-export const { setLoading, setSuccess, setError, reset } =
-  deleteMemberSlice.actions;
+export const {
+  setLoading,
+  setSuccess,
+  setError,
+  reset,
+} = deleteMemberSlice.actions;
 
 // export the selector (".items" being same as in slices/index.js's "items: something")
 export const deleteMemberSelector = (state) => {
@@ -47,10 +51,10 @@ export const deleteMemberSelector = (state) => {
 export default deleteMemberSlice.reducer;
 
 // fetch all opportunities
-export const deleteMember = (member) => async (dispatch) => {
+export const deleteMember = () => async (dispatch) => {
   try {
     dispatch(setLoading());
-    await refractioApi.delete(`/users/delete/${member}`);
+    await refractioApi.delete(`/users/delete-team`);
     dispatch(setSuccess(true));
   } catch (error) {
     const errorMessage =

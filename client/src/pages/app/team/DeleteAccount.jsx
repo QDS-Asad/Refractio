@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Message, Modal } from 'semantic-ui-react';
+import { logoutUser } from '../../../features/auth/authLoginSlice';
 import {
   deleteMemberSelector,
   resetDeleteTeamMember,
@@ -9,7 +10,6 @@ import {
 const DeleteAccount = ({
   deleteAccount,
   setDeleteAccount,
-  member,
   transferOwnership,
 }) => {
   const dispatch = useDispatch();
@@ -19,13 +19,13 @@ const DeleteAccount = ({
   const deleteWorkSpace = () => {
     // dispatch team cancel invite;
     setDeleteAccount(false);
-    dispatch(deleteMember(member));
+    dispatch(deleteMember());
   };
 
   useEffect(() => {
     if (success) {
       setDeleteAccount(false);
-      dispatch(resetDeleteTeamMember());
+      dispatch(logoutUser());
     }
   }, [success]);
 
