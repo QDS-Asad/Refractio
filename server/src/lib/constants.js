@@ -21,6 +21,8 @@ module.exports = Object.freeze({
     TOTAL_TEAM_ADMIN: 3,
     TOTAL_TEAM_ORGANIZER: 3,
     TOTAL_TEAM_MEMBERS: 24,
+    TOTAL_OPPORTUNITIES: 12,
+    REQUIRED_MEMBER_TO_PUBLISH: 2,
     EMAIL_TYPES: {
         VERIFY_REGISTER: "verify-register",
         INVITE_USER: "invite-user",
@@ -37,6 +39,17 @@ module.exports = Object.freeze({
       DISABLED: "disabled",
       INVITE_SENT: "invite_sent",
       SUBSCRIPTION_PENDING: "subscription_pending",
+    },
+    OPPORTUNITY_STATUS : {
+      PUBLISH: "publish",
+      DRAFT: "draft",
+      DISABLED: "disabled",
+      COMPLETED: "completed",
+      ANSWERING: "answering",
+    },
+    TEAM_STATUS: {
+      ACTIVE: "active",
+      DISABLED: "disabled"
     },
     SUBSCRIPTION_STATUS: {
       SUCCESS: "success",
@@ -83,6 +96,7 @@ module.exports = Object.freeze({
         UPDATED: "Updated Successfully",
         DELETED: "Deleted Successfully",
         CANCELED: "Canceled Successfully",
+        TRANSFERED: "Transfered Succesfully"
 
     },
     ERROR_MESSAGE:{
@@ -116,6 +130,8 @@ module.exports = Object.freeze({
         ALLREADY_REGISTERED: "Already registered!",
         ALLREADY_VERIFIED: "Already Verified!",
         ALLREADY_INVITED: "Already Invited!",
+        ALLREADY_IN_OPPORTUNITY: "Already a Member of this opportunity!",
+        REQUIRED_MEMBER_IN_OPPORTUNITY: "Minimum 2 members should be added to publish this opportunity!",
         EMAIL_SENT_FAILED: "unable to send email!",
         DEFAULT_ROLES_FAILED: "Error in creating Default Roles!",
         SUPER_ADMIN_FAILED: "Error in creating Super Admin!",
@@ -123,8 +139,11 @@ module.exports = Object.freeze({
         SUPER_ADMIN_EXIST: "Super Admin already exist!",
         TOKEN_EXPIRED: "OTP expired. Please request again!",
         TEAM_LIMIT_EXCEED:"Team limit reached. You can add only 24 team members!",
+        OPPORTUNITY_LIMIT_EXCEED:"Opportunity limit reached. You can add only 12 Opportunities! Please delete opportunities to add new",
         TEAM_ADMIN_LIMIT_EXCEED:"Team Administrator limit reached. A Team can have 3 Administrators only!",
         TEAM_ORGANIZER_LIMIT_EXCEED:"Team Organizer limit reached. A Team can have 3 Organizers only!",
+        COMP_MIN_ONE_QUESTION: "Minimum 1 question Required in Comprehension",
+        QOA_MIN_ONE_QUESTION: "Minimum 1 question Required in Quality of idea",
     },
     VERIFY_REGISTER_EMAIL_SUBJECT: "Verify your email",
     VERIFY_REGISTER_EMAIL_TEMPLATE: (params) => {
