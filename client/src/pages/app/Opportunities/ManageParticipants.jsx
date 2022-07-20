@@ -1,11 +1,26 @@
 import React from 'react';
-import { Modal, List, Header, Button } from 'semantic-ui-react';
+import { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { Modal, List, Header, Button, Message } from 'semantic-ui-react';
+import {
+  fetchMemberList,
+  teamMembersSelector,
+  addMemberOpportunity,
+  removeMemberOpportunity,
+} from '../../../features/team/teamParticipantsSlice';
 
 const ManageParticipants = ({
   viewParticipant,
   setViewParticipant,
   opportunity,
 }) => {
+  const dispatch = useDispatch();
+  // fetch data from our store
+  const { loading, error, members } = useSelector(teamMembersSelector);
+  useEffect(() => {
+    dispatch(fetchMemberList());
+  }, []);
+
   return (
     <Modal
       onClose={() => setViewParticipant(false)}
@@ -21,17 +36,48 @@ const ManageParticipants = ({
       </Modal.Header>
       <Modal.Content scrolling>
         <Modal.Description>
-          {opportunity.participants.map((participant) => (
-            <List divided verticalAlign='middle' key={participant._id}>
+          {error && (
+            <Message color='red' className='error-message mb-3'>
+              {error}
+            </Message>
+          )}
+          {members.map((member) => (
+            <List divided verticalAlign='middle' key={member._id}>
               <List.Item>
-                <List.Content floated='right'>
-                  <button className='btn-link'>Remove</button>
-                </List.Content>
+                {opportunity.participants.includes(member._id) ? (
+                  <List.Content floated='right'>
+                    <button
+                      onClick={() =>
+                        dispatch(
+                          removeMemberOpportunity(opportunity._id, member._id)
+                        )
+                      }
+                      disabled={loading}
+                      className='btn-link'
+                    >
+                      Remove
+                    </button>
+                  </List.Content>
+                ) : (
+                  <List.Content floated='right'>
+                    <button
+                      onClick={() =>
+                        dispatch(
+                          addMemberOpportunity(opportunity._id, member._id)
+                        )
+                      }
+                      disabled={loading}
+                      className='btn-link'
+                    >
+                      Add
+                    </button>
+                  </List.Content>
+                )}
 
                 <List.Content>
                   <Header>
-                    {participant.name}
-                    <Header.Subheader>{participant.email}</Header.Subheader>
+                    {`${member.firstName} ${member.lastName}`}
+                    <Header.Subheader>{member.email}</Header.Subheader>
                   </Header>
                 </List.Content>
               </List.Item>

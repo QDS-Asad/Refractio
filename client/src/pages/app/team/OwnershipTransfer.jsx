@@ -48,6 +48,7 @@ const OwnershipTransfer = ({ transferOwner, setTransferOwner, member }) => {
 
   useEffect(() => {
     if (success) {
+      dispatch(resetTransferOwner())
       setTransferOwner(false);
       dispatch(logoutUser());
     }

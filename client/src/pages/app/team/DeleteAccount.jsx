@@ -28,6 +28,7 @@ const DeleteAccount = ({
 
   useEffect(() => {
     if (success) {
+      dispatch(resetDeleteTeamMember())
       setDeleteAccount(false);
       dispatch(logoutUser());
     }

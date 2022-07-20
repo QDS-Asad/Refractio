@@ -60,6 +60,19 @@ export const changeUserCard = (userId, body) => async (dispatch) => {
     dispatch(setError(errorMessage));
   }
 };
+export const AddUserCard = (userId, body) => async (dispatch) => {
+  try {
+    dispatch(setLoading());
+    await refractioApi.put(`/users/add-payment-method/${userId}`, body);
+    dispatch(setSuccess(true));
+  } catch (error) {
+    const errorMessage =
+      error.response && error.response.data
+        ? error.response.data.message
+        : error.message;
+    dispatch(setError(errorMessage));
+  }
+};
 
 export const resetChangeCard = () => (dispatch) => {
   dispatch(reset());
