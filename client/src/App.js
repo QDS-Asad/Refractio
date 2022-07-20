@@ -38,7 +38,7 @@ const App = () => {
         <Route path='new-password/:token' element={<NewPassword />} />
         <Route path='password-recover' element={<PasswordRecover />} />
         <Route path='verify-code' element={<VerificationCode />} />
-        <Route path='invite-account/:token' element={<InviteAccount />} />
+        <Route path='invite-account/:token/:team' element={<InviteAccount />} />
       </Route>
       <Route path='subscription' element={<SubscriptionLayout />}>
         <Route path='' element={<Subscription />} />

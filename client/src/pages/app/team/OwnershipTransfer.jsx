@@ -37,9 +37,14 @@ const OwnershipTransfer = ({ transferOwner, setTransferOwner, member }) => {
   };
 
   useEffect(() => {
-    dispatch(fetchAdmins());
     register({ name: 'owner' }, createOptions.owner);
   }, []);
+  
+  useEffect(() => {
+    if (transferOwner) {
+      dispatch(fetchAdmins());
+    }
+  }, [transferOwner]);
 
   useEffect(() => {
     if (success) {
