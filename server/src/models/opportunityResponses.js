@@ -36,16 +36,6 @@ const OpportunityResponseSchema = new Schema(
           },
         },
       ],
-      evaluation: [
-        {
-          userId: {
-            type: String,
-          },
-          score: {
-            type: String,
-          },
-        },
-      ],
     },
     qualityOfIdea: {
       answers: [
@@ -54,16 +44,6 @@ const OpportunityResponseSchema = new Schema(
             type: String,
           },
           answer: {
-            type: String,
-          },
-        },
-      ],
-      evaluation: [
-        {
-          userId: {
-            type: String,
-          },
-          score: {
             type: String,
           },
         },
