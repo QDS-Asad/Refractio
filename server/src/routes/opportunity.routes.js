@@ -219,99 +219,99 @@ router.post("/create", Auth, validateCreateOpportunity, Opportunity.createOpport
  */
 router.get("/:opportunityId", Auth, Opportunity.getOpportunityById);
 
-// /**
-//  * @swagger
-//  *   /api/opportunities/update/{opportunityId}:
-//  *   put:
-//  *     description: update opportunity
-//  *     tags: [Opportunities]
-//  *     parameters:
-//  *       - in: path
-//  *         name: opportunityId
-//  *     schema:
-//  *        type: integer
-//  *     requestBody:
-//  *       required: true
-//  *       content:
-//  *         application/json:
-//  *           schema:
-//  *             $ref: '#/components/schemas/UpdateOpportunity'
-//  *     responses:
-//  *        '200':
-//  *           description: Success
-//  *           content:
-//  *             application/json:
-//  *               schema:
-//  *                 type: object
-//  *                 properties:
-//  *                   success:
-//  *                     type: string
-//  *                   code:
-//  *                     type: integer
-//  *                   message:
-//  *                     type: string
-//  *                   data:
-//  *                     type: object
-//  *                 example:
-//  *                   success: true
-//  *                   code: 200
-//  *                   message: Operation successfull.
-//  *        '404':
-//  *           description: Operation Failed
-//  *           content:
-//  *             application/json:
-//  *               schema:
-//  *                 type: object
-//  *                 properties:
-//  *                   success:
-//  *                     type: string
-//  *                   code:
-//  *                     type: integer
-//  *                   message:
-//  *                     type: string
-//  *                   data:
-//  *                     type: object
-//  *                 example:
-//  *                    {"success": false,"code": 404,"message": "Operation Failed."}
-//  *
-//  *        '422':
-//  *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
-//  *           content:
-//  *             application/json:
-//  *               schema:
-//  *                 type: object
-//  *                 properties:
-//  *                   success:
-//  *                     type: string
-//  *                   code:
-//  *                     type: integer
-//  *                   message:
-//  *                     type: string
-//  *                   data:
-//  *                     type: object
-//  *                 example:
-//  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
-//  *
-//  * components:
-//  *  schemas:
-//  *   UpdateOpportunity:
-//  *    type: object
-//  *    required:
-//  *      - status
-//  *      - comprehension
-//  *      - qualityOfIdea
-//  *    properties:
-//  *      status:
-//  *        type: string
-//  *        enum: ['publish', 'draft']
-//  *      comprehension:
-//  *        type: object
-//  *        questions:
-//  *          type: array
-//  *      qualityOfIdea:
-//  *        type: object
-//  */
-// router.put("/update/:opportunityId", Auth, validateUpdateOpportunity, Opportunity.updateOpportunity);
+/**
+ * @swagger
+ *   /api/opportunities/update/{opportunityId}:
+ *   put:
+ *     description: update opportunity
+ *     tags: [Opportunities]
+ *     parameters:
+ *       - in: path
+ *         name: opportunityId
+ *     schema:
+ *        type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateOpportunity'
+ *     responses:
+ *        '200':
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                   success: true
+ *                   code: 200
+ *                   message: Operation successfull.
+ *        '404':
+ *           description: Operation Failed
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 404,"message": "Operation Failed."}
+ *
+ *        '422':
+ *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
+ *
+ * components:
+ *  schemas:
+ *   UpdateOpportunity:
+ *    type: object
+ *    required:
+ *      - status
+ *      - comprehension
+ *      - qualityOfIdea
+ *    properties:
+ *      status:
+ *        type: string
+ *        enum: ['publish', 'draft']
+ *      comprehension:
+ *        type: object
+ *        questions:
+ *          type: array
+ *      qualityOfIdea:
+ *        type: object
+ */
+router.put("/update/:opportunityId", Auth, validateUpdateOpportunity, Opportunity.updateOpportunity);
 
 /**
  * @swagger

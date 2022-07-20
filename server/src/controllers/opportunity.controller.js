@@ -134,7 +134,7 @@ exports.updateOpportunity = async (req, res, next) => {
           const participantsEmails = await UserService.getParticipants(
             opportunityRes.participants
           );
-          const link = `${CLIENT_HOST}/opportunities/${opportunityId}`;
+          const link = `${CLIENT_HOST}/opportunityresponse/${opportunityId}`;
           const emailObj = {
             email: participantsEmails,
             subjact: OPPORTUNITY_EMAIL_SUBJECT,
