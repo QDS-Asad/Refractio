@@ -30,16 +30,28 @@ const maxLengthObject = {
 const questionFormationArray = (data) => {
   let apiData = {
     comprehension: {
-      questions: [{ order: 1, question: data.comprehensionQ1 }],
+      questions: [],
     },
     qualityOfIdea: {
-      questions: [{ order: 1, question: data.qualityOfIdeaQ1 }],
+      questions: [],
     },
   };
-  if (data.comprehensionQ2) {
+  if (data.comprehensionQ1) {
     apiData.comprehension.questions.push({
       order: 1,
+      question: data.comprehensionQ1,
+    });
+  }
+  if (data.comprehensionQ2) {
+    apiData.comprehension.questions.push({
+      order: 2,
       question: data.comprehensionQ2,
+    });
+  }
+  if (data.qualityOfIdeaQ1) {
+    apiData.qualityOfIdea.questions.push({
+      order: 1,
+      question: data.qualityOfIdeaQ1,
     });
   }
   if (data.qualityOfIdeaQ2) {
