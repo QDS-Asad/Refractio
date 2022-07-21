@@ -6,7 +6,6 @@ export const initialState = {
   loading: false,
   error: null,
   opportunity: null,
-  published: false,
 };
 
 // our slice
@@ -26,9 +25,6 @@ const opportunityDetailSlice = createSlice({
       state.loading = false;
       state.error = payload;
     },
-    setPublish: (state) => {
-      state.published = true;
-    },
     reset: (state) => {
       state.loading = false;
       state.error = null;
@@ -41,7 +37,6 @@ export const {
   setLoading,
   setOpportunity,
   setError,
-  setPublish,
   reset,
 } = opportunityDetailSlice.actions;
 
@@ -73,9 +68,6 @@ export const updateOpportunity = (id, status, bodyData) => async (dispatch) => {
       ...bodyData,
     });
     dispatch(fetchOpportunity(id));
-    if (status === 'publish') {
-      dispatch(setPublish());
-    }
   } catch (error) {
     const errorMessage =
       error.response && error.response.data

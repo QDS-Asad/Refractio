@@ -3,6 +3,7 @@ import { Card, Divider, Button } from 'semantic-ui-react';
 import { useState } from 'react';
 const description =
   'You will benefit from the product by maintaining control over important company informationYou will benefit from the product by maintaining control over important company informationYou will benefit from the product by maintaining control over important company information  ...view more.';
+const style = { color: 'blue', cursor: 'pointer' };
 const Content = () => {
   const [showMore, setShowMore] = useState(false);
   return (
@@ -12,13 +13,10 @@ const Content = () => {
         <Card.Description className='mb-3'>
           {showMore ? description : <>{description.substr(0, 203)}...</>}
           {description.length > 203 && (
-            <a
-              style={{ color: 'blue' }}
-              onClick={() => setShowMore((prev) => !prev)}
-            >
+            <span style={style} onClick={() => setShowMore((prev) => !prev)}>
               {' '}
               {showMore ? 'Show Less' : 'Show More'}
-            </a>
+            </span>
           )}
         </Card.Description>
         <Divider />

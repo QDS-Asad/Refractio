@@ -6,6 +6,7 @@ import OpportunityStatus from './OpportunityStatus';
 import { authLoginSelector } from '../features/auth/authLoginSlice';
 import { useState } from 'react';
 
+const style = { color: 'blue', cursor: 'pointer' };
 const Opportunity = ({ opportunity }) => {
   const [showMore, setShowMore] = useState(false);
   const navigate = useNavigate();
@@ -35,13 +36,10 @@ const Opportunity = ({ opportunity }) => {
               ) : (
                 <>{opportunity.description.substr(0, 203)}... </>
               )}
-              <a
-                style={{ color: 'blue' }}
-                onClick={() => setShowMore((prev) => !prev)}
-              >
+              <span style={style} onClick={() => setShowMore((prev) => !prev)}>
                 {' '}
                 {showMore ? 'Show Less' : 'Show More'}
-              </a>
+              </span>
             </>
           ) : (
             opportunity.description

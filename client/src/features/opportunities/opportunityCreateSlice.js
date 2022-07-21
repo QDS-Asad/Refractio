@@ -44,14 +44,11 @@ export const opportunityCreateSelector = (state) => state.opportunityCreate;
 // export the default reducer
 export default opportunityCreateSlice.reducer;
 
-// fetch opportunity details
+// create opportunity
 export const createOpportunity = (opportunity) => async (dispatch) => {
   try {
     dispatch(setLoading());
-    let { data } = await refractioApi.post(
-      '/opportunities/create',
-      opportunity
-    );
+    await refractioApi.post('/opportunities/create', opportunity);
     dispatch(setOpportunity(opportunity));
     dispatch(fetchOpportunities());
   } catch (error) {

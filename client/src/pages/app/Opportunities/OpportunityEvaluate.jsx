@@ -21,9 +21,7 @@ const OpportunityEvaluate = () => {
   const dispatch = useDispatch();
 
   // fetch data from our store
-  const { loading, error, opportunity } = useSelector(
-    opportunityEvaluateSelector
-  );
+  const { error, opportunity } = useSelector(opportunityEvaluateSelector);
   const handleComprehensionChange = (e, { value }) => {
     setComprehensionRating(value);
   };

@@ -17,7 +17,7 @@ const DeleteAccount = ({
   const [deleteWorkspace, setDeleteWorkspace] = useState(false);
   const dispatch = useDispatch();
 
-  const { loading, error, success } = useSelector(deleteMemberSelector);
+  const { error, success } = useSelector(deleteMemberSelector);
 
   const deleteWorkSpace = () => {
     // dispatch team cancel invite;
@@ -28,7 +28,7 @@ const DeleteAccount = ({
 
   useEffect(() => {
     if (success) {
-      dispatch(resetDeleteTeamMember())
+      dispatch(resetDeleteTeamMember());
       setDeleteAccount(false);
       dispatch(logoutUser());
     }
@@ -63,13 +63,13 @@ const DeleteAccount = ({
             </p>
             <p>
               You can{' '}
-              <a onClick={transferOwnership} style={style}>
+              <span onClick={transferOwnership} style={style}>
                 transfer ownership
-              </a>{' '}
+              </span>{' '}
               to another member or{' '}
-              <a onClick={deleteWorkSpace} style={style}>
+              <span onClick={deleteWorkSpace} style={style}>
                 delete this workspace
-              </a>
+              </span>
               .{' '}
             </p>
           </Modal.Description>

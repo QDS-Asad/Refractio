@@ -16,7 +16,7 @@ import {
   Tab,
   Segment,
 } from 'semantic-ui-react';
-import { Navigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import OpportunityStatus from '../../../components/OpportunityStatus';
 import PublishOpportunity from './PublishOpportunity';
 import ManageParticipants from './ManageParticipants';
@@ -109,8 +109,9 @@ const OpportunityDetail = () => {
   };
   const handleSubmittion = (data) => {
     let apiData = questionFormationArray(data);
-    setViewPublish(true);
     setFormValues(apiData);
+    debugger;
+    setViewPublish(true);
   };
   const handleDraft = (data) => {
     let apiData = questionFormationArray(data);
@@ -157,7 +158,7 @@ const OpportunityDetail = () => {
   const dispatch = useDispatch();
 
   // fetch data from our store
-  const { loading, error, opportunity, published } = useSelector(
+  const { loading, error, opportunity } = useSelector(
     opportunityDetailSelector
   );
 
@@ -175,11 +176,6 @@ const OpportunityDetail = () => {
       });
     }
   }, [opportunity]);
-  useEffect(() => {
-    if (published) {
-      return <Navigate to={{ pathname: '/oppotunities' }} />;
-    }
-  }, [published]);
   const watchComprehensionQ1 = watch('comprehensionQ1', '');
   const watchComprehensionQ2 = watch('comprehensionQ2', '');
   const watchQualityOfIdeaQ1 = watch('qualityOfIdeaQ1', '');
@@ -223,7 +219,8 @@ const OpportunityDetail = () => {
                     <Button
                       className='btn-link'
                       floated='right'
-                      onClick={() => setEditOpportunity((prev) => !prev)}
+                      type='button'
+                      onClick={() => setEditOpportunity(true)}
                       disabled={loading}
                     >
                       Edit

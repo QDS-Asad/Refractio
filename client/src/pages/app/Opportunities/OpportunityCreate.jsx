@@ -8,7 +8,7 @@ import {
 } from '../../../features/opportunities/opportunityCreateSlice';
 import { opportunityDetailSelector } from '../../../features/opportunities/opportunityDetailSlice';
 
-const OpportunityCreate = ({ showCreate, setShowCreate, id, title }) => {
+const OpportunityCreate = ({ showCreate, setShowCreate, id }) => {
   const { register, setValue, handleSubmit, watch, errors, trigger } = useForm({
     mode: 'onBlur',
     defaultValues: {
