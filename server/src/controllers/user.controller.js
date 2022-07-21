@@ -174,7 +174,7 @@ exports.inviteUser = async (req, res, next) => {
               }
             } else {
               return errorResp(res, {
-                msg: ERROR_MESSAGE.ALLREADY_INVITED,
+                msg: ERROR_MESSAGE.ALLREADY_INVITED(email),
                 code: HTTP_STATUS.BAD_REQUEST.CODE,
               });
             }

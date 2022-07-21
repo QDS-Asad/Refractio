@@ -5,6 +5,9 @@ const Schema = mongoose.Schema;
 
 const OpportunityEvaluationSchema = new Schema(
   {
+    opportunityId: {
+      type: String,
+    },
     opportunityResponseId: {
       type: String,
     },
@@ -19,35 +22,19 @@ const OpportunityEvaluationSchema = new Schema(
       enum: [
         OPPORTUNITY_STATUS.PUBLISH,
         OPPORTUNITY_STATUS.DRAFT,
-        OPPORTUNITY_STATUS.EVALUATING,
-        OPPORTUNITY_STATUS.COMPLETED,
         OPPORTUNITY_STATUS.DISABLED,
       ],
       default: OPPORTUNITY_STATUS.DRAFT,
     },
     comprehension: {
-      evaluation: [
-        {
-          userId: {
-            type: String,
-          },
-          score: {
-            type: String,
-          },
-        },
-      ],
+      score: {
+        type: String,
+      },
     },
     qualityOfIdea: {
-      evaluation: [
-        {
-          userId: {
-            type: String,
-          },
-          score: {
-            type: String,
-          },
-        },
-      ],
+      score: {
+        type: String,
+      },
     },
     createdBy: {
       type: String,
@@ -71,5 +58,8 @@ OpportunityEvaluationSchema.pre("findOneAndUpdate", function (next) {
 });
 OpportunityEvaluationSchema.plugin(mongoosePaginate);
 module.exports = {
-  OpportunityEvaluation: mongoose.model("OpportunityEvaluation", OpportunityEvaluationSchema),
+  OpportunityEvaluation: mongoose.model(
+    "OpportunityEvaluation",
+    OpportunityEvaluationSchema
+  ),
 };

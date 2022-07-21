@@ -48,6 +48,10 @@ module.exports = Object.freeze({
       ANSWERING: "answering",
       EVALUATING: "evaluating",
     },
+    OPPORTUNITY_EVALUATION_STATUS : {
+      COMPLETED: "completed",
+      PENDING: "pending",
+    },
     TEAM_STATUS: {
       ACTIVE: "active",
       DISABLED: "disabled"
@@ -99,6 +103,7 @@ module.exports = Object.freeze({
         CANCELED: "Canceled Successfully",
         TRANSFERED: "Transfered Succesfully",
         ANSWERED: "Answered Sussefully",
+        EVALUATED: "Evaluated Sussefully",
 
     },
     ERROR_MESSAGE:{
@@ -113,6 +118,7 @@ module.exports = Object.freeze({
         UNAUTHORIZED: "authorization denied.",
         NO_DATA: "No data available.",
         NOT_FOUND: "Not found.",
+        NOT_ALLOWED: "Not allowed.",
         INVALID_ENDPOINT: "Invalid api endpoint!",
         FULL_NAME: "Full name can not be empty!",
         EMAIL: "Email can not be empty!",
@@ -131,7 +137,7 @@ module.exports = Object.freeze({
         INVALID_PASSWORD: "Invalid password!",
         ALLREADY_REGISTERED: "Already registered!",
         ALLREADY_VERIFIED: "Already Verified!",
-        ALLREADY_INVITED: "Already Invited!",
+        ALLREADY_INVITED: (email) => {return `User with email '${email}' already invited, if you wish to remind the user please use resend invitation.`},
         ALLREADY_IN_OPPORTUNITY: "Already a Member of this opportunity!",
         REQUIRED_MEMBER_IN_OPPORTUNITY: "Minimum 2 members should be added to publish this opportunity!",
         EMAIL_SENT_FAILED: "unable to send email!",
@@ -218,7 +224,19 @@ module.exports = Object.freeze({
             <a href="" style="font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600">Refractio</a>
           </div>
           <p style="font-size:1.1em">Hi,</p>
-          <p>We value your ideas. Please submit your thoughts on the opportunity listed. <a href="${params.link}" style="color:#ffff;text-decoration:none;">Click Here</a>.</p>
+          <p>We value your ideas. Please submit your thoughts on the opportunity listed. <a href="${params.link}" style="color:#00466a;text-decoration:none;">Click Here</a>.</p>
+        </div>
+      </div>`
+    },
+    EVALUATE_OPPORTUNITY_EMAIL_SUBJECT: "Final step pending",
+    EVALUATE_OPPORTUNITY_EMAIL_TEMPLATE: (params) => {
+        return `<div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
+        <div style="margin:50px auto;width:70%;padding:20px 0">
+          <div style="border-bottom:1px solid #eee">
+            <a href="" style="font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600">Refractio</a>
+          </div>
+          <p style="font-size:1.1em">Hi,</p>
+          <p>Thank you for sharing your ideas. Please <a href="${params.link}" style="color:#00466a;text-decoration:none;">Click Here</a> to complete the submission.</p>
         </div>
       </div>`
     },

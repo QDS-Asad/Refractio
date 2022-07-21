@@ -68,11 +68,11 @@ exports.getUsersByTeamId = async (teamId) => {
 
 exports.getTeamMembers = async (user) => {
   return await User.find({
-    _id: { $nin: user._id },
+    // _id: { $nin: user._id },
     teams: {
       $elemMatch: {
         teamId: ObjectId(user.teamId),
-        status: { $nin: [USER_STATUS.DISABLED, USER_STATUS.INVITE_SENT] },
+        status: { $in: [USER_STATUS.ACTIVE] },
       },
     },
   }).select({ _id: 1, firstName: 1, lastName: 1, email: 1 });
