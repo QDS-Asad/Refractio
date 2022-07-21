@@ -110,7 +110,6 @@ const OpportunityDetail = () => {
   const handleSubmittion = (data) => {
     let apiData = questionFormationArray(data);
     setFormValues(apiData);
-    debugger;
     setViewPublish(true);
   };
   const handleDraft = (data) => {
