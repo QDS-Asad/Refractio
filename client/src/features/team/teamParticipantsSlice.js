@@ -8,6 +8,7 @@ export const initialState = {
   error: null,
   members: [],
   success: false,
+  message: '',
 };
 
 // our slice
@@ -24,7 +25,6 @@ const teamParticipantsSlice = createSlice({
       state.loading = false;
       state.error = null;
       state.members = payload;
-      state.success = true;
     },
     setError: (state, { payload }) => {
       state.loading = false;
@@ -32,10 +32,11 @@ const teamParticipantsSlice = createSlice({
       state.success = false;
       state.members = [];
     },
-    setSuccess: (state) => {
+    setSuccess: (state, { payload }) => {
       state.loading = false;
       state.error = null;
       state.success = true;
+      state.message = payload;
     },
   },
 });
@@ -76,7 +77,7 @@ export const addMemberOpportunity = (opportunityId, userId) => async (
       `/opportunities/add-opportunity-member/${opportunityId}/${userId}`
     );
     dispatch(fetchOpportunity(opportunityId));
-    dispatch(setSuccess());
+    dispatch(setSuccess('Participant added successfully.'));
   } catch (error) {
     const errorMessage =
       error.response && error.response.data
@@ -94,7 +95,11 @@ export const removeMemberOpportunity = (opportunityId, userId) => async (
       `/opportunities/remove-opportunity-member/${opportunityId}/${userId}`
     );
     dispatch(fetchOpportunity(opportunityId));
-    dispatch(setSuccess());
+    dispatch(
+      setSuccess(
+        'Participant removed successfully and can no longer access this opportunity.'
+      )
+    );
   } catch (error) {
     const errorMessage =
       error.response && error.response.data

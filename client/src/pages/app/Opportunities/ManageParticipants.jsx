@@ -1,4 +1,5 @@
 import React from 'react';
+import { useState } from 'react';
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
@@ -22,13 +23,23 @@ const ManageParticipants = ({
   setViewParticipant,
   opportunity,
 }) => {
+  const [displayMessage, setDisplayMessage] = useState(false);
   const dispatch = useDispatch();
   // fetch data from our store
-  const { loading, error, members } = useSelector(teamMembersSelector);
+  const { loading, error, members, success, message } = useSelector(
+    teamMembersSelector
+  );
   useEffect(() => {
     dispatch(fetchMemberList());
   }, []);
-
+  useEffect(() => {
+    if (success) {
+      setDisplayMessage(true);
+      setTimeout(() => {
+        setDisplayMessage(false);
+      }, 4000);
+    }
+  }, [success]);
   return (
     <Modal
       onClose={() => setViewParticipant(false)}
@@ -52,6 +63,13 @@ const ManageParticipants = ({
             <Message color='red' className='error-message mb-3'>
               {error}
             </Message>
+          )}
+          {displayMessage && (
+            <Message
+              header={message}
+              success
+              className='mb-3 success-message'
+            />
           )}
           {loading && (
             <Dimmer active inverted>
