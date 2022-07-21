@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { TEAM_STATUS } = require("../lib/constants");
 const Schema = mongoose.Schema;
 
 const TeamSchema = new Schema(
@@ -20,6 +21,14 @@ const TeamSchema = new Schema(
         }
       },
     ],
+    status: {
+      type: String,
+      enum: [
+        TEAM_STATUS.ACTIVE,
+        TEAM_STATUS.DISABLED
+      ],
+      default: TEAM_STATUS.ACTIVE,
+    },
     createdBy: {
       type: String,
     },
