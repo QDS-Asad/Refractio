@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchOpportunity,
   opportunityDetailSelector,
+  resetOpportunity,
+  updateOpportunity,
 } from '../../../features/opportunities/opportunityDetailSlice';
 import {
   Button,
@@ -14,18 +16,63 @@ import {
   Tab,
   Segment,
 } from 'semantic-ui-react';
-import { useParams } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
 import OpportunityStatus from '../../../components/OpportunityStatus';
 import PublishOpportunity from './PublishOpportunity';
 import ManageParticipants from './ManageParticipants';
 import OpportunityCreate from './OpportunityCreate';
 import { useForm } from 'react-hook-form';
 import QuestionsOpportunityForm from './QuestionsOpportunityForm';
-
+const maxLengthObject = {
+  value: 120,
+  message: 'Maximum characters are 120.',
+};
+const questionFormationArray = (data) => {
+  let apiData = {
+    comprehension: {
+      questions: [{ order: 1, question: data.comprehensionQ1 }],
+    },
+    qualityOfIdea: {
+      questions: [{ order: 1, question: data.qualityOfIdeaQ1 }],
+    },
+  };
+  if (data.comprehensionQ2) {
+    apiData.comprehension.questions.push({
+      order: 1,
+      question: data.comprehensionQ2,
+    });
+  }
+  if (data.qualityOfIdeaQ2) {
+    apiData.qualityOfIdea.questions.push({
+      order: 2,
+      question: data.qualityOfIdeaQ2,
+    });
+  }
+  if (data.qualityOfIdeaQ3) {
+    apiData.qualityOfIdea.questions.push({
+      order: 3,
+      question: data.qualityOfIdeaQ3,
+    });
+  }
+  if (data.qualityOfIdeaQ4) {
+    apiData.qualityOfIdea.questions.push({
+      order: 4,
+      question: data.qualityOfIdeaQ4,
+    });
+  }
+  if (data.qualityOfIdeaQ5) {
+    apiData.qualityOfIdea.questions.push({
+      order: 5,
+      question: data.qualityOfIdeaQ5,
+    });
+  }
+  return apiData;
+};
 const OpportunityDetail = () => {
   const [viewParticipant, setViewParticipant] = useState(false);
   const [viewPublish, setViewPublish] = useState(false);
   const [editOpportunity, setEditOpportunity] = useState(false);
+  const [formValues, setFormValues] = useState(null);
   const { id } = useParams();
   const { register, setValue, handleSubmit, errors, trigger, watch } = useForm({
     mode: 'onBlur',
@@ -44,15 +91,42 @@ const OpportunityDetail = () => {
     setValue(e.target.name, e.target.value);
     trigger(e.target.name);
   };
+  const onPublishResponse = () => {
+    dispatch(updateOpportunity(id, 'publish', formValues));
+    setViewPublish(false);
+  };
   const handleSubmittion = (data) => {
-    console.log(data);
+    let apiData = questionFormationArray(data);
+    setViewPublish(true);
+    setFormValues(apiData);
+  };
+  const handleDraft = (data) => {
+    let apiData = questionFormationArray(data);
+    dispatch(updateOpportunity(id, 'draft', apiData));
   };
   const createOptions = {
     comprehensionQ1: {
       required: 'Atleast one question for comprehension is required',
+      maxLength: maxLengthObject,
+    },
+    comprehensionQ2: {
+      maxLength: maxLengthObject,
     },
     qualityOfIdeaQ1: {
       required: 'Atleast one question for quality of idea-response is required',
+      maxLength: maxLengthObject,
+    },
+    qualityOfIdeaQ2: {
+      maxLength: maxLengthObject,
+    },
+    qualityOfIdeaQ3: {
+      maxLength: maxLengthObject,
+    },
+    qualityOfIdeaQ4: {
+      maxLength: maxLengthObject,
+    },
+    qualityOfIdeaQ5: {
+      maxLength: maxLengthObject,
     },
   };
   useEffect(() => {
@@ -63,12 +137,15 @@ const OpportunityDetail = () => {
     register({ name: 'qualityOfIdeaQ3' }, createOptions.qualityOfIdeaQ3);
     register({ name: 'qualityOfIdeaQ4' }, createOptions.qualityOfIdeaQ4);
     register({ name: 'qualityOfIdeaQ5' }, createOptions.qualityOfIdeaQ5);
+    return () => {
+      dispatch(resetOpportunity());
+    };
   }, []);
   // set up dispatch
   const dispatch = useDispatch();
 
   // fetch data from our store
-  const { loading, error, opportunity } = useSelector(
+  const { loading, error, opportunity, published } = useSelector(
     opportunityDetailSelector
   );
 
@@ -76,6 +153,21 @@ const OpportunityDetail = () => {
   useEffect(() => {
     dispatch(fetchOpportunity(id));
   }, [dispatch, id]);
+  useEffect(() => {
+    if (opportunity) {
+      opportunity.comprehension.questions.forEach((question) => {
+        setValue(`comprehensionQ${question.order}`, question.question);
+      });
+      opportunity.qualityOfIdea.questions.forEach((question) => {
+        setValue(`qualityOfIdeaQ${question.order}`, question.question);
+      });
+    }
+  }, [opportunity]);
+  useEffect(() => {
+    if (published) {
+      return <Navigate to={{ pathname: '/oppotunities' }} />;
+    }
+  }, [published]);
   const watchComprehensionQ1 = watch('comprehensionQ1', '');
   const watchComprehensionQ2 = watch('comprehensionQ2', '');
   const watchQualityOfIdeaQ1 = watch('qualityOfIdeaQ1', '');
@@ -120,6 +212,7 @@ const OpportunityDetail = () => {
                       className='btn-link'
                       floated='right'
                       onClick={() => setEditOpportunity((prev) => !prev)}
+                      disabled={loading}
                     >
                       Edit
                     </Button>
@@ -171,7 +264,7 @@ const OpportunityDetail = () => {
 
                 <span
                   className='ms-2 fw-bold primary-color'
-                  onClick={() => setViewParticipant(true)}
+                  onClick={() => !loading && setViewParticipant(true)}
                 >
                   {opportunity.participants.length > 0
                     ? 'View Participants'
@@ -193,15 +286,22 @@ const OpportunityDetail = () => {
                 primary
                 className='btn-secondary'
                 floated='right'
-                onClick={() => setViewPublish(true)}
+                type='submit'
+                form='create-opportunity'
               >
                 Publish
               </Button>
               <PublishOpportunity
                 viewPublish={viewPublish}
                 setViewPublish={setViewPublish}
+                onSubmittion={onPublishResponse}
               />
-              <Button primary className='btn-outline me-3' floated='right'>
+              <Button
+                onClick={handleSubmit(handleDraft)}
+                primary
+                className='btn-outline me-3'
+                floated='right'
+              >
                 Save as Draft
               </Button>
             </Grid.Column>

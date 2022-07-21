@@ -28,18 +28,24 @@ const Opportunity = ({ opportunity }) => {
           </Link>
         </Card.Meta>
         <Card.Description className='mb-3'>
-          {showMore ? (
-            opportunity.description
+          {opportunity.description.length > 203 ? (
+            <>
+              {showMore ? (
+                opportunity.description
+              ) : (
+                <>{opportunity.description.substr(0, 203)}... </>
+              )}
+              <a
+                style={{ color: 'blue' }}
+                onClick={() => setShowMore((prev) => !prev)}
+              >
+                {' '}
+                {showMore ? 'Show Less' : 'Show More'}
+              </a>
+            </>
           ) : (
-            <>{opportunity.description.substr(0, 203)}...</>
+            opportunity.description
           )}
-          <a
-            style={{ color: 'blue' }}
-            onClick={() => setShowMore((prev) => !prev)}
-          >
-            {' '}
-            {showMore ? 'Show Less' : 'Show More'}
-          </a>
         </Card.Description>
         {application.length > 0 ? (
           <>

@@ -1,11 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
-import refractioApi, { localAPI } from '../../common/refractioApi';
+import refractioApi from '../../common/refractioApi';
 
 // initial state
 export const initialState = {
   loading: false,
   error: null,
   opportunity: null,
+  published: false,
 };
 
 // our slice
@@ -25,6 +26,14 @@ const opportunityDetailSlice = createSlice({
       state.loading = false;
       state.error = payload;
     },
+    setPublish: (state) => {
+      state.published = true;
+    },
+    reset: (state) => {
+      state.loading = false;
+      state.error = null;
+      state.opportunity = null;
+    },
   },
 });
 // export the actions
@@ -32,6 +41,8 @@ export const {
   setLoading,
   setOpportunity,
   setError,
+  setPublish,
+  reset,
 } = opportunityDetailSlice.actions;
 
 // export the selector (".items" being same as in slices/index.js's "items: something")
@@ -53,4 +64,26 @@ export const fetchOpportunity = (id) => async (dispatch) => {
         : error.message;
     dispatch(setError(errorMessage));
   }
+};
+export const updateOpportunity = (id, status, bodyData) => async (dispatch) => {
+  try {
+    dispatch(setLoading());
+    await refractioApi.put(`/opportunities/update/${id}`, {
+      status,
+      ...bodyData,
+    });
+    dispatch(fetchOpportunity(id));
+    if (status === 'publish') {
+      dispatch(setPublish());
+    }
+  } catch (error) {
+    const errorMessage =
+      error.response && error.response.data
+        ? error.response.data.message
+        : error.message;
+    dispatch(setError(errorMessage));
+  }
+};
+export const resetOpportunity = () => async (dispatch) => {
+  dispatch(reset());
 };

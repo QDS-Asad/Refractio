@@ -72,7 +72,7 @@ export const addMemberOpportunity = (opportunityId, userId) => async (
 ) => {
   try {
     dispatch(setLoading());
-    let { data: response } = await refractioApi.put(
+    await refractioApi.put(
       `/opportunities/add-opportunity-member/${opportunityId}/${userId}`
     );
     dispatch(fetchOpportunity(opportunityId));
@@ -90,7 +90,7 @@ export const removeMemberOpportunity = (opportunityId, userId) => async (
 ) => {
   try {
     dispatch(setLoading());
-    let { data: response } = await refractioApi.delete(
+    await refractioApi.delete(
       `/opportunities/remove-opportunity-member/${opportunityId}/${userId}`
     );
     dispatch(fetchOpportunity(opportunityId));

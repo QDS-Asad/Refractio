@@ -52,7 +52,6 @@ export const createOpportunity = (opportunity) => async (dispatch) => {
       '/opportunities/create',
       opportunity
     );
-    console.log(data);
     dispatch(setOpportunity(opportunity));
     dispatch(fetchOpportunities());
   } catch (error) {

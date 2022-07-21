@@ -11,13 +11,15 @@ const Content = () => {
         <Card.Header className='my-3'>Home: Hero image</Card.Header>
         <Card.Description className='mb-3'>
           {showMore ? description : <>{description.substr(0, 203)}...</>}
-          <a
-            style={{ color: 'blue' }}
-            onClick={() => setShowMore((prev) => !prev)}
-          >
-            {' '}
-            {showMore ? 'Show Less' : 'Show More'}
-          </a>
+          {description.length > 203 && (
+            <a
+              style={{ color: 'blue' }}
+              onClick={() => setShowMore((prev) => !prev)}
+            >
+              {' '}
+              {showMore ? 'Show Less' : 'Show More'}
+            </a>
+          )}
         </Card.Description>
         <Divider />
         <div style={{ display: 'flex', justifyContent: 'center' }}>

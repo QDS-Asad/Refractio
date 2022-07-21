@@ -65,7 +65,6 @@ const OpportunityResponse = () => {
 
   const handleEdit = (data) => {
     setViewSubmit(true);
-    console.log(data);
   };
   const onSubmittion = async () => {
     setViewMessage(true);

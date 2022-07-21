@@ -8,7 +8,7 @@ import {
 } from '../../../features/opportunities/opportunityCreateSlice';
 import { opportunityDetailSelector } from '../../../features/opportunities/opportunityDetailSlice';
 
-const OpportunityCreate = ({ showCreate, setShowCreate, id }) => {
+const OpportunityCreate = ({ showCreate, setShowCreate, id, title }) => {
   const { register, setValue, handleSubmit, watch, errors, trigger } = useForm({
     mode: 'onBlur',
     defaultValues: {
@@ -24,7 +24,6 @@ const OpportunityCreate = ({ showCreate, setShowCreate, id }) => {
   const { loading, error, success } = useSelector(opportunityCreateSelector);
   const { opportunity } = useSelector(opportunityDetailSelector);
   const handleCreate = (data) => {
-    console.log(data);
     dispatch(createOpportunity(data));
   };
 
@@ -82,7 +81,7 @@ const OpportunityCreate = ({ showCreate, setShowCreate, id }) => {
       size='tiny'
       closeIcon
     >
-      <Modal.Header>Create Opportunity</Modal.Header>
+      <Modal.Header>{id ? 'Update' : 'Create'} Opportunity</Modal.Header>
       <Modal.Content>
         <Form
           id='create-opportunity'

@@ -14,7 +14,7 @@ const ChangeCard = ({ changeCard, setChangeCard, title }) => {
   const { register, setValue, handleSubmit, errors, trigger } = useForm({
     mode: 'onBlur',
     defaultValues: {
-      autoRenew: false,
+      autoRenew: true,
     },
   });
 
@@ -208,6 +208,7 @@ const ChangeCard = ({ changeCard, setChangeCard, title }) => {
               <Checkbox
                 label='Autorenewal subscription'
                 name='autoRenew'
+                defaultChecked
                 onBlur={handleChangeCheckBox}
               />
             </Form.Field>

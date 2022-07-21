@@ -1,21 +1,19 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;500;600;700&display=swap');
 
 * {
   font-family: 'Nunito', sans-serif;
 }
 
-
 :root {
-  --primary-dark: #083B66;
-  --primary: #454FC8;
-  --secondary: #6C757D;
-  --white: #FFFFFF;
-  --dark: #3B3B3B;
-  --success: #74D14C;
-  --danger: #FA6767;
+  --primary-dark: #083b66;
+  --primary: #454fc8;
+  --secondary: #6c757d;
+  --white: #ffffff;
+  --dark: #3b3b3b;
+  --success: #74d14c;
+  --danger: #fa6767;
 }
- 
+
 .auth.ui.grid {
   margin: 0 !important;
 }
@@ -28,7 +26,7 @@
   background-color: var(--secondary) !important;
 }
 
-.success-bg{
+.success-bg {
   background-color: var(--success) !important;
 }
 
@@ -36,13 +34,12 @@
   color: var(--primary-dark) !important;
 }
 
-
-.primary-color{
-  color: var(--primary) !important
+.primary-color {
+  color: var(--primary) !important;
 }
 
 .secondary-color {
-  color: var(--secondary) !important
+  color: var(--secondary) !important;
 }
 
 .white-color {
@@ -69,7 +66,6 @@ label {
 .fs-heading {
   font-size: 3rem !important;
 }
-
 
 .btn {
   background: var(--primary) !important;
@@ -113,7 +109,6 @@ label {
   cursor: pointer !important;
 }
 
-
 .btn-outline {
   background: none !important;
   color: var(--primary) !important;
@@ -124,7 +119,7 @@ label {
 
 .backToLogin {
   margin: 6% !important;
-    text-align: center;
+  text-align: center;
 }
 
 .ui.form .field {
@@ -139,7 +134,7 @@ label {
   background: none;
   padding: 0;
   line-height: 1.4285em;
-  color: rgba(0,0,0,.87);
+  color: rgba(0, 0, 0, 0.87);
   box-shadow: none;
 }
 
@@ -174,16 +169,16 @@ label {
   color: var(--secondary) !important;
 }
 
-.opportunities-tabs.active  {
- border-color: var(--primary-dark) ;
- color: var(--text-secondary)  !important;
+.opportunities-tabs.active {
+  border-color: var(--primary-dark);
+  color: var(--text-secondary) !important;
 }
 
 .opportunities-tabs-height {
   min-height: calc(100vh - 215px);
 }
 
-.ui.secondary.pointing.menu .active.item  {
+.ui.secondary.pointing.menu .active.item {
   color: var(--secondary) !important;
   border-color: var(--primary-dark) !important;
 }
@@ -202,29 +197,28 @@ label {
   height: auto;
 }
 
-.error-message, .success-message {
+.error-message,
+.success-message {
   padding: 1rem !important;
   font-size: 1.25rem !important;
   text-align: center;
 }
 
-.ui.modal>.close {
+.ui.modal > .close {
   top: 1rem;
   right: 1rem;
   color: var(--dark) !important;
 }
 i.icon.close:before {
-  content: "\f00d";
+  content: '\f00d';
 }
-.ui.action.input>.button {
+.ui.action.input > .button {
   display: block;
 }
 
 .ui.pagination.secondary.menu .active.item {
-
   background: var(--primary-dark);
   color: var(--white);
- 
 }
 
 .ui.pagination.secondary.menu .item {
@@ -232,4 +226,70 @@ i.icon.close:before {
   display: inline;
 }
 
-#misc{position:relative;height:100vh}#misc .misc{position:absolute;left:50%;top:50%;-webkit-transform:translate(-50%,-50%);-ms-transform:translate(-50%,-50%);transform:translate(-50%,-50%)}.misc{max-width:920px;width:100%;line-height:1.4;text-align:center;padding-left:15px;padding-right:15px}.misc .misc-error{position:absolute;height:100px;top:0;left:50%;-webkit-transform:translateX(-50%);-ms-transform:translateX(-50%);transform:translateX(-50%);z-index:-1}.misc .misc-error h1{font-family:maven pro,sans-serif;color:#ececec;font-weight:900;font-size:276px;margin:0;position:absolute;left:50%;top:50%;-webkit-transform:translate(-50%,-50%);-ms-transform:translate(-50%,-50%);transform:translate(-50%,-50%)}.misc h2{font-family:maven pro,sans-serif;font-size:46px;color:#000;font-weight:900;text-transform:uppercase;margin:0}.misc p{font-family:maven pro,sans-serif;font-size:16px;color:#000;font-weight:400;text-transform:uppercase;margin-top:15px}@media only screen and (max-width:480px){.misc .misc-error h1{font-size:162px}.misc h2{font-size:26px}}
+#misc {
+  position: relative;
+  height: 100vh;
+}
+#misc .misc {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+.misc {
+  max-width: 920px;
+  width: 100%;
+  line-height: 1.4;
+  text-align: center;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+.misc .misc-error {
+  position: absolute;
+  height: 100px;
+  top: 0;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+  z-index: -1;
+}
+.misc .misc-error h1 {
+  font-family: maven pro, sans-serif;
+  color: #ececec;
+  font-weight: 900;
+  font-size: 276px;
+  margin: 0;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+.misc h2 {
+  font-family: maven pro, sans-serif;
+  font-size: 46px;
+  color: #000;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin: 0;
+}
+.misc p {
+  font-family: maven pro, sans-serif;
+  font-size: 16px;
+  color: #000;
+  font-weight: 400;
+  text-transform: uppercase;
+  margin-top: 15px;
+}
+@media only screen and (max-width: 480px) {
+  .misc .misc-error h1 {
+    font-size: 162px;
+  }
+  .misc h2 {
+    font-size: 26px;
+  }
+}

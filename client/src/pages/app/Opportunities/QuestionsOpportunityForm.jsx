@@ -50,6 +50,9 @@ function QuestionsOpportunityForm({
           disabled={opportunity.status !== 'draft'}
           placeholder='e.g. What is the best reason for Team to NOT pursue Opportunity'
         />
+        {errors && errors.comprehensionQ2 && (
+          <Message error content={errors.comprehensionQ2.message} />
+        )}
       </Form.Field>
       <Header>
         Evaluation of Quality of Idea-Response
@@ -87,6 +90,9 @@ function QuestionsOpportunityForm({
           disabled={opportunity.status !== 'draft'}
           placeholder='e.g. Describe the EXPECTED RESULTS from action taken to pursue Opportunity'
         />
+        {errors && errors.qualityOfIdeaQ2 && (
+          <Message error content={errors.qualityOfIdeaQ2.message} />
+        )}
       </Form.Field>
 
       <Form.Field>
@@ -101,6 +107,9 @@ function QuestionsOpportunityForm({
           disabled={opportunity.status !== 'draft'}
           placeholder='e.g. Describe the EXPECTED RESULTS from action taken to pursue Opportunity'
         />
+        {errors && errors.qualityOfIdeaQ3 && (
+          <Message error content={errors.qualityOfIdeaQ3.message} />
+        )}
       </Form.Field>
 
       <Form.Field>
@@ -115,6 +124,9 @@ function QuestionsOpportunityForm({
           disabled={opportunity.status !== 'draft'}
           placeholder='e.g. Describe the RISKS from action taken to pursue Opportunity'
         />
+        {errors && errors.qualityOfIdeaQ4 && (
+          <Message error content={errors.qualityOfIdeaQ4.message} />
+        )}
       </Form.Field>
 
       <Form.Field>
@@ -129,6 +141,9 @@ function QuestionsOpportunityForm({
           disabled={opportunity.status !== 'draft'}
           placeholder='e.g. WHEN can or should Team work on pursuing Opportunity? What are DEPENDENCIES?'
         />
+        {errors && errors.qualityOfIdeaQ5 && (
+          <Message error content={errors.qualityOfIdeaQ5.message} />
+        )}
       </Form.Field>
     </>
   );
