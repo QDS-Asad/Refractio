@@ -2,18 +2,31 @@ const { Opportunity } = require("../models/opportunity");
 const { OpportunityResponse } = require("../models/opportunityResponses");
 const { ObjectId } = require("mongodb");
 const { OPPORTUNITY_STATUS } = require("../lib/constants");
+const { OpportunityEvaluation } = require("../models/opportunityEvaluation");
 
 exports.getOpportunitiesByUser = async (user) => {
   return await Opportunity.find({
-    // $or: [{ createdById: user._id }, {participants: { $in: [ObjectId(user._id)] }}],
+    $or: [{ createdById: user._id }, {participants: { $in: [ObjectId(user._id)] }}],
     teamId: user.teamId,
-    participants: { $in: [ObjectId(user._id)] },
+    // participants: { $in: [ObjectId(user._id)] },
     status: { $nin: OPPORTUNITY_STATUS.DISABLED },
   });
 };
 
 exports.getOpportunityById = async (id) => {
   return await Opportunity.findOne({ _id: ObjectId(id) });
+};
+
+exports.getOpportunityResponseByIdUserId = async (opportunityId, userId) => {
+  return await OpportunityResponse.findOne({ opportunityId, userId });
+};
+
+exports.getOpportunityEvaluateByIdUserId = async (opportunityResponseId, userId) => {
+    return await OpportunityEvaluation.findOne({ opportunityResponseId, userId });
+};
+
+exports.getOpportunityResponseById = async (id) => {
+  return await OpportunityResponse.findOne({ _id: ObjectId(id) });
 };
 
 exports.createOpportunity = async (obj) => {
@@ -39,11 +52,47 @@ exports.deleteOpportunity = async (id) => {
 };
 
 exports.answerOpportunity = async (obj) => {
-  return await OpportunityResponse.creaet(obj);
+  return await OpportunityResponse.create(obj);
+};
+
+exports.updateAnswerOpportunity = async (id, obj) => {
+  return await OpportunityResponse.findOneAndUpdate(
+    {
+      _id: ObjectId(id),
+    },
+    obj
+  );
+};
+
+exports.evaluateOpportunity = async (obj) => {
+  return await OpportunityEvaluation.create(obj);
+};
+
+exports.updateEvaluateOpportunity = async (id, obj) => {
+  return await OpportunityEvaluation.findOneAndUpdate(
+    {
+      _id: ObjectId(id),
+    },
+    obj
+  );
 };
 
 exports.getOpportunityResponsesByOpportunityId = async (id) => {
-  return await Opportunity.find({
+  return await OpportunityResponse.find({
     OpportunityId: ObjectId(id),
+    status: OPPORTUNITY_STATUS.PUBLISH,
+  });
+};
+
+exports.getOpportunityEvaluationByResponseId = async (id) => {
+    return await OpportunityEvaluation.find({
+      opportunityResponseId: ObjectId(id),
+      status: OPPORTUNITY_STATUS.PUBLISH,
+    });
+  };
+
+exports.getOpportunityEvaluationByResponseIdUserId = async (opportunityResponseId, userId) => {
+  return await OpportunityEvaluation.findOne({
+    opportunityResponseId
   });
 };

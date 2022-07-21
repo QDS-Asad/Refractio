@@ -19,8 +19,6 @@ const OpportunityResponseSchema = new Schema(
       enum: [
         OPPORTUNITY_STATUS.PUBLISH,
         OPPORTUNITY_STATUS.DRAFT,
-        OPPORTUNITY_STATUS.ANSWERING,
-        OPPORTUNITY_STATUS.COMPLETED,
         OPPORTUNITY_STATUS.DISABLED,
       ],
       default: OPPORTUNITY_STATUS.DRAFT,
