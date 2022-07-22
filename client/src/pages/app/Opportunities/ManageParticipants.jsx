@@ -11,6 +11,7 @@ import {
   Loader,
   Dimmer,
 } from 'semantic-ui-react';
+import { opportunityDetailSelector } from '../../../features/opportunities/opportunityDetailSlice';
 import {
   fetchMemberList,
   teamMembersSelector,
@@ -29,6 +30,9 @@ const ManageParticipants = ({
   // fetch data from our store
   const { loading, error, members, success, message } = useSelector(
     teamMembersSelector
+  );
+  const { loading: opportunityLoading } = useSelector(
+    opportunityDetailSelector
   );
   useEffect(() => {
     dispatch(fetchMemberList());
@@ -72,7 +76,7 @@ const ManageParticipants = ({
               className='mb-3 success-message'
             />
           )}
-          {loading && (
+          {(loading || opportunityLoading) && (
             <Dimmer active inverted>
               <Loader inverted>Loading</Loader>
             </Dimmer>
@@ -89,7 +93,11 @@ const ManageParticipants = ({
                             removeMemberOpportunity(opportunity._id, member._id)
                           )
                         }
-                        disabled={loading || opportunity.createdById != userId}
+                        disabled={
+                          loading ||
+                          opportunityLoading ||
+                          opportunity.createdById != userId
+                        }
                         className='btn-link-danger'
                       >
                         Remove
@@ -105,6 +113,7 @@ const ManageParticipants = ({
                         }
                         disabled={
                           loading ||
+                          opportunityLoading ||
                           opportunity.createdById != userId ||
                           opportunity.status != 'draft'
                         }

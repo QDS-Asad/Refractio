@@ -77,7 +77,9 @@ export const addMemberOpportunity = (opportunityId, userId) => async (
       `/opportunities/add-opportunity-member/${opportunityId}/${userId}`
     );
     dispatch(fetchOpportunity(opportunityId));
-    dispatch(setSuccess('Participant added successfully.'));
+    setTimeout(() => {
+      dispatch(setSuccess('Participant added successfully.'));
+    }, 1000);
   } catch (error) {
     const errorMessage =
       error.response && error.response.data
@@ -95,11 +97,13 @@ export const removeMemberOpportunity = (opportunityId, userId) => async (
       `/opportunities/remove-opportunity-member/${opportunityId}/${userId}`
     );
     dispatch(fetchOpportunity(opportunityId));
-    dispatch(
-      setSuccess(
-        'Participant removed successfully and can no longer access this opportunity.'
-      )
-    );
+    setTimeout(() => {
+      dispatch(
+        setSuccess(
+          'Participant removed successfully and can no longer access this opportunity.'
+        )
+      );
+    }, 1000);
   } catch (error) {
     const errorMessage =
       error.response && error.response.data
