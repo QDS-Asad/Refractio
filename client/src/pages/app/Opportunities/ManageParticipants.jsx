@@ -11,6 +11,7 @@ import {
   Loader,
   Dimmer,
 } from 'semantic-ui-react';
+import { opportunityDetailSelector } from '../../../features/opportunities/opportunityDetailSlice';
 import {
   fetchMemberList,
   teamMembersSelector,
@@ -29,6 +30,9 @@ const ManageParticipants = ({
   // fetch data from our store
   const { loading, error, members, success, message } = useSelector(
     teamMembersSelector
+  );
+  const { loading: opportunityLoading } = useSelector(
+    opportunityDetailSelector
   );
   useEffect(() => {
     dispatch(fetchMemberList());
@@ -72,7 +76,7 @@ const ManageParticipants = ({
               className='mb-3 success-message'
             />
           )}
-          {loading && (
+          {(loading || opportunityLoading) && (
             <Dimmer active inverted>
               <Loader inverted>Loading</Loader>
             </Dimmer>
@@ -89,30 +93,36 @@ const ManageParticipants = ({
                             removeMemberOpportunity(opportunity._id, member._id)
                           )
                         }
-                        disabled={loading || opportunity.createdById != userId}
+                        disabled={
+                          loading ||
+                          opportunityLoading ||
+                          opportunity.createdById != userId
+                        }
                         className='btn-link-danger'
                       >
                         Remove
                       </Button>
                     </List.Content>
                   ) : (
-                    <List.Content floated='right'>
-                      <Button
-                        onClick={() =>
-                          dispatch(
-                            addMemberOpportunity(opportunity._id, member._id)
-                          )
-                        }
-                        disabled={
-                          loading ||
-                          opportunity.createdById != userId ||
-                          opportunity.status != 'draft'
-                        }
-                        className='btn-link'
-                      >
-                        Add
-                      </Button>
-                    </List.Content>
+                    opportunity.status == 'draft' && (
+                      <List.Content floated='right'>
+                        <Button
+                          onClick={() =>
+                            dispatch(
+                              addMemberOpportunity(opportunity._id, member._id)
+                            )
+                          }
+                          disabled={
+                            loading ||
+                            opportunityLoading ||
+                            opportunity.createdById != userId
+                          }
+                          className='btn-link'
+                        >
+                          Add
+                        </Button>
+                      </List.Content>
+                    )
                   )}
 
                   <List.Content>
