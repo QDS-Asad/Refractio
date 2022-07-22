@@ -93,6 +93,7 @@ exports.getOpportunityEvaluationByResponseId = async (id) => {
 
 exports.getOpportunityEvaluationByResponseIdUserId = async (opportunityResponseId, userId) => {
   return await OpportunityEvaluation.findOne({
-    opportunityResponseId
+    opportunityResponseId,
+    userId
   });
 };

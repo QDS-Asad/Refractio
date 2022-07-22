@@ -83,13 +83,13 @@ exports.updateOpportunity = async (req, res, next) => {
   try {
     const { opportunityId } = req.params;
     const { user } = req.body;
-    if (req.body.comprehension.questions.length < 1) {
+    if (req.body.comprehension && req.body.comprehension.questions && req.body.comprehension.questions.length < 1) {
       return errorResp(res, {
         msg: ERROR_MESSAGE.COMP_MIN_ONE_QUESTION,
         code: HTTP_STATUS.BAD_REQUEST.CODE,
       });
     }
-    if (req.body.qualityOfIdea.questions.length < 1) {
+    if (req.body.qualityOfIdea && req.body.qualityOfIdea.questions && req.body.qualityOfIdea.questions.length < 1) {
       return errorResp(res, {
         msg: ERROR_MESSAGE.QOA_MIN_ONE_QUESTION,
         code: HTTP_STATUS.BAD_REQUEST.CODE,
@@ -328,6 +328,7 @@ const isParticipantAllowed = async (opportunityId, user) => {
 exports.getOpportunityResponsesById = async (req, res, next) => {
   try {
     const { opportunityId } = req.params;
+    const { user } = req.body;
     const opportunityInfo = await OpportunityService.getOpportunityById(
       opportunityId
     );
@@ -340,9 +341,10 @@ exports.getOpportunityResponsesById = async (req, res, next) => {
         await Promise.all(
           opportunityResponses.map(async (obj, key) => {
             const opportunityEvaluations =
-              await OpportunityService.getOpportunityEvaluationByResponseIdUserId(
-                obj._id
-              );
+            await OpportunityService.getOpportunityEvaluationByResponseIdUserId(
+              opportunityResponseId,
+              user._id
+            );
             let evaluation = "";
             if (
               opportunityEvaluations &&
@@ -470,49 +472,54 @@ exports.answerOpportunity = async (req, res, next) => {
 };
 
 const answerOpportunityResponse = async (req, res, opportunityRes) => {
-  const { opportunityId } = req.params;
-  const opportunityInfo = await OpportunityService.getOpportunityById(
-    opportunityId
-  );
-  const opportunityResponses =
-    await OpportunityService.getOpportunityResponsesByOpportunityId(
+  try {
+    const { opportunityId } = req.params;
+    const opportunityInfo = await OpportunityService.getOpportunityById(
       opportunityId
     );
-  const filterParticipants = opportunityInfo.participants;
-  if (opportunityResponses.length == filterParticipants.length) {
-    await OpportunityService.updateOpportunity(opportunityId, {
-      stauts: OPPORTUNITY_STATUS.EVALUATING,
-    });
-    const participantsEmails = await UserService.getParticipants(
-      opportunityRes.participants
-    );
-    const link = `${CLIENT_HOST}/opportunityevaluate/${opportunityId}`;
-    const emailObj = {
-      email: participantsEmails,
-      subject: EVALUATE_OPPORTUNITY_EMAIL_SUBJECT,
-      html: EVALUATE_OPPORTUNITY_EMAIL_TEMPLATE({ link }),
-    };
-    await UserService.tokenVerificationEmail(emailObj)
-      .then((emailRes) => {
-        return successResp(res, {
-          msg: SUCCESS_MESSAGE.ANSWERED,
-          code: HTTP_STATUS.SUCCESS.CODE,
-        });
-      })
-      .catch((error) => {
-        return errorResp(res, {
-          msg: ERROR_MESSAGE.NOT_FOUND,
-          code: HTTP_STATUS.BAD_REQUEST.CODE,
-        });
+    const opportunityResponses =
+      await OpportunityService.getOpportunityResponsesByOpportunityId(
+        opportunityId
+      );
+    const filterParticipants = opportunityInfo.participants;
+    if (opportunityResponses.length == filterParticipants.length) {
+      await OpportunityService.updateOpportunity(opportunityId, {
+        stauts: OPPORTUNITY_STATUS.EVALUATING,
       });
-  } else {
-    await OpportunityService.updateOpportunity(opportunityId, {
-      stauts: OPPORTUNITY_STATUS.ANSWERING,
-    });
-    return successResp(res, {
-      msg: SUCCESS_MESSAGE.ANSWERED,
-      code: HTTP_STATUS.SUCCESS.CODE,
-    });
+      const participantsEmails = await UserService.getParticipants(
+        opportunityRes.participants
+      );
+      const link = `${CLIENT_HOST}/opportunityevaluate/${opportunityId}`;
+      const emailObj = {
+        email: participantsEmails,
+        subject: EVALUATE_OPPORTUNITY_EMAIL_SUBJECT,
+        html: EVALUATE_OPPORTUNITY_EMAIL_TEMPLATE({ link }),
+      };
+      await UserService.tokenVerificationEmail(emailObj)
+        .then((emailRes) => {
+          return successResp(res, {
+            msg: SUCCESS_MESSAGE.ANSWERED,
+            code: HTTP_STATUS.SUCCESS.CODE,
+          });
+        })
+        .catch((error) => {
+          return errorResp(res, {
+            msg: ERROR_MESSAGE.NOT_FOUND,
+            code: HTTP_STATUS.BAD_REQUEST.CODE,
+          });
+        });
+    } else {
+      await OpportunityService.updateOpportunity(opportunityId, {
+        stauts: OPPORTUNITY_STATUS.ANSWERING,
+      });
+      return successResp(res, {
+        msg: SUCCESS_MESSAGE.ANSWERED,
+        code: HTTP_STATUS.SUCCESS.CODE,
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    serverError(res, error);
   }
 };
 
@@ -547,7 +554,6 @@ exports.evaluateAnswerOpportunity = async (req, res, next) => {
         requestBody
       )
         .then(async (opportunityRes) => {
-          console.log("eva--", eva);
           evaluateAnswerOpportunityResponse(
             req,
             res,
@@ -611,6 +617,83 @@ const evaluateAnswerOpportunityResponse = async (
       msg: SUCCESS_MESSAGE.EVALUATED,
       code: HTTP_STATUS.SUCCESS.CODE,
     });
+  }
+};
+
+// evaluation results
+exports.evalutationResultsByParticipants = async (req, res, next) => {
+  try {
+    const { opportunityId } = req.params;
+    const { user } = req.body;
+    const opportunityInfo = await OpportunityService.getOpportunityById(
+      opportunityId
+    );
+    await OpportunityService.getOpportunityResponsesByOpportunityId(
+      opportunityId
+    )
+      .then(async (results) => {
+        let participantResults = [];
+        await Promise.all(
+          resluts.map(async (obj, key) =>{
+            const userInfo = await UserService.getUserById(obj.userId);
+            const evaluationResults = await OpportunityService.getOpportunityEvaluationByResponseId(
+              opportunityResponseId
+            );
+            let evaluationScores = [];
+            let totalEvaluationScore = 0;
+            let totalAverageEvaluationScore = 0;
+            evaluationResults.map(async (el, elKey) => {
+              const elUserInfo = await UserService.getUserById(el.userId);
+              evaluationScores[key] = {
+                firstName: elUserInfo.firstName,
+                lastName: elUserInfo.lastName,
+                comprehension: el.comprehension.score,
+                qualityOfIdea: el.qualityOfIdea.score
+              }
+            })
+            let comprehension_answers = [];
+            obj.comprehension.answers.map((comp, compKey) => {
+              let queObj = opportunityInfo.comprehension.questions.find(
+                (que) => que._id.toString() === comp.questionId
+              );
+              comprehension_answers[compKey] = {
+                question: queObj.question,
+                answer: comp.answer,
+                order: queObj.order,
+              };
+            });
+            let qualityOfIdea_answers = [];
+            obj.qualityOfIdea.answers.map((qoa, compKey) => {
+              let qoaObj = opportunityInfo.qualityOfIdea.questions.find(
+                (que) => que._id.toString() === qoa.questionId
+              );
+              qualityOfIdea_answers[compKey] = {
+                question: qoaObj.question,
+                answer: qoa.answer,
+                order: qoaObj.order,
+              };
+            });
+            participantResults[key] = {
+              _id: obj._id,
+              opportunityId: obj.opportunityId,
+              firstName: userInfo.firstName,
+              lastName: userInfo.lastName,
+              status: obj.status,
+              comprehension: {qa : comprehension_answers, evaluation: ''},
+              qualityOfIdea: qualityOfIdea_answers,
+            };
+          })
+        )
+      })
+      .catch((error) => {
+        console.log(error);
+        return errorResp(res, {
+          msg: ERROR_MESSAGE.NOT_FOUND,
+          code: HTTP_STATUS.BAD_REQUEST.CODE,
+        });
+      });
+  } catch (error) {
+    serverError(res, error);
   }
 };
 
