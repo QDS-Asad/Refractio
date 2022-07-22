@@ -232,24 +232,25 @@ const OpportunityDetail = () => {
             <Segment>
               <div className='clearfix'>
                 <Header floated='left'>Opportunity Information</Header>
-                {opportunity.status === 'draft' && (
-                  <>
-                    <Button
-                      className='btn-link'
-                      floated='right'
-                      type='button'
-                      onClick={() => setEditOpportunity(true)}
-                      disabled={loading}
-                    >
-                      Edit
-                    </Button>
-                    <OpportunityCreate
-                      showCreate={editOpportunity}
-                      setShowCreate={setEditOpportunity}
-                      id={opportunity._id}
-                    />
-                  </>
-                )}
+                {opportunity.status === 'draft' &&
+                  userLogin.id === opportunity.createdById && (
+                    <>
+                      <Button
+                        className='btn-link'
+                        floated='right'
+                        type='button'
+                        onClick={() => setEditOpportunity(true)}
+                        disabled={loading}
+                      >
+                        Edit
+                      </Button>
+                      <OpportunityCreate
+                        showCreate={editOpportunity}
+                        setShowCreate={setEditOpportunity}
+                        id={opportunity._id}
+                      />
+                    </>
+                  )}
               </div>
 
               <Header size='small'>
