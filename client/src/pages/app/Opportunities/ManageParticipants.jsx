@@ -103,7 +103,11 @@ const ManageParticipants = ({
                             addMemberOpportunity(opportunity._id, member._id)
                           )
                         }
-                        disabled={loading || opportunity.createdById != userId}
+                        disabled={
+                          loading ||
+                          opportunity.createdById != userId ||
+                          opportunity.status != 'draft'
+                        }
                         className='btn-link'
                       >
                         Add
