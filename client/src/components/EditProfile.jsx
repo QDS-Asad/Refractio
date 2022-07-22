@@ -41,15 +41,15 @@ const EditProfile = ({ editProfile, setEditProfile, userInfo }) => {
     firstName: {
       required: 'First Name is required',
       pattern: {
-        value: /^[a-zA-Z ]*$/,
-        message: 'Invalid First Name. Only letters are allowed.',
+        value: /^[\w\-\s]+$/,
+        message: 'Invalid First Name. Only alpha-numeric letters are allowed.',
       },
     },
     lastName: {
       required: 'Last Name is required',
       pattern: {
-        value: /^[a-zA-Z ]*$/,
-        message: 'Invalid Last Name. Only letters are allowed.',
+        value: /^[\w\-\s]+$/,
+        message: 'Invalid First Name. Only alpha-numeric letters are allowed.',
       },
     },
   };
