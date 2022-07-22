@@ -83,13 +83,13 @@ exports.updateOpportunity = async (req, res, next) => {
   try {
     const { opportunityId } = req.params;
     const { user } = req.body;
-    if (req.body.comprehension && req.body.comprehension.questions && req.body.comprehension.questions.length < 1) {
+    if (req.body.status === OPPORTUNITY_STATUS.PUBLISH && req.body.comprehension && req.body.comprehension.questions && req.body.comprehension.questions.length < 1) {
       return errorResp(res, {
         msg: ERROR_MESSAGE.COMP_MIN_ONE_QUESTION,
         code: HTTP_STATUS.BAD_REQUEST.CODE,
       });
     }
-    if (req.body.qualityOfIdea && req.body.qualityOfIdea.questions && req.body.qualityOfIdea.questions.length < 1) {
+    if (req.body.status === OPPORTUNITY_STATUS.PUBLISH && req.body.qualityOfIdea && req.body.qualityOfIdea.questions && req.body.qualityOfIdea.questions.length < 1) {
       return errorResp(res, {
         msg: ERROR_MESSAGE.QOA_MIN_ONE_QUESTION,
         code: HTTP_STATUS.BAD_REQUEST.CODE,
