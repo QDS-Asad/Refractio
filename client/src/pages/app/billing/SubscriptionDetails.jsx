@@ -53,115 +53,140 @@ const SubscriptionDetails = () => {
         </Message>
       )}
       {subscription && (
-        <List divided relaxed='very'>
-          <List.Item className='px-3'>
-            <List.Content>
-              <Grid columns={3}>
-                <Grid.Row>
-                  <Grid.Column>
-                    <p className='pt-2 fw-bold'>Plan</p>
-                  </Grid.Column>
+        <>
+          {subscription.hasPaymentMethod ? (
+            <List divided relaxed='very'>
+              <List.Item className='px-3'>
+                <List.Content>
+                  <Grid columns={3}>
+                    <Grid.Row>
+                      <Grid.Column>
+                        <p className='pt-2 fw-bold'>Plan</p>
+                      </Grid.Column>
 
-                  <Grid.Column>
-                    <p className='pt-2'>
-                      {subscription.planName}, {subscription.interval}ly
-                    </p>
-                  </Grid.Column>
-                </Grid.Row>
-              </Grid>
-            </List.Content>
-          </List.Item>
-          <List.Item className='px-3'>
-            <Grid columns={3}>
-              <Grid.Row>
-                <Grid.Column>
-                  <p className='pt-2 fw-bold'>Next Payment</p>
-                </Grid.Column>
-                <Grid.Column>
-                  {subscription.status === SUBSCRIPTION_STATUS.ACTIVE && (
-                    <p className='pt-2'>
-                      ${subscription.amount} -{' '}
-                      {formatDate(subscription.nextBillingAt)}{' '}
-                      {subscription.autoRenew && (
-                        <span>(Billed automatically)</span>
+                      <Grid.Column>
+                        <p className='pt-2'>
+                          {subscription.planName}, {subscription.interval}ly
+                        </p>
+                      </Grid.Column>
+                    </Grid.Row>
+                  </Grid>
+                </List.Content>
+              </List.Item>
+              <List.Item className='px-3'>
+                <Grid columns={3}>
+                  <Grid.Row>
+                    <Grid.Column>
+                      <p className='pt-2 fw-bold'>Next Payment</p>
+                    </Grid.Column>
+                    <Grid.Column>
+                      {subscription.status === SUBSCRIPTION_STATUS.ACTIVE && (
+                        <p className='pt-2'>
+                          ${subscription.amount} -{' '}
+                          {formatDate(subscription.nextBillingAt)}{' '}
+                          {subscription.autoRenew && (
+                            <span>(Billed automatically)</span>
+                          )}
+                        </p>
                       )}
-                    </p>
-                  )}
-                  {subscription.status === SUBSCRIPTION_STATUS.CANCELED && (
-                    <p className='pt-2'>Canceled</p>
-                  )}
-                </Grid.Column>
-                <Grid.Column>
-                  {subscription.status === SUBSCRIPTION_STATUS.ACTIVE && (
-                    <>
-                      <Button
-                        className='btn-link'
-                        floated='right'
-                        onClick={() => cancelSubscriptionHandler()}
-                      >
-                        Cancel Subscription
-                      </Button>
-                      <CancelSubscription
-                        cancelSubscription={cancelSubscription}
-                        setCancelSubscription={setCancelSubscription}
-                      />
-                    </>
-                  )}
-                  {subscription.status === SUBSCRIPTION_STATUS.CANCELED && (
-                    <>
-                      <Button
-                        className='btn-link'
-                        floated='right'
-                        onClick={() => resumeSubscriptionHandler()}
-                      >
-                        Resume Subscription
-                      </Button>
-                      <ResumeSubscription
-                        resumeSubscription={resumeSubscription}
-                        setResumeSubscription={setResumeSubscription}
-                      />
-                    </>
-                  )}
-                </Grid.Column>
-              </Grid.Row>
-            </Grid>
-          </List.Item>
-          {subscription.PaymentMethod && (
-            <List.Item className='px-3'>
-              <Grid columns={3}>
-                <Grid.Row>
-                  <Grid.Column>
-                    <p className='pt-2 fw-bold'>Payment Method</p>
-                  </Grid.Column>
-                  <Grid.Column>
-                    <p className='pt-2'>
-                      <span className='text-capitalize'>
-                        {subscription.PaymentMethod.brand}
-                      </span>{' '}
-                      <span className='text-capitalize'>
-                        {subscription.PaymentMethod.type}
-                      </span>{' '}
-                      **** **** **** {subscription.PaymentMethod.last4Digits}
-                    </p>
-                  </Grid.Column>
-                  <Grid.Column>
-                    <Button
-                      className='btn-link'
-                      floated='right'
-                      onClick={() => changeCardHandler()}
-                    >
-                      Change
-                    </Button>
-                    <ChangeCard
-                      changeCard={changeCard}
-                      setChangeCard={setChangeCard}
-                    />
-                  </Grid.Column>
-                </Grid.Row>
-              </Grid>
-            </List.Item>
+                      {subscription.status === SUBSCRIPTION_STATUS.CANCELED && (
+                        <p className='pt-2'>Canceled</p>
+                      )}
+                    </Grid.Column>
+                    <Grid.Column>
+                      {subscription.status === SUBSCRIPTION_STATUS.ACTIVE && (
+                        <>
+                          <Button
+                            className='btn-link'
+                            floated='right'
+                            onClick={() => cancelSubscriptionHandler()}
+                          >
+                            Cancel Subscription
+                          </Button>
+                          <CancelSubscription
+                            cancelSubscription={cancelSubscription}
+                            setCancelSubscription={setCancelSubscription}
+                          />
+                        </>
+                      )}
+                      {subscription.status === SUBSCRIPTION_STATUS.CANCELED && (
+                        <>
+                          <Button
+                            className='btn-link'
+                            floated='right'
+                            onClick={() => resumeSubscriptionHandler()}
+                          >
+                            Resume Subscription
+                          </Button>
+                          <ResumeSubscription
+                            resumeSubscription={resumeSubscription}
+                            setResumeSubscription={setResumeSubscription}
+                          />
+                        </>
+                      )}
+                    </Grid.Column>
+                  </Grid.Row>
+                </Grid>
+              </List.Item>
+              {subscription.PaymentMethod && (
+                <List.Item className='px-3'>
+                  <Grid columns={3}>
+                    <Grid.Row>
+                      <Grid.Column>
+                        <p className='pt-2 fw-bold'>Payment Method</p>
+                      </Grid.Column>
+                      <Grid.Column>
+                        <p className='pt-2'>
+                          <span className='text-capitalize'>
+                            {subscription.PaymentMethod.brand}
+                          </span>{' '}
+                          <span className='text-capitalize'>
+                            {subscription.PaymentMethod.type}
+                          </span>{' '}
+                          **** **** ****{' '}
+                          {subscription.PaymentMethod.last4Digits}
+                        </p>
+                      </Grid.Column>
+                      <Grid.Column>
+                        <Button
+                          className='btn-link'
+                          floated='right'
+                          onClick={() => changeCardHandler()}
+                        >
+                          Change
+                        </Button>
+                        <ChangeCard
+                          title='Change'
+                          changeCard={changeCard}
+                          setChangeCard={setChangeCard}
+                        />
+                      </Grid.Column>
+                    </Grid.Row>
+                  </Grid>
+                </List.Item>
+              )}
+            </List>
+          ) : (
+            <List divided relaxed='very'>
+              <List.Item className='px-3'>
+                <List.Content>
+                  <Button
+                    className='btn-link'
+                    floated='left'
+                    onClick={() => changeCardHandler()}
+                  >
+                    Add Payment method
+                  </Button>
+                  <ChangeCard
+                    title='Add'
+                    changeCard={changeCard}
+                    setChangeCard={setChangeCard}
+                  />
+                </List.Content>
+              </List.Item>
+            </List>
           )}
-        </List>
+        </>
       )}
     </Segment>
   );

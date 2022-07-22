@@ -1,22 +1,23 @@
-import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchOpportunity,
   opportunityResponseSelector,
-} from "../../../features/opportunities/opportunityResponseSlice";
-import { Button, Form, Grid, Header, Message } from "semantic-ui-react";
-import { useParams } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import ResponseForm from "../../../components/ResponseForm";
-import PublishResponse from "./PublishResponse";
+} from '../../../features/opportunities/opportunityResponseSlice';
+import { Button, Form, Grid, Header, Message } from 'semantic-ui-react';
+import { useParams } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import ResponseForm from '../../../components/ResponseForm';
+import PublishResponse from './PublishResponse';
 
 const OpportunityResponse = () => {
   const [viewSubmit, setViewSubmit] = useState(false);
   const [viewMessage, setViewMessage] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(1);
+  const [allQuestions, setAllQuestions] = useState([]);
   const { id } = useParams();
   const { register, setValue, handleSubmit, errors, trigger, watch } = useForm({
-    mode: "onBlur",
+    mode: 'onBlur',
   });
 
   // set up dispatch
@@ -37,26 +38,33 @@ const OpportunityResponse = () => {
     dispatch(fetchOpportunity(id));
   }, [dispatch, id]);
   useEffect(() => {
-    if (opportunity) {
-      for (let i = 1; i <= opportunity.questions.length; i++) {
+    if (opportunity && opportunity.comprehension.questions) {
+      setAllQuestions([
+        ...opportunity.comprehension.questions,
+        ...opportunity.qualityOfIdea.questions,
+      ]);
+    }
+  }, [opportunity]);
+  useEffect(() => {
+    if (allQuestions.length > 0) {
+      for (let i = 1; i <= allQuestions.length; i++) {
         register(
           { name: `q${i}` },
           {
-            required: "Answer is required",
+            required: 'Answer is required',
             maxLength: {
               value: 600,
-              message: "Maximum characters are 600.",
+              message: 'Maximum characters are 600.',
             },
           }
         );
-        setValue((`q${i}`, ""));
+        setValue((`q${i}`, ''));
       }
     }
-  }, [opportunity]);
+  }, [allQuestions]);
 
   const handleEdit = (data) => {
     setViewSubmit(true);
-    console.log(data);
   };
   const onSubmittion = async () => {
     setViewMessage(true);
@@ -72,18 +80,18 @@ const OpportunityResponse = () => {
             {viewMessage && (
               <Message
                 positive
-                content="Your response has been saved."
-                className="error-message mb-3"
+                content='Your response has been saved.'
+                className='error-message mb-3'
               />
             )}
-            <Header as="h3" className="primary-dark-color">
+            <Header as='h3' className='primary-dark-color'>
               {opportunity.name}
               <Button
                 primary
-                type="submit"
-                form="create-opportunity"
-                className="btn-secondary"
-                floated="right"
+                type='submit'
+                form='create-opportunity'
+                className='btn-secondary'
+                floated='right'
               >
                 Submit
               </Button>
@@ -95,26 +103,26 @@ const OpportunityResponse = () => {
               <Button
                 onClick={onSubmittion}
                 primary
-                className="btn-outline me-3"
-                floated="right"
+                className='btn-outline me-3'
+                floated='right'
               >
                 Save as Draft
               </Button>
             </Header>
-            <div style={{ padding: "1em" }}>
+            <div style={{ padding: '1em' }}>
               <Form
-                id="create-opportunity"
+                id='create-opportunity'
                 error
-                size="small"
+                size='small'
                 onSubmit={handleSubmit(handleEdit)}
                 loading={loading}
               >
                 {error && (
-                  <Message color="red" className="error-message">
+                  <Message color='red' className='error-message'>
                     {error}
                   </Message>
                 )}
-                {opportunity.questions.map((o, index) => (
+                {allQuestions.map((o, index) => (
                   <div key={index}>
                     {currentQuestion === index + 1 && (
                       <ResponseForm
@@ -123,7 +131,7 @@ const OpportunityResponse = () => {
                         handleChange={handleChange}
                         errors={errors}
                         watch={watch}
-                        allQuestions={opportunity.questions.length}
+                        allQuestions={allQuestions.length}
                         setCurrentQuestion={setCurrentQuestion}
                       />
                     )}
@@ -135,21 +143,21 @@ const OpportunityResponse = () => {
           <>
             <Grid.Column
               width={5}
-              style={{ backgroundColor: "#EDF1F6", height: "100%" }}
+              style={{ backgroundColor: '#EDF1F6', height: '100%' }}
             >
-              <div className="clearfix">
-                <Header floated="left">Opportunity Information</Header>
+              <div className='clearfix'>
+                <Header floated='left'>Opportunity Information</Header>
               </div>
 
-              <Header size="small">
+              <Header size='small'>
                 Opportunity Name
-                <Header.Subheader className="mt-3">
+                <Header.Subheader className='mt-3'>
                   {opportunity.name}
                 </Header.Subheader>
               </Header>
-              <Header size="small">
+              <Header size='small'>
                 Description
-                <Header.Subheader className="mt-3">
+                <Header.Subheader className='mt-3'>
                   {opportunity.description}
                 </Header.Subheader>
               </Header>

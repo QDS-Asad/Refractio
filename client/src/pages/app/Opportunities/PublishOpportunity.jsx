@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Modal } from 'semantic-ui-react';
 
-const PublishOpportunity = ({ viewPublish, setViewPublish }) => {
+const PublishOpportunity = ({ viewPublish, setViewPublish, onSubmittion }) => {
   return (
     <Modal
       onClose={() => setViewPublish(false)}
@@ -18,13 +18,13 @@ const PublishOpportunity = ({ viewPublish, setViewPublish }) => {
         </Modal.Description>
       </Modal.Content>
       <Modal.Actions>
-        <Button
-          content='Cancel'
-          onClick={() => setViewPublish(false)}
-        />
+        <Button content='Cancel' onClick={() => setViewPublish(false)} />
         <Button
           content='Publish Now'
-          onClick={() => setViewPublish(false)}
+          onClick={() => {
+            onSubmittion();
+            setViewPublish(false);
+          }}
           className='btn'
         />
       </Modal.Actions>

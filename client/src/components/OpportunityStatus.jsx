@@ -4,7 +4,7 @@ import { Label } from 'semantic-ui-react';
 const OpportunityStatus = ({ status }) => {
   let bgColor = '';
   switch (status.toLowerCase()) {
-    case 'published':
+    case 'publish':
       bgColor = 'success-bg';
       break;
     case 'draft':

@@ -20,7 +20,12 @@ const AppLayout = () => {
     return <Navigate to='/subscription' />;
   }
 
-  if (userLogin && !userLogin.isRegistered && userLogin.role === undefined) {
+  if (
+    userLogin &&
+    !userLogin.isRegistered &&
+    userLogin.role === undefined &&
+    !userLogin.isSuperAdmin
+  ) {
     return <Navigate to='/workspaces' />;
   }
 

@@ -6,11 +6,12 @@ export const initialState = {
   loading: false,
   error: null,
   success: false,
+  admins: [],
 };
 
 // our slice
-const changeCardSlice = createSlice({
-  name: 'changeCard',
+const transferOwnersSlice = createSlice({
+  name: 'transferOwner',
   initialState,
   reducers: {
     setLoading: (state) => {
@@ -18,17 +19,21 @@ const changeCardSlice = createSlice({
     },
     setSuccess: (state, { payload }) => {
       state.loading = false;
-      state.error = null;
+      state.error = false;
       state.success = payload;
     },
     setError: (state, { payload }) => {
       state.loading = false;
       state.error = payload;
-      state.success = false;
+    },
+    setAdminList: (state, { payload }) => {
+      state.loading = false;
+      state.error = false;
+      state.admins = payload;
     },
     reset: (state) => {
       state.loading = false;
-      state.error = null;
+      state.error = false;
       state.success = false;
     },
   },
@@ -39,31 +44,20 @@ export const {
   setSuccess,
   setError,
   reset,
-} = changeCardSlice.actions;
+  setAdminList,
+} = transferOwnersSlice.actions;
 
-export const changeCardSelector = (state) => state.changeCard;
+// export the selector (".items" being same as in slices/index.js's "items: something")
+export const transferOwnershipSelector = (state) => state.transferOwner;
 
 // export the default reducer
-export default changeCardSlice.reducer;
+export default transferOwnersSlice.reducer;
 
-// register user
-export const changeUserCard = (userId, body) => async (dispatch) => {
+// fetch all opportunities
+export const transferOwnershipCall = (member) => async (dispatch) => {
   try {
     dispatch(setLoading());
-    await refractioApi.put(`/users/change-payment-method/${userId}`, body);
-    dispatch(setSuccess(true));
-  } catch (error) {
-    const errorMessage =
-      error.response && error.response.data
-        ? error.response.data.message
-        : error.message;
-    dispatch(setError(errorMessage));
-  }
-};
-export const AddUserCard = (userId, body) => async (dispatch) => {
-  try {
-    dispatch(setLoading());
-    await refractioApi.put(`/users/add-payment-method/${userId}`, body);
+    await refractioApi.put(`/users/ownership-transfer/${member}`);
     dispatch(setSuccess(true));
   } catch (error) {
     const errorMessage =
@@ -74,6 +68,22 @@ export const AddUserCard = (userId, body) => async (dispatch) => {
   }
 };
 
-export const resetChangeCard = () => (dispatch) => {
+export const resetTransferOwner = () => async (dispatch) => {
   dispatch(reset());
+};
+
+export const fetchAdmins = () => async (dispatch) => {
+  try {
+    dispatch(setLoading());
+    let { data: response } = await refractioApi.get(
+      '/users/team-administrators'
+    );
+    dispatch(setAdminList(response.data));
+  } catch (error) {
+    const errorMessage =
+      error.response && error.response.data
+        ? error.response.data.message
+        : error.message;
+    dispatch(setError(errorMessage));
+  }
 };

@@ -4,13 +4,17 @@
     "name": "Opportunity Name",
     "description": "Quid ex eo ortum, tam egregios viros censes aut in malis dolor, non. Primum igitur, inquit, modo ista sis aequitate, quam nihil ut aut voluptates.  Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae quasi doloribus harum odio iure eveniet quae culpa sunt, sapiente voluptate mollitia asperiores fugit, dolorum sint, vitae earum doloremque maxime soluta?  Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae quasi doloribus harum odio iure eveniet quae culpa sunt, sapiente voluptate mollitia asperiores fugit, dolorum sint, vitae earum doloremque maxime soluta?",
     "status": "published",
-    "questions": [
-      "What is the best reason for Team to pursue Opportunity",
-      "What is the best reason for Team to NOT pursue Opportunity",
-      "Describe the Stakeholders involved in the Idea you are submitting",
-      "Describe the EXPECTED RESULTS from action taken to pursue Opportunity",
-      "Describe the EXPECTED RESULTS from action taken to pursue Opportunity"
-    ],
+    "questions": {
+      "comprehension": [
+        "What is the best reason for Team to pursue Opportunity",
+        "What is the best reason for Team to NOT pursue Opportunity"
+      ],
+      "quality": [
+        "Describe the Stakeholders involved in the Idea you are submitting",
+        "Describe the EXPECTED RESULTS from action taken to pursue Opportunity",
+        "Describe the EXPECTED RESULTS from action taken to pursue Opportunity"
+      ]
+    },
     "participants": [
       {
         "_id": "1",
@@ -39,13 +43,17 @@
     "name": "Opportunity Name",
     "description": "Quid ex eo ortum, tam egregios viros censes aut in malis dolor, non. Primum igitur, inquit, modo ista sis aequitate, quam nihil ut aut voluptates.  Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae quasi doloribus harum odio iure eveniet quae culpa sunt, sapiente voluptate mollitia asperiores fugit, dolorum sint, vitae earum doloremque maxime soluta?  Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae quasi doloribus harum odio iure eveniet quae culpa sunt, sapiente voluptate mollitia asperiores fugit, dolorum sint, vitae earum doloremque maxime soluta?",
     "status": "draft",
-    "questions": [
-      "What is the best reason for Team to pursue Opportunity",
-      "What is the best reason for Team to NOT pursue Opportunity",
-      "Describe the Stakeholders involved in the Idea you are submitting",
-      "Describe the EXPECTED RESULTS from action taken to pursue Opportunity",
-      "Describe the EXPECTED RESULTS from action taken to pursue Opportunity"
-    ],
+    "questions": {
+      "comprehension": [
+        "What is the best reason for Team to pursue Opportunity",
+        "What is the best reason for Team to NOT pursue Opportunity"
+      ],
+      "quality": [
+        "Describe the Stakeholders involved in the Idea you are submitting",
+        "Describe the EXPECTED RESULTS from action taken to pursue Opportunity",
+        "Describe the EXPECTED RESULTS from action taken to pursue Opportunity"
+      ]
+    },
     "participants": [
       {
         "_id": "1",
@@ -74,13 +82,17 @@
     "name": "Opportunity Name",
     "description": "Quid ex eo ortum, tam egregios viros censes aut in malis dolor, non. Primum igitur, inquit, modo ista sis aequitate, quam nihil ut aut voluptates.  Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae quasi doloribus harum odio iure eveniet quae culpa sunt, sapiente voluptate mollitia asperiores fugit, dolorum sint, vitae earum doloremque maxime soluta?  Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae quasi doloribus harum odio iure eveniet quae culpa sunt, sapiente voluptate mollitia asperiores fugit, dolorum sint, vitae earum doloremque maxime soluta?",
     "status": "completed",
-    "questions": [
-      "What is the best reason for Team to pursue Opportunity",
-      "What is the best reason for Team to NOT pursue Opportunity",
-      "Describe the Stakeholders involved in the Idea you are submitting",
-      "Describe the EXPECTED RESULTS from action taken to pursue Opportunity",
-      "Describe the EXPECTED RESULTS from action taken to pursue Opportunity"
-    ],
+    "questions": {
+      "comprehension": [
+        "What is the best reason for Team to pursue Opportunity",
+        "What is the best reason for Team to NOT pursue Opportunity"
+      ],
+      "quality": [
+        "Describe the Stakeholders involved in the Idea you are submitting",
+        "Describe the EXPECTED RESULTS from action taken to pursue Opportunity",
+        "Describe the EXPECTED RESULTS from action taken to pursue Opportunity"
+      ]
+    },
     "participants": [
       {
         "_id": "1",
