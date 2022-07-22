@@ -106,8 +106,8 @@ const Subscription = () => {
         message: 'Enter at least 5 characters',
       },
       pattern: {
-        value: /^[A-Za-z]+$/,
-        message: 'Only alalphabets are allowed',
+        value: /^[\w\-\s]+$/,
+        message: 'Only alphanumeric characters are allowed',
       },
     },
     nameOnCard: {

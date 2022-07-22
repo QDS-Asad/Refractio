@@ -35,6 +35,9 @@ import opportunityManageListSlice from './opportunities/opportunityManageListSli
 import opportunityResponseSlice from './opportunities/opportunityResponseSlice';
 import opportunityEvaluateSlice from './opportunities/opportunityEvaluateSlice';
 import editProfileSlice from './opportunities/opportunityEvaluateSlice';
+import deleteMemberSlice from './team/deleteMemberSlice';
+import transferOwnerSlice from './team/transferOwnerSlice';
+import teamParticipantsSlice from './team/teamParticipantsSlice';
 
 const store = configureStore({
   reducer: {
@@ -73,6 +76,9 @@ const store = configureStore({
     orderList: orderListSlice,
     opportunityManageList: opportunityManageListSlice,
     editProfile: editProfileSlice,
+    deleteMember: deleteMemberSlice,
+    transferOwner: transferOwnerSlice,
+    teamParticipants: teamParticipantsSlice,
   },
 });
 

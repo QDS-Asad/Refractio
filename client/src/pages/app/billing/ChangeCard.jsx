@@ -5,15 +5,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button, Form, Message, Modal, Checkbox } from 'semantic-ui-react';
 import { authLoginSelector } from '../../../features/auth/authLoginSlice';
 import {
+  AddUserCard,
   changeCardSelector,
   changeUserCard,
   resetChangeCard,
 } from '../../../features/billing/changeCardSlice';
-const ChangeCard = ({ changeCard, setChangeCard }) => {
+const ChangeCard = ({ changeCard, setChangeCard, title }) => {
   const { register, setValue, handleSubmit, errors, trigger } = useForm({
     mode: 'onBlur',
     defaultValues: {
-      autoRenew: false,
+      autoRenew: true,
     },
   });
 
@@ -37,7 +38,11 @@ const ChangeCard = ({ changeCard, setChangeCard }) => {
 
   const handleCreate = (data) => {
     // dispatch user change card;
-    dispatch(changeUserCard(userLogin.id, data));
+    if (title === 'Change') {
+      dispatch(changeUserCard(userLogin.id, data));
+    } else {
+      dispatch(AddUserCard(userLogin.id, data));
+    }
   };
 
   const createOptions = {
@@ -50,7 +55,7 @@ const ChangeCard = ({ changeCard, setChangeCard }) => {
     cardExpiry: {
       required: 'Card expiry is required',
       pattern: {
-        value: /^(0[1-9]|1[0-2])\/?([0-9]{2})$/,
+        value: /^(0[1-9]|1[0-2])\/([0-9]{2})$/,
         message: 'Invalid expiry date.',
       },
     },
@@ -95,7 +100,7 @@ const ChangeCard = ({ changeCard, setChangeCard }) => {
       size='small'
       closeIcon
     >
-      <Modal.Header color='red'>Change Card</Modal.Header>
+      <Modal.Header color='red'>{title} Card</Modal.Header>
       <Modal.Content>
         <Modal.Description>
           {error && (
@@ -203,6 +208,7 @@ const ChangeCard = ({ changeCard, setChangeCard }) => {
               <Checkbox
                 label='Autorenewal subscription'
                 name='autoRenew'
+                defaultChecked
                 onBlur={handleChangeCheckBox}
               />
             </Form.Field>

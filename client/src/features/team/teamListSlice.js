@@ -31,10 +31,18 @@ const teamListSlice = createSlice({
       state.loading = false;
       state.error = payload;
     },
+    setPageNumber: (state, { payload }) => {
+      state.page = payload;
+    },
   },
 });
 // export the actions
-export const { setLoading, setTeamList, setError } = teamListSlice.actions;
+export const {
+  setLoading,
+  setTeamList,
+  setError,
+  setPageNumber,
+} = teamListSlice.actions;
 
 // export the selector (".items" being same as in slices/index.js's "items: something")
 export const teamListSelector = (state) => state.teamList;
@@ -50,6 +58,7 @@ export const fetchTeamList = (pageNumber, pageSize) => async (dispatch) => {
       `/users/team?page=${pageNumber}&page_size=${pageSize}`
     );
     dispatch(setTeamList(data.data));
+    dispatch(setPageNumber(pageNumber));
   } catch (error) {
     const errorMessage =
       error.response && error.response.data

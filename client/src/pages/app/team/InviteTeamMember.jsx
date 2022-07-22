@@ -7,7 +7,7 @@ import {
   inviteMember,
   resetInviteTeamMember,
 } from '../../../features/team/inviteMemberSlice';
-import { fetchRoles, roleListSelector } from '../../../features/roles/roleList';
+import { roleListSelector } from '../../../features/roles/roleList';
 import { ROLES } from '../../../common/constants';
 
 const InviteTeamMember = ({ inviteTeamMember, setInviteTeamMember }) => {
@@ -52,7 +52,6 @@ const InviteTeamMember = ({ inviteTeamMember, setInviteTeamMember }) => {
   };
 
   useEffect(() => {
-    dispatch(fetchRoles());
     register({ name: 'email' }, createOptions.email);
     register({ name: 'role' }, createOptions.role);
   }, []);

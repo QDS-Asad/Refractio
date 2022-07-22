@@ -1,32 +1,35 @@
 import { createSlice } from '@reduxjs/toolkit';
 import refractioApi from '../../common/refractioApi';
-import { fetchOpportunities } from './opportunityListSlice';
 
 // initial state
 export const initialState = {
   loading: false,
   error: null,
-  opportunity: null,
   success: false,
 };
 
 // our slice
-const opportunityCreateSlice = createSlice({
-  name: 'opportunityCreate',
+const deleteMemberSlice = createSlice({
+  name: 'deleteMember',
   initialState,
   reducers: {
     setLoading: (state) => {
       state.loading = true;
+      state.error = null;
+      state.success = false;
     },
-    setOpportunity: (state, { payload }) => {
+    setSuccess: (state, { payload }) => {
       state.loading = false;
       state.error = false;
-      state.opportunity = payload;
-      state.success = true;
+      state.success = payload;
     },
     setError: (state, { payload }) => {
       state.loading = false;
       state.error = payload;
+    },
+    reset: (state) => {
+      state.loading = false;
+      state.error = null;
       state.success = false;
     },
   },
@@ -34,23 +37,25 @@ const opportunityCreateSlice = createSlice({
 // export the actions
 export const {
   setLoading,
-  setOpportunity,
+  setSuccess,
   setError,
-} = opportunityCreateSlice.actions;
+  reset,
+} = deleteMemberSlice.actions;
 
 // export the selector (".items" being same as in slices/index.js's "items: something")
-export const opportunityCreateSelector = (state) => state.opportunityCreate;
+export const deleteMemberSelector = (state) => {
+  return state.deleteMember;
+};
 
 // export the default reducer
-export default opportunityCreateSlice.reducer;
+export default deleteMemberSlice.reducer;
 
-// create opportunity
-export const createOpportunity = (opportunity) => async (dispatch) => {
+// fetch all opportunities
+export const deleteMember = () => async (dispatch) => {
   try {
     dispatch(setLoading());
-    await refractioApi.post('/opportunities/create', opportunity);
-    dispatch(setOpportunity(opportunity));
-    dispatch(fetchOpportunities());
+    await refractioApi.delete(`/users/delete-team`);
+    dispatch(setSuccess(true));
   } catch (error) {
     const errorMessage =
       error.response && error.response.data
@@ -58,4 +63,8 @@ export const createOpportunity = (opportunity) => async (dispatch) => {
         : error.message;
     dispatch(setError(errorMessage));
   }
+};
+
+export const resetDeleteTeamMember = () => async (dispatch) => {
+  dispatch(reset());
 };

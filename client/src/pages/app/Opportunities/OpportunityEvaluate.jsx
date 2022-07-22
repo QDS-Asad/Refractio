@@ -21,9 +21,7 @@ const OpportunityEvaluate = () => {
   const dispatch = useDispatch();
 
   // fetch data from our store
-  const { loading, error, opportunity } = useSelector(
-    opportunityEvaluateSelector
-  );
+  const { error, opportunity } = useSelector(opportunityEvaluateSelector);
   const handleComprehensionChange = (e, { value }) => {
     setComprehensionRating(value);
   };
@@ -82,41 +80,22 @@ const OpportunityEvaluate = () => {
                   {error}
                 </Message>
               )}
-              {currentQuestion === 1 ? (
-                <EvaluateForm
-                  handleIdeaChange={handleIdeaChange}
-                  ideaRating={ideaRating}
-                  comprehensionRating={comprehensionRating}
-                  setCurrentQuestion={setCurrentQuestion}
-                  currentQuestion={currentQuestion}
-                  handleComprehensionChange={handleComprehensionChange}
-                  quality={opportunity.questions.quality}
-                  comprehension={opportunity.questions.comprehension}
-                  allQuestions={
-                    [
-                      ...opportunity.questions.quality,
-                      ...opportunity.questions.comprehension,
-                    ].length
-                  }
-                />
-              ) : (
-                <EvaluateForm
-                  handleIdeaChange={handleIdeaChange}
-                  ideaRating={ideaRating}
-                  comprehensionRating={comprehensionRating}
-                  setCurrentQuestion={setCurrentQuestion}
-                  currentQuestion={currentQuestion}
-                  handleComprehensionChange={handleComprehensionChange}
-                  quality={opportunity.questions.quality}
-                  comprehension={opportunity.questions.comprehension}
-                  allQuestions={
-                    [
-                      ...opportunity.questions.quality,
-                      ...opportunity.questions.comprehension,
-                    ].length
-                  }
-                />
-              )}
+              <EvaluateForm
+                handleIdeaChange={handleIdeaChange}
+                ideaRating={ideaRating}
+                comprehensionRating={comprehensionRating}
+                setCurrentQuestion={setCurrentQuestion}
+                currentQuestion={currentQuestion}
+                handleComprehensionChange={handleComprehensionChange}
+                quality={opportunity.questions.quality}
+                comprehension={opportunity.questions.comprehension}
+                allQuestions={
+                  [
+                    ...opportunity.questions.quality,
+                    ...opportunity.questions.comprehension,
+                  ].length
+                }
+              />
             </div>
           </Grid.Column>
           <>

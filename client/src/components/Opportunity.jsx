@@ -6,13 +6,13 @@ import OpportunityStatus from './OpportunityStatus';
 import { authLoginSelector } from '../features/auth/authLoginSlice';
 import { useState } from 'react';
 
+const style = { color: 'blue', cursor: 'pointer' };
 const Opportunity = ({ opportunity }) => {
   const [showMore, setShowMore] = useState(false);
   const navigate = useNavigate();
   const { userLogin } = useSelector(authLoginSelector);
-  const application = opportunity.participants.filter(
-    (o) => o.email === userLogin.email
-  );
+  // const application = opportunity.participants.includes(userLogin.id);
+  const application = false;
   return (
     <Card fluid>
       <Card.Content>
@@ -30,20 +30,23 @@ const Opportunity = ({ opportunity }) => {
           </Link>
         </Card.Meta>
         <Card.Description className='mb-3'>
-          {showMore ? (
-            opportunity.description
+          {opportunity.description.length > 203 ? (
+            <>
+              {showMore ? (
+                opportunity.description
+              ) : (
+                <>{opportunity.description.substr(0, 203)}... </>
+              )}
+              <span style={style} onClick={() => setShowMore((prev) => !prev)}>
+                {' '}
+                {showMore ? 'Show Less' : 'Show More'}
+              </span>
+            </>
           ) : (
-            <>{opportunity.description.substr(0, 203)}...</>
+            opportunity.description
           )}
-          <a
-            style={{ color: 'blue' }}
-            onClick={() => setShowMore((prev) => !prev)}
-          >
-            {' '}
-            {showMore ? 'Show Less' : 'Show More'}
-          </a>
         </Card.Description>
-        {application.length > 0 ? (
+        {application ? (
           <>
             <Divider />
             <div style={{ display: 'flex', justifyContent: 'center' }}>

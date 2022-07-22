@@ -13,6 +13,7 @@ import {
 import { fetchRoles, roleListSelector } from '../../../features/roles/roleList';
 import {
   fetchTeamList,
+  setPageNumber,
   teamListSelector,
 } from '../../../features/team/teamListSlice';
 import CancelInvitation from './CancelInvitation';
@@ -23,12 +24,14 @@ import RemoveTeamMember from './RemoveTeamMember';
 import ResendInvitation from './ResendInvitation';
 import { ROLES, USER_STATUS } from '../../../common/constants';
 import { authLoginSelector } from '../../../features/auth/authLoginSlice';
+import OwnershipTransfer from './OwnershipTransfer';
 
 const TeamMembers = () => {
   const [inviteTeamMember, setInviteTeamMember] = useState(false);
   const [removeTeamMember, setRemoveTeamMember] = useState(false);
   const [cancelInvitation, setCancelInvitation] = useState(false);
   const [resendInvitation, setResendInvitation] = useState(false);
+  const [transferOwner, setTransferOwner] = useState(false);
   const [deleteAccount, setDeleteAccount] = useState(false);
   const [changeMemberRole, setChangeMemberRole] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
@@ -52,6 +55,7 @@ const TeamMembers = () => {
       !resendInvitation &&
       !changeMemberRole &&
       !removeTeamMember &&
+      !deleteAccount &&
       dispatch(fetchTeamList(page, limit)) &&
       dispatch(fetchRoles());
   }, [
@@ -60,8 +64,13 @@ const TeamMembers = () => {
     resendInvitation,
     changeMemberRole,
     removeTeamMember,
+    deleteAccount,
   ]);
-
+  useEffect(() => {
+    return () => {
+      dispatch(setPageNumber(1));
+    };
+  }, []);
   const removeTeamMemberHandler = (id) => {
     setSelectedMember(id);
     setRemoveTeamMember(true);
@@ -90,6 +99,11 @@ const TeamMembers = () => {
     setSelectedMember(userId);
     setSelectedRole(newRoleId);
     setChangeMemberRole(true);
+  };
+
+  const transferOwnership = () => {
+    setDeleteAccount(false);
+    setTransferOwner(true);
   };
 
   return (
@@ -133,6 +147,11 @@ const TeamMembers = () => {
             <DeleteAccount
               deleteAccount={deleteAccount}
               setDeleteAccount={setDeleteAccount}
+              transferOwnership={transferOwnership}
+            />
+            <OwnershipTransfer
+              transferOwner={transferOwner}
+              setTransferOwner={setTransferOwner}
               member={selectedMember}
             />
             <ChangeRole
