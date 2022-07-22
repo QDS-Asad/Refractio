@@ -6,8 +6,12 @@ import {
   createOpportunity,
   opportunityCreateSelector,
 } from '../../../features/opportunities/opportunityCreateSlice';
+import {
+  opportunityDetailSelector,
+  updateOpportunity,
+} from '../../../features/opportunities/opportunityDetailSlice';
 
-const OpportunityCreate = ({ showCreate, setShowCreate }) => {
+const OpportunityCreate = ({ showCreate, setShowCreate, id }) => {
   const { register, setValue, handleSubmit, watch, errors, trigger } = useForm({
     mode: 'onBlur',
     defaultValues: {
@@ -21,10 +25,13 @@ const OpportunityCreate = ({ showCreate, setShowCreate }) => {
 
   // fetch data from our store
   const { loading, error, success } = useSelector(opportunityCreateSelector);
-
+  const { opportunity } = useSelector(opportunityDetailSelector);
   const handleCreate = (data) => {
-    console.log(data);
-    dispatch(createOpportunity(data));
+    if (id) {
+      dispatch(updateOpportunity(id, 'draft', data));
+    } else {
+      dispatch(createOpportunity(data));
+    }
   };
 
   const handleChange = (e) => {
@@ -57,6 +64,13 @@ const OpportunityCreate = ({ showCreate, setShowCreate }) => {
   }, []);
 
   useEffect(() => {
+    if (id && opportunity) {
+      setValue('name', opportunity.name);
+      setValue('description', opportunity.description);
+    }
+  }, [id, opportunity]);
+
+  useEffect(() => {
     if (success) {
       setShowCreate(false);
     }
@@ -74,10 +88,10 @@ const OpportunityCreate = ({ showCreate, setShowCreate }) => {
       size='tiny'
       closeIcon
     >
-      <Modal.Header>Create Opportunity</Modal.Header>
+      <Modal.Header>{id ? 'Update' : 'Create'} Opportunity</Modal.Header>
       <Modal.Content>
         <Form
-          id='create-opportunity'
+          id='create-opp'
           onSubmit={handleSubmit(handleCreate)}
           loading={loading}
           error
@@ -98,6 +112,7 @@ const OpportunityCreate = ({ showCreate, setShowCreate }) => {
                 onChange={handleChange}
                 onBlur={handleChange}
                 error={!!errors.name}
+                value={watchName}
               />
               {errors && errors.name && (
                 <Message error content={errors.name.message} />
@@ -114,6 +129,7 @@ const OpportunityCreate = ({ showCreate, setShowCreate }) => {
                 onChange={handleChange}
                 onBlur={handleChange}
                 error={!!errors.description}
+                value={watchDescription}
               />
               {errors && errors.description && (
                 <Message error content={errors.description.message} />
@@ -124,9 +140,11 @@ const OpportunityCreate = ({ showCreate, setShowCreate }) => {
       </Modal.Content>
       <Modal.Actions>
         <Button
-          type='submit'
-          form='create-opportunity'
           content='Save'
+          onClick={() => {
+            handleSubmit(handleCreate)();
+            setShowCreate(false);
+          }}
           className='btn'
         />
       </Modal.Actions>

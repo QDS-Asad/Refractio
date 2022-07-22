@@ -24,6 +24,8 @@ import ManageOrders from './pages/admin/manage-orders/ManageOrders';
 import ManageSubscriptions from './pages/admin/manage-subscriptions/ManageSubscriptions';
 import ManageOpportunities from './pages/admin/manage-opportunities/ManageOpportunities';
 import ManageContent from './pages/admin/manage-content/ManageContent';
+import OpportunityResponse from './pages/app/Opportunities/OpportunityResponse';
+import OpportunityEvaluate from './pages/app/Opportunities/OpportunityEvaluate';
 import WorkspaceLayout from './layouts/WorkspaceLayout';
 import WorkspaceSelection from './pages/workspaces/WorkspaceSelection';
 const App = () => {
@@ -56,6 +58,26 @@ const App = () => {
               roles={[ROLES.ADMIN, ROLES.ORGANIZER, ROLES.PARTICIPANT]}
             >
               <Opportunities />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='opportunityresponse/:id'
+          element={
+            <ProtectedRoute
+              roles={[ROLES.ADMIN, ROLES.ORGANIZER, ROLES.PARTICIPANT]}
+            >
+              <OpportunityResponse />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='opportunityevaluate/:id'
+          element={
+            <ProtectedRoute
+              roles={[ROLES.ADMIN, ROLES.ORGANIZER, ROLES.PARTICIPANT]}
+            >
+              <OpportunityEvaluate />
             </ProtectedRoute>
           }
         />

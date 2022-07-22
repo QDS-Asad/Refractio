@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchOpportunity,
   opportunityDetailSelector,
+  resetOpportunity,
+  updateOpportunity,
 } from '../../../features/opportunities/opportunityDetailSlice';
 import {
   Button,
@@ -18,24 +20,186 @@ import { useParams } from 'react-router-dom';
 import OpportunityStatus from '../../../components/OpportunityStatus';
 import PublishOpportunity from './PublishOpportunity';
 import ManageParticipants from './ManageParticipants';
-
+import OpportunityCreate from './OpportunityCreate';
+import { useForm } from 'react-hook-form';
+import QuestionsOpportunityForm from './QuestionsOpportunityForm';
+import { authLoginSelector } from '../../../features/auth/authLoginSlice';
+const maxLengthObject = {
+  value: 120,
+  message: 'Maximum characters are 120.',
+};
+const questionFormationArray = (data) => {
+  let apiData = {
+    comprehension: {
+      questions: [],
+    },
+    qualityOfIdea: {
+      questions: [],
+    },
+  };
+  if (data.comprehensionQ1) {
+    apiData.comprehension.questions.push({
+      order: 1,
+      question: data.comprehensionQ1,
+    });
+  }
+  if (data.comprehensionQ2) {
+    apiData.comprehension.questions.push({
+      order: 2,
+      question: data.comprehensionQ2,
+    });
+  }
+  if (data.qualityOfIdeaQ1) {
+    apiData.qualityOfIdea.questions.push({
+      order: 1,
+      question: data.qualityOfIdeaQ1,
+    });
+  }
+  if (data.qualityOfIdeaQ2) {
+    apiData.qualityOfIdea.questions.push({
+      order: 2,
+      question: data.qualityOfIdeaQ2,
+    });
+  }
+  if (data.qualityOfIdeaQ3) {
+    apiData.qualityOfIdea.questions.push({
+      order: 3,
+      question: data.qualityOfIdeaQ3,
+    });
+  }
+  if (data.qualityOfIdeaQ4) {
+    apiData.qualityOfIdea.questions.push({
+      order: 4,
+      question: data.qualityOfIdeaQ4,
+    });
+  }
+  if (data.qualityOfIdeaQ5) {
+    apiData.qualityOfIdea.questions.push({
+      order: 5,
+      question: data.qualityOfIdeaQ5,
+    });
+  }
+  return apiData;
+};
 const OpportunityDetail = () => {
   const [viewParticipant, setViewParticipant] = useState(false);
   const [viewPublish, setViewPublish] = useState(false);
+  const [editOpportunity, setEditOpportunity] = useState(false);
+  const [formValues, setFormValues] = useState(null);
+  const [displayMessage, setDisplayMessage] = useState(false);
   const { id } = useParams();
-
+  const { register, setValue, handleSubmit, errors, trigger, watch } = useForm({
+    mode: 'onBlur',
+    defaultValues: {
+      comprehensionQ1: '',
+      comprehensionQ2: '',
+      qualityOfIdeaQ1: '',
+      qualityOfIdeaQ2: '',
+      qualityOfIdeaQ3: '',
+      qualityOfIdeaQ4: '',
+      qualityOfIdeaQ5: '',
+    },
+  });
+  const handleChange = (e) => {
+    e.persist();
+    setValue(e.target.name, e.target.value);
+    trigger(e.target.name);
+  };
+  const onPublishResponse = () => {
+    dispatch(updateOpportunity(id, 'publish', formValues));
+    setViewPublish(false);
+  };
+  const handleSubmittion = (data) => {
+    let apiData = questionFormationArray(data);
+    setFormValues(apiData);
+    setViewPublish(true);
+  };
+  const handleDraft = () => {
+    let apiData = questionFormationArray({
+      comprehensionQ1: watchComprehensionQ1,
+      comprehensionQ2: watchComprehensionQ2,
+      qualityOfIdeaQ1: watchQualityOfIdeaQ1,
+      qualityOfIdeaQ2: watchQualityOfIdeaQ2,
+      qualityOfIdeaQ3: watchQualityOfIdeaQ3,
+      qualityOfIdeaQ4: watchQualityOfIdeaQ4,
+      qualityOfIdeaQ5: watchQualityOfIdeaQ5,
+    });
+    dispatch(updateOpportunity(id, 'draft', apiData));
+  };
+  const createOptions = {
+    comprehensionQ1: {
+      required: 'Atleast one question for comprehension is required',
+      maxLength: maxLengthObject,
+    },
+    comprehensionQ2: {
+      maxLength: maxLengthObject,
+    },
+    qualityOfIdeaQ1: {
+      required: 'Atleast one question for quality of idea-response is required',
+      maxLength: maxLengthObject,
+    },
+    qualityOfIdeaQ2: {
+      maxLength: maxLengthObject,
+    },
+    qualityOfIdeaQ3: {
+      maxLength: maxLengthObject,
+    },
+    qualityOfIdeaQ4: {
+      maxLength: maxLengthObject,
+    },
+    qualityOfIdeaQ5: {
+      maxLength: maxLengthObject,
+    },
+  };
+  useEffect(() => {
+    register({ name: 'comprehensionQ1' }, createOptions.comprehensionQ1);
+    register({ name: 'comprehensionQ2' }, createOptions.comprehensionQ2);
+    register({ name: 'qualityOfIdeaQ1' }, createOptions.qualityOfIdeaQ1);
+    register({ name: 'qualityOfIdeaQ2' }, createOptions.qualityOfIdeaQ2);
+    register({ name: 'qualityOfIdeaQ3' }, createOptions.qualityOfIdeaQ3);
+    register({ name: 'qualityOfIdeaQ4' }, createOptions.qualityOfIdeaQ4);
+    register({ name: 'qualityOfIdeaQ5' }, createOptions.qualityOfIdeaQ5);
+    return () => {
+      dispatch(resetOpportunity());
+    };
+  }, []);
   // set up dispatch
   const dispatch = useDispatch();
 
   // fetch data from our store
-  const { loading, error, opportunity } = useSelector(
+  const { loading, error, opportunity, success, message } = useSelector(
     opportunityDetailSelector
   );
-
+  const { userLogin } = useSelector(authLoginSelector);
   // hook to fetch items
   useEffect(() => {
     dispatch(fetchOpportunity(id));
   }, [dispatch, id]);
+  useEffect(() => {
+    if (opportunity) {
+      opportunity.comprehension.questions.forEach((question) => {
+        setValue(`comprehensionQ${question.order}`, question.question);
+      });
+      opportunity.qualityOfIdea.questions.forEach((question) => {
+        setValue(`qualityOfIdeaQ${question.order}`, question.question);
+      });
+    }
+  }, [opportunity]);
+  useEffect(() => {
+    if (success) {
+      setDisplayMessage(true);
+      setTimeout(() => {
+        setDisplayMessage(false);
+      }, 4000);
+    }
+  }, [success]);
+  const watchComprehensionQ1 = watch('comprehensionQ1', '');
+  const watchComprehensionQ2 = watch('comprehensionQ2', '');
+  const watchQualityOfIdeaQ1 = watch('qualityOfIdeaQ1', '');
+  const watchQualityOfIdeaQ2 = watch('qualityOfIdeaQ2', '');
+  const watchQualityOfIdeaQ3 = watch('qualityOfIdeaQ3', '');
+  const watchQualityOfIdeaQ4 = watch('qualityOfIdeaQ4', '');
+  const watchQualityOfIdeaQ5 = watch('qualityOfIdeaQ5', '');
 
   const panes = [
     {
@@ -43,87 +207,19 @@ const OpportunityDetail = () => {
       render: () => (
         <Tab.Pane loading={loading} attached={false}>
           {opportunity && (
-            <>
-              <Header>
-                Evaluation of Comprehension
-                <Header.Subheader>
-                  Publish question or prompt that will measure comprehension of
-                  the opportunity.
-                </Header.Subheader>
-              </Header>
-              <Form.Field>
-                <label>Question 1 (Required)</label>
-                <Form.Input
-                  name='q1'
-                  fluid
-                  placeholder='e.g. What is the best reason for Team to pursue Opportunity'
-                />
-              </Form.Field>
-
-              <Form.Field>
-                <label>Question 2</label>
-                <Form.Input
-                  name='q1'
-                  fluid
-                  placeholder='e.g. What is the best reason for Team to NOT pursue Opportunity'
-                />
-              </Form.Field>
-              <Header>
-                Evaluation of Quality of Idea-Response
-                <Header.Subheader>
-                  Publish questions that will help participants structure their
-                  responses.
-                </Header.Subheader>
-              </Header>
-              <Form.Field>
-                <label>Question 1 (Required)</label>
-                <Form.Input
-                  name='q1'
-                  fluid
-                  placeholder='e.g. Describe the Stakeholders involved in the Idea you are submitting'
-                />
-              </Form.Field>
-
-              <Form.Field>
-                <label>Question 2</label>
-                <Form.Input
-                  name='q2'
-                  fluid
-                  readOnly
-                  placeholder='e.g. Describe the EXPECTED RESULTS from action taken to pursue Opportunity'
-                />
-              </Form.Field>
-
-              <Form.Field>
-                <label>Question 3</label>
-                <Form.Input
-                  name='q3'
-                  fluid
-                  readOnly
-                  placeholder='e.g. Describe the EXPECTED RESULTS from action taken to pursue Opportunity'
-                />
-              </Form.Field>
-
-              <Form.Field>
-                <label>Question 4</label>
-                <Form.Input
-                  name='q4'
-                  fluid
-                  readOnly
-                  placeholder='e.g. Describe the RISKS from action taken to pursue Opportunity'
-                />
-              </Form.Field>
-
-              <Form.Field>
-                <label>Question 5</label>
-                <Form.Input
-                  name='q5'
-                  fluid
-                  readOnly
-                  placeholder='e.g. WHEN can or should Team work on pursuing Opportunity? What are DEPENDENCIES?'
-                />
-              </Form.Field>
-            </>
+            <QuestionsOpportunityForm
+              handleChange={handleChange}
+              errors={errors}
+              watchComprehensionQ1={watchComprehensionQ1}
+              watchComprehensionQ2={watchComprehensionQ2}
+              watchQualityOfIdeaQ1={watchQualityOfIdeaQ1}
+              watchQualityOfIdeaQ2={watchQualityOfIdeaQ2}
+              watchQualityOfIdeaQ3={watchQualityOfIdeaQ3}
+              watchQualityOfIdeaQ4={watchQualityOfIdeaQ4}
+              watchQualityOfIdeaQ5={watchQualityOfIdeaQ5}
+              opportunity={opportunity}
+              userId={userLogin.id}
+            />
           )}
         </Tab.Pane>
       ),
@@ -136,9 +232,25 @@ const OpportunityDetail = () => {
             <Segment>
               <div className='clearfix'>
                 <Header floated='left'>Opportunity Information</Header>
-                <Button className='btn-link' floated='right'>
-                  Edit
-                </Button>
+                {opportunity.status === 'draft' &&
+                  userLogin.id === opportunity.createdById && (
+                    <>
+                      <Button
+                        className='btn-link'
+                        floated='right'
+                        type='button'
+                        onClick={() => setEditOpportunity(true)}
+                        disabled={loading}
+                      >
+                        Edit
+                      </Button>
+                      <OpportunityCreate
+                        showCreate={editOpportunity}
+                        setShowCreate={setEditOpportunity}
+                        id={opportunity._id}
+                      />
+                    </>
+                  )}
               </div>
 
               <Header size='small'>
@@ -180,7 +292,7 @@ const OpportunityDetail = () => {
 
                 <span
                   className='ms-2 fw-bold primary-color'
-                  onClick={() => setViewParticipant(true)}
+                  onClick={() => !loading && setViewParticipant(true)}
                 >
                   {opportunity.participants.length > 0
                     ? 'View Participants'
@@ -190,44 +302,62 @@ const OpportunityDetail = () => {
                   opportunity={opportunity}
                   viewParticipant={viewParticipant}
                   setViewParticipant={setViewParticipant}
+                  userId={userLogin.id}
                 />
               </Header.Subheader>
             </Header>
           )}
         </Grid.Column>
-        {opportunity && opportunity.status === 'draft' && (
-          <>
-            <Grid.Column width={8}>
-              <Button
-                primary
-                className='btn-secondary'
-                floated='right'
-                onClick={() => setViewPublish(true)}
-              >
-                Publish
-              </Button>
-              <PublishOpportunity
-                viewPublish={viewPublish}
-                setViewPublish={setViewPublish}
-              />
-              <Button primary className='btn-outline me-3' floated='right'>
-                Save as Draft
-              </Button>
-            </Grid.Column>
+        {opportunity &&
+          opportunity.status === 'draft' &&
+          userLogin.id === opportunity.createdById && (
+            <>
+              <Grid.Column width={8}>
+                <Button
+                  primary
+                  className='btn-secondary'
+                  floated='right'
+                  type='submit'
+                  form='create-opportunity'
+                >
+                  Publish
+                </Button>
+                <PublishOpportunity
+                  viewPublish={viewPublish}
+                  setViewPublish={setViewPublish}
+                  onSubmittion={onPublishResponse}
+                />
+                <Button
+                  onClick={handleDraft}
+                  primary
+                  className='btn-outline me-3'
+                  floated='right'
+                >
+                  Save as Draft
+                </Button>
+              </Grid.Column>
 
-            <Grid.Column width={16}>
-              <p>
-                To publish an Opportunity you need at least one question for
-                Comprehension and one for Quality of Idea-Response. You need to
-                select the Team Members you want to respond with an Idea.
-              </p>
-            </Grid.Column>
-          </>
-        )}
+              <Grid.Column width={16}>
+                <p>
+                  To publish an Opportunity you need at least one question for
+                  Comprehension and one for Quality of Idea-Response. You need
+                  to select the Team Members you want to respond with an Idea.
+                </p>
+              </Grid.Column>
+            </>
+          )}
       </Grid>
       <Grid>
         <Grid.Column>
-          <Form id='create-opportunity' error size='small'>
+          {displayMessage && (
+            <Message header={message} success className='success-message' />
+          )}
+          <Form
+            id='create-opportunity'
+            error
+            size='small'
+            onSubmit={handleSubmit(handleSubmittion)}
+          >
             {error && (
               <Message color='red' className='error-message'>
                 {error}

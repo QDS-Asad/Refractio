@@ -1,4 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
+import { interceptor } from '../common/refractioApi';
 import authForgetPasswordSlice from './auth/authForgetPasswordSlice';
 import authLoginSlice from './auth/authLoginSlice';
 import authNewPasswordSlice from './auth/authNewPasswordSlice';
@@ -31,8 +32,12 @@ import workspaceSelectSlice from './workspace/workspaceSelectSlice';
 import workspaceJoinSlice from './workspace/workspaceJoinSlice';
 import orderListSlice from './orders/orderListSlice';
 import opportunityManageListSlice from './opportunities/opportunityManageListSlice';
-import { interceptor } from '../common/refractioApi';
-import editProfileSlice from './team/editProfileSlice';
+import opportunityResponseSlice from './opportunities/opportunityResponseSlice';
+import opportunityEvaluateSlice from './opportunities/opportunityEvaluateSlice';
+import editProfileSlice from './opportunities/opportunityEvaluateSlice';
+import deleteMemberSlice from './team/deleteMemberSlice';
+import transferOwnerSlice from './team/transferOwnerSlice';
+import teamParticipantsSlice from './team/teamParticipantsSlice';
 
 const store = configureStore({
   reducer: {
@@ -63,12 +68,17 @@ const store = configureStore({
     changeCard: changeCardSlice,
     subscriptionCancel: subscriptionCancelSlice,
     subscriptionResume: subscriptionResumeSlice,
+    opportunityResponse: opportunityResponseSlice,
+    opportunityEvaluate: opportunityEvaluateSlice,
     workspaceList: workspaceListSlice,
     workspaceSelect: workspaceSelectSlice,
     workspaceJoin: workspaceJoinSlice,
     orderList: orderListSlice,
     opportunityManageList: opportunityManageListSlice,
     editProfile: editProfileSlice,
+    deleteMember: deleteMemberSlice,
+    transferOwner: transferOwnerSlice,
+    teamParticipants: teamParticipantsSlice,
   },
 });
 

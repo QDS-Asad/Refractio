@@ -1,6 +1,6 @@
 import React from 'react';
 import { Grid } from 'semantic-ui-react';
-import Opportunity from '../../../components/Opportunity';
+import Opportunity from '../../../components/Opportunity.jsx';
 
 const AllOpportunities = ({ opportunities }) => {
   return (
