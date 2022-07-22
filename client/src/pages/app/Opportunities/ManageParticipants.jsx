@@ -104,24 +104,25 @@ const ManageParticipants = ({
                       </Button>
                     </List.Content>
                   ) : (
-                    <List.Content floated='right'>
-                      <Button
-                        onClick={() =>
-                          dispatch(
-                            addMemberOpportunity(opportunity._id, member._id)
-                          )
-                        }
-                        disabled={
-                          loading ||
-                          opportunityLoading ||
-                          opportunity.createdById != userId ||
-                          opportunity.status != 'draft'
-                        }
-                        className='btn-link'
-                      >
-                        Add
-                      </Button>
-                    </List.Content>
+                    opportunity.status == 'draft' && (
+                      <List.Content floated='right'>
+                        <Button
+                          onClick={() =>
+                            dispatch(
+                              addMemberOpportunity(opportunity._id, member._id)
+                            )
+                          }
+                          disabled={
+                            loading ||
+                            opportunityLoading ||
+                            opportunity.createdById != userId
+                          }
+                          className='btn-link'
+                        >
+                          Add
+                        </Button>
+                      </List.Content>
+                    )
                   )}
 
                   <List.Content>
