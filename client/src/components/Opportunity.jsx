@@ -11,7 +11,8 @@ const Opportunity = ({ opportunity }) => {
   const [showMore, setShowMore] = useState(false);
   const navigate = useNavigate();
   const { userLogin } = useSelector(authLoginSelector);
-  const application = opportunity.participants.includes(userLogin.id);
+  // const application = opportunity.participants.includes(userLogin.id);
+  const application = false;
   return (
     <Card fluid>
       <Card.Content>
@@ -45,7 +46,7 @@ const Opportunity = ({ opportunity }) => {
             opportunity.description
           )}
         </Card.Description>
-        {application.length > 0 ? (
+        {application ? (
           <>
             <Divider />
             <div style={{ display: 'flex', justifyContent: 'center' }}>

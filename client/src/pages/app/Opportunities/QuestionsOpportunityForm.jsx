@@ -11,6 +11,7 @@ function QuestionsOpportunityForm({
   watchQualityOfIdeaQ4,
   watchQualityOfIdeaQ5,
   opportunity,
+  userId,
 }) {
   return (
     <>
@@ -30,7 +31,9 @@ function QuestionsOpportunityForm({
           onBlur={handleChange}
           error={!!errors.comprehensionQ1}
           value={watchComprehensionQ1}
-          disabled={opportunity.status !== 'draft'}
+          disabled={
+            opportunity.status !== 'draft' || opportunity.createdById != userId
+          }
           placeholder='e.g. What is the best reason for Team to pursue Opportunity'
         />
         {errors && errors.comprehensionQ1 && (
@@ -47,7 +50,9 @@ function QuestionsOpportunityForm({
           onBlur={handleChange}
           error={!!errors.comprehensionQ2}
           value={watchComprehensionQ2}
-          disabled={opportunity.status !== 'draft'}
+          disabled={
+            opportunity.status !== 'draft' || opportunity.createdById != userId
+          }
           placeholder='e.g. What is the best reason for Team to NOT pursue Opportunity'
         />
         {errors && errors.comprehensionQ2 && (
@@ -70,7 +75,9 @@ function QuestionsOpportunityForm({
           onBlur={handleChange}
           error={!!errors.qualityOfIdeaQ1}
           value={watchQualityOfIdeaQ1}
-          disabled={opportunity.status !== 'draft'}
+          disabled={
+            opportunity.status !== 'draft' || opportunity.createdById != userId
+          }
           placeholder='e.g. Describe the Stakeholders involved in the Idea you are submitting'
         />
         {errors && errors.qualityOfIdeaQ1 && (
@@ -87,7 +94,9 @@ function QuestionsOpportunityForm({
           onBlur={handleChange}
           error={!!errors.qualityOfIdeaQ2}
           value={watchQualityOfIdeaQ2}
-          disabled={opportunity.status !== 'draft'}
+          disabled={
+            opportunity.status !== 'draft' || opportunity.createdById != userId
+          }
           placeholder='e.g. Describe the EXPECTED RESULTS from action taken to pursue Opportunity'
         />
         {errors && errors.qualityOfIdeaQ2 && (
@@ -104,7 +113,9 @@ function QuestionsOpportunityForm({
           onBlur={handleChange}
           error={!!errors.qualityOfIdeaQ3}
           value={watchQualityOfIdeaQ3}
-          disabled={opportunity.status !== 'draft'}
+          disabled={
+            opportunity.status !== 'draft' || opportunity.createdById != userId
+          }
           placeholder='e.g. Describe the EXPECTED RESULTS from action taken to pursue Opportunity'
         />
         {errors && errors.qualityOfIdeaQ3 && (
@@ -121,7 +132,9 @@ function QuestionsOpportunityForm({
           onBlur={handleChange}
           error={!!errors.qualityOfIdeaQ4}
           value={watchQualityOfIdeaQ4}
-          disabled={opportunity.status !== 'draft'}
+          disabled={
+            opportunity.status !== 'draft' || opportunity.createdById != userId
+          }
           placeholder='e.g. Describe the RISKS from action taken to pursue Opportunity'
         />
         {errors && errors.qualityOfIdeaQ4 && (
@@ -138,7 +151,9 @@ function QuestionsOpportunityForm({
           onBlur={handleChange}
           error={!!errors.qualityOfIdeaQ5}
           value={watchQualityOfIdeaQ5}
-          disabled={opportunity.status !== 'draft'}
+          disabled={
+            opportunity.status !== 'draft' || opportunity.createdById != userId
+          }
           placeholder='e.g. WHEN can or should Team work on pursuing Opportunity? What are DEPENDENCIES?'
         />
         {errors && errors.qualityOfIdeaQ5 && (

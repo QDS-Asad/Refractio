@@ -22,6 +22,7 @@ const ManageParticipants = ({
   viewParticipant,
   setViewParticipant,
   opportunity,
+  userId,
 }) => {
   const [displayMessage, setDisplayMessage] = useState(false);
   const dispatch = useDispatch();
@@ -88,7 +89,7 @@ const ManageParticipants = ({
                             removeMemberOpportunity(opportunity._id, member._id)
                           )
                         }
-                        disabled={loading}
+                        disabled={loading || opportunity.createdById != userId}
                         className='btn-link-danger'
                       >
                         Remove
@@ -102,7 +103,7 @@ const ManageParticipants = ({
                             addMemberOpportunity(opportunity._id, member._id)
                           )
                         }
-                        disabled={loading}
+                        disabled={loading || opportunity.createdById != userId}
                         className='btn-link'
                       >
                         Add
@@ -122,13 +123,13 @@ const ManageParticipants = ({
           {members.length === 0 && !loading && (
             <Message>No Team members available.</Message>
           )}
-          <p className='mt-2'>
-            If a Team Member is not in the list above, please add them first in
-            the 'Team' section.
-          </p>
         </Modal.Description>
       </Modal.Content>
       <Modal.Actions>
+        <p className='mb-1' style={{ textAlign: 'left' }}>
+          If a Team Member is not in the list above, please add them first in
+          the 'Team' section.
+        </p>
         <Button
           content='Done'
           onClick={() => setViewParticipant(false)}

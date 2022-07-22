@@ -23,6 +23,7 @@ import ManageParticipants from './ManageParticipants';
 import OpportunityCreate from './OpportunityCreate';
 import { useForm } from 'react-hook-form';
 import QuestionsOpportunityForm from './QuestionsOpportunityForm';
+import { authLoginSelector } from '../../../features/auth/authLoginSlice';
 const maxLengthObject = {
   value: 120,
   message: 'Maximum characters are 120.',
@@ -85,6 +86,7 @@ const OpportunityDetail = () => {
   const [viewPublish, setViewPublish] = useState(false);
   const [editOpportunity, setEditOpportunity] = useState(false);
   const [formValues, setFormValues] = useState(null);
+  const [displayMessage, setDisplayMessage] = useState(false);
   const { id } = useParams();
   const { register, setValue, handleSubmit, errors, trigger, watch } = useForm({
     mode: 'onBlur',
@@ -112,8 +114,16 @@ const OpportunityDetail = () => {
     setFormValues(apiData);
     setViewPublish(true);
   };
-  const handleDraft = (data) => {
-    let apiData = questionFormationArray(data);
+  const handleDraft = () => {
+    let apiData = questionFormationArray({
+      comprehensionQ1: watchComprehensionQ1,
+      comprehensionQ2: watchComprehensionQ2,
+      qualityOfIdeaQ1: watchQualityOfIdeaQ1,
+      qualityOfIdeaQ2: watchQualityOfIdeaQ2,
+      qualityOfIdeaQ3: watchQualityOfIdeaQ3,
+      qualityOfIdeaQ4: watchQualityOfIdeaQ4,
+      qualityOfIdeaQ5: watchQualityOfIdeaQ5,
+    });
     dispatch(updateOpportunity(id, 'draft', apiData));
   };
   const createOptions = {
@@ -157,10 +167,10 @@ const OpportunityDetail = () => {
   const dispatch = useDispatch();
 
   // fetch data from our store
-  const { loading, error, opportunity } = useSelector(
+  const { loading, error, opportunity, success, message } = useSelector(
     opportunityDetailSelector
   );
-
+  const { userLogin } = useSelector(authLoginSelector);
   // hook to fetch items
   useEffect(() => {
     dispatch(fetchOpportunity(id));
@@ -175,6 +185,14 @@ const OpportunityDetail = () => {
       });
     }
   }, [opportunity]);
+  useEffect(() => {
+    if (success) {
+      setDisplayMessage(true);
+      setTimeout(() => {
+        setDisplayMessage(false);
+      }, 4000);
+    }
+  }, [success]);
   const watchComprehensionQ1 = watch('comprehensionQ1', '');
   const watchComprehensionQ2 = watch('comprehensionQ2', '');
   const watchQualityOfIdeaQ1 = watch('qualityOfIdeaQ1', '');
@@ -200,6 +218,7 @@ const OpportunityDetail = () => {
               watchQualityOfIdeaQ4={watchQualityOfIdeaQ4}
               watchQualityOfIdeaQ5={watchQualityOfIdeaQ5}
               opportunity={opportunity}
+              userId={userLogin.id}
             />
           )}
         </Tab.Pane>
@@ -282,50 +301,56 @@ const OpportunityDetail = () => {
                   opportunity={opportunity}
                   viewParticipant={viewParticipant}
                   setViewParticipant={setViewParticipant}
+                  userId={userLogin.id}
                 />
               </Header.Subheader>
             </Header>
           )}
         </Grid.Column>
-        {opportunity && opportunity.status === 'draft' && (
-          <>
-            <Grid.Column width={8}>
-              <Button
-                primary
-                className='btn-secondary'
-                floated='right'
-                type='submit'
-                form='create-opportunity'
-              >
-                Publish
-              </Button>
-              <PublishOpportunity
-                viewPublish={viewPublish}
-                setViewPublish={setViewPublish}
-                onSubmittion={onPublishResponse}
-              />
-              <Button
-                onClick={handleSubmit(handleDraft)}
-                primary
-                className='btn-outline me-3'
-                floated='right'
-              >
-                Save as Draft
-              </Button>
-            </Grid.Column>
+        {opportunity &&
+          opportunity.status === 'draft' &&
+          userLogin.id === opportunity.createdById && (
+            <>
+              <Grid.Column width={8}>
+                <Button
+                  primary
+                  className='btn-secondary'
+                  floated='right'
+                  type='submit'
+                  form='create-opportunity'
+                >
+                  Publish
+                </Button>
+                <PublishOpportunity
+                  viewPublish={viewPublish}
+                  setViewPublish={setViewPublish}
+                  onSubmittion={onPublishResponse}
+                />
+                <Button
+                  onClick={handleDraft}
+                  primary
+                  className='btn-outline me-3'
+                  floated='right'
+                >
+                  Save as Draft
+                </Button>
+              </Grid.Column>
 
-            <Grid.Column width={16}>
-              <p>
-                To publish an Opportunity you need at least one question for
-                Comprehension and one for Quality of Idea-Response. You need to
-                select the Team Members you want to respond with an Idea.
-              </p>
-            </Grid.Column>
-          </>
-        )}
+              <Grid.Column width={16}>
+                <p>
+                  To publish an Opportunity you need at least one question for
+                  Comprehension and one for Quality of Idea-Response. You need
+                  to select the Team Members you want to respond with an Idea.
+                </p>
+              </Grid.Column>
+            </>
+          )}
       </Grid>
       <Grid>
         <Grid.Column>
+          {displayMessage && (
+            <Message header={message} success className='success-message' />
+          )}
           <Form
             id='create-opportunity'
             error

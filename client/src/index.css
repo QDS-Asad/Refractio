@@ -196,7 +196,18 @@ label {
   position: static;
   height: auto;
 }
-
+.ui.fluid.card {
+  min-height: 273px !important;
+}
+.ui.card > .content > .meta + .description {
+  min-height: 119px !important;
+}
+.ui.disabled.input {
+  opacity: 0.75 !important;
+}
+.ui.form .disabled.field {
+  opacity: 0.85 !important;
+}
 .error-message,
 .success-message {
   padding: 1rem !important;

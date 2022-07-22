@@ -6,6 +6,8 @@ export const initialState = {
   loading: false,
   error: null,
   opportunity: null,
+  success: false,
+  message: '',
 };
 
 // our slice
@@ -15,6 +17,7 @@ const opportunityDetailSlice = createSlice({
   reducers: {
     setLoading: (state) => {
       state.loading = true;
+      state.success = false;
     },
     setOpportunity: (state, { payload }) => {
       state.loading = false;
@@ -24,11 +27,19 @@ const opportunityDetailSlice = createSlice({
     setError: (state, { payload }) => {
       state.loading = false;
       state.error = payload;
+      state.success = false;
+    },
+    setSuccess: (state, { payload }) => {
+      state.error = null;
+      state.success = true;
+      state.message = payload;
     },
     reset: (state) => {
       state.loading = false;
       state.error = null;
       state.opportunity = null;
+      state.message = '';
+      state.success = false;
     },
   },
 });
@@ -38,6 +49,7 @@ export const {
   setOpportunity,
   setError,
   reset,
+  setSuccess,
 } = opportunityDetailSlice.actions;
 
 // export the selector (".items" being same as in slices/index.js's "items: something")
@@ -67,6 +79,11 @@ export const updateOpportunity = (id, status, bodyData) => async (dispatch) => {
       status,
       ...bodyData,
     });
+    if (status === 'draft') {
+      dispatch(setSuccess('Opportunity saved as draft successfully.'));
+    } else {
+      dispatch(setSuccess('Opportunity published successfully.'));
+    }
     dispatch(fetchOpportunity(id));
   } catch (error) {
     const errorMessage =

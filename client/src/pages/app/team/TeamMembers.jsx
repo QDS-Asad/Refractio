@@ -13,6 +13,7 @@ import {
 import { fetchRoles, roleListSelector } from '../../../features/roles/roleList';
 import {
   fetchTeamList,
+  setPageNumber,
   teamListSelector,
 } from '../../../features/team/teamListSlice';
 import CancelInvitation from './CancelInvitation';
@@ -65,7 +66,11 @@ const TeamMembers = () => {
     removeTeamMember,
     deleteAccount,
   ]);
-
+  useEffect(() => {
+    return () => {
+      dispatch(setPageNumber(1));
+    };
+  }, []);
   const removeTeamMemberHandler = (id) => {
     setSelectedMember(id);
     setRemoveTeamMember(true);

@@ -6,7 +6,10 @@ import {
   createOpportunity,
   opportunityCreateSelector,
 } from '../../../features/opportunities/opportunityCreateSlice';
-import { opportunityDetailSelector } from '../../../features/opportunities/opportunityDetailSlice';
+import {
+  opportunityDetailSelector,
+  updateOpportunity,
+} from '../../../features/opportunities/opportunityDetailSlice';
 
 const OpportunityCreate = ({ showCreate, setShowCreate, id }) => {
   const { register, setValue, handleSubmit, watch, errors, trigger } = useForm({
@@ -24,7 +27,11 @@ const OpportunityCreate = ({ showCreate, setShowCreate, id }) => {
   const { loading, error, success } = useSelector(opportunityCreateSelector);
   const { opportunity } = useSelector(opportunityDetailSelector);
   const handleCreate = (data) => {
-    dispatch(createOpportunity(data));
+    if (id) {
+      dispatch(updateOpportunity(id, 'draft', data));
+    } else {
+      dispatch(createOpportunity(data));
+    }
   };
 
   const handleChange = (e) => {
@@ -84,7 +91,7 @@ const OpportunityCreate = ({ showCreate, setShowCreate, id }) => {
       <Modal.Header>{id ? 'Update' : 'Create'} Opportunity</Modal.Header>
       <Modal.Content>
         <Form
-          id='create-opportunity'
+          id='create-opp'
           onSubmit={handleSubmit(handleCreate)}
           loading={loading}
           error
@@ -133,9 +140,11 @@ const OpportunityCreate = ({ showCreate, setShowCreate, id }) => {
       </Modal.Content>
       <Modal.Actions>
         <Button
-          type='submit'
-          form='create-opportunity'
           content='Save'
+          onClick={() => {
+            handleSubmit(handleCreate)();
+            setShowCreate(false);
+          }}
           className='btn'
         />
       </Modal.Actions>
