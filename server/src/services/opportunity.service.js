@@ -79,7 +79,7 @@ exports.updateEvaluateOpportunity = async (id, obj) => {
 
 exports.getOpportunityResponsesByOpportunityId = async (id) => {
   return await OpportunityResponse.find({
-    OpportunityId: ObjectId(id),
+    opportunityId: id,
     status: OPPORTUNITY_STATUS.PUBLISH,
   });
 };

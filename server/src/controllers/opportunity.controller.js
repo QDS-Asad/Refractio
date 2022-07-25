@@ -376,7 +376,7 @@ exports.getOpportunityResponsesById = async (req, res, next) => {
       opportunityId
     )
       .then(async (opportunityResponses) => {
-        // console.log(opportunityResponses);
+        console.log(opportunityResponses);
         let responses = [];
         await Promise.all(
           opportunityResponses.map(async (obj, key) => {
@@ -403,24 +403,27 @@ exports.getOpportunityResponsesById = async (req, res, next) => {
                 (que) => que._id.toString() === comp.questionId
               );
               console.log(queObj);
-              comprehension_answers[compKey] = {
-                question: queObj.question,
-                answer: comp.answer,
-                order: queObj.order,
-              };
+              if(queObj){
+                comprehension_answers[compKey] = {
+                  question: queObj.question,
+                  answer: comp.answer,
+                  order: queObj.order,
+                };
+              }
             });
             let qualityOfIdea_answers = [];
             obj.qualityOfIdea.answers.map((qoa, compKey) => {
               let qoaObj = opportunityInfo.qualityOfIdea.questions.find(
                 (que) => que._id.toString() === qoa.questionId
               );
-              qualityOfIdea_answers[compKey] = {
-                question: qoaObj.question,
-                answer: qoa.answer,
-                order: qoaObj.order,
-              };
+              if(qoaObj){
+                qualityOfIdea_answers[compKey] = {
+                  question: qoaObj.question,
+                  answer: qoa.answer,
+                  order: qoaObj.order,
+                };
+              }
             });
-            console.log();
             responses[key] = {
               _id: obj._id,
               opportunityId: obj.opportunityId,
@@ -456,14 +459,28 @@ exports.answerOpportunity = async (req, res, next) => {
   try {
     const { opportunityId } = req.params;
     const { user } = req.body;
-    const requestBody = {
-      userId: user._id,
-      teamId: user.teamId,
-      opportunityId: opportunityId,
-      status: req.body.status,
-      comprehension: req.body.comprehension || undefined,
-      qualityOfIdea: req.body.qualityOfIdea || undefined,
-    };
+    if (
+      req.body.status === OPPORTUNITY_STATUS.PUBLISH &&
+      req.body.comprehension &&
+      req.body.comprehension.answers &&
+      req.body.comprehension.answers.length < 1
+    ) {
+      return errorResp(res, {
+        msg: ERROR_MESSAGE.COMP_MIN_ONE_ANSWER,
+        code: HTTP_STATUS.BAD_REQUEST.CODE,
+      });
+    }
+    if (
+      req.body.status === OPPORTUNITY_STATUS.PUBLISH &&
+      req.body.qualityOfIdea &&
+      req.body.qualityOfIdea.answers &&
+      req.body.qualityOfIdea.answers.length < 1
+    ) {
+      return errorResp(res, {
+        msg: ERROR_MESSAGE.QOA_MIN_ONE_ANSWER,
+        code: HTTP_STATUS.BAD_REQUEST.CODE,
+      });
+    }
     const participantAllowed = await isParticipantAllowed(opportunityId, user);
     console.log(participantAllowed);
     if (!participantAllowed) {
@@ -472,6 +489,15 @@ exports.answerOpportunity = async (req, res, next) => {
         code: HTTP_STATUS.BAD_REQUEST.CODE,
       });
     }
+    const requestBody = {
+      userId: user._id,
+      teamId: user.teamId,
+      opportunityId: opportunityId,
+      status: req.body.status,
+      comprehension: req.body.comprehension || undefined,
+      qualityOfIdea: req.body.qualityOfIdea || undefined,
+    };
+    
     const opportunityresponse =
       await OpportunityService.getOpportunityResponseByIdUserId(
         opportunityId,
@@ -574,6 +600,14 @@ exports.evaluateAnswerOpportunity = async (req, res, next) => {
       );
     console.log(opportunityresponse);
     const opportunityId = opportunityresponse.opportunityId;
+    const participantAllowed = await isParticipantAllowed(opportunityId, user);
+    console.log(participantAllowed);
+    if (!participantAllowed) {
+      return errorResp(res, {
+        msg: ERROR_MESSAGE.NOT_ALLOWED,
+        code: HTTP_STATUS.BAD_REQUEST.CODE,
+      });
+    }
     const requestBody = {
       userId: user._id,
       teamId: user.teamId,
@@ -648,7 +682,7 @@ const evaluateAnswerOpportunityResponse = async (
   const filterParticipants = opportunityInfo.participants;
   if (opportunityEvaluation.length == filterParticipants.length) {
     await OpportunityService.updateOpportunity(opportunityId, {
-      stauts: OPPORTUNITY_STATUS.COMPLETED,
+      stauts: OPPORTUNITY_STATUS.COMPLETED,b
     });
   } else {
     await OpportunityService.updateOpportunity(opportunityId, {
@@ -669,12 +703,12 @@ exports.evalutationResultsByParticipants = async (req, res, next) => {
     const opportunityInfo = await OpportunityService.getOpportunityById(
       opportunityId
     );
-    // if(opportunityInfo.createdById !== user._id){
-    //   return errorResp(res, {
-    //     msg: ERROR_MESSAGE.NOT_ALLOWED,
-    //     code: HTTP_STATUS.BAD_REQUEST.CODE
-    //   })
-    // }
+    if(opportunityInfo.createdById !== user._id){
+      return errorResp(res, {
+        msg: ERROR_MESSAGE.NOT_ALLOWED,
+        code: HTTP_STATUS.BAD_REQUEST.CODE
+      })
+    }
     await OpportunityService.getOpportunityResponsesByOpportunityId(
       opportunityId
     )
