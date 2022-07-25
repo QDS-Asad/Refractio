@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchOpportunity,
   opportunityResponseSelector,
+  respondOpportunity,
 } from '../../../features/opportunities/opportunityResponseSlice';
 import { Button, Form, Grid, Header, Message } from 'semantic-ui-react';
 import { useParams } from 'react-router-dom';
@@ -104,6 +105,7 @@ const OpportunityResponse = () => {
   };
   const onSubmittion = async (status) => {
     let finalobject = { ...answerArray, status };
+    dispatch(respondOpportunity(id, finalobject));
     setViewMessage(true);
     setTimeout(() => {
       setViewMessage(false);
