@@ -152,6 +152,9 @@ module.exports = Object.freeze({
         TEAM_ORGANIZER_LIMIT_EXCEED:"Team Organizer limit reached. A Team can have 3 Organizers only!",
         COMP_MIN_ONE_QUESTION: "Minimum 1 question Required in Comprehension",
         QOA_MIN_ONE_QUESTION: "Minimum 1 question Required in Quality of idea",
+        COMP_MIN_ONE_ANSWER: "Minimum 1 answer Required in Comprehension",
+        QOA_MIN_ONE_ANSWER: "Minimum 1 answer Required in Quality of idea",
+        PARTICIPANT_RESPONDED: "Cannot Remove! This Participant has responded to the opportunity and evaluation",
     },
     VERIFY_REGISTER_EMAIL_SUBJECT: "Verify your email",
     VERIFY_REGISTER_EMAIL_TEMPLATE: (params) => {

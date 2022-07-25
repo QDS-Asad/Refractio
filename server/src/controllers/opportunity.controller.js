@@ -83,13 +83,23 @@ exports.updateOpportunity = async (req, res, next) => {
   try {
     const { opportunityId } = req.params;
     const { user } = req.body;
-    if (req.body.status === OPPORTUNITY_STATUS.PUBLISH && req.body.comprehension && req.body.comprehension.questions && req.body.comprehension.questions.length < 1) {
+    if (
+      req.body.status === OPPORTUNITY_STATUS.PUBLISH &&
+      req.body.comprehension &&
+      req.body.comprehension.questions &&
+      req.body.comprehension.questions.length < 1
+    ) {
       return errorResp(res, {
         msg: ERROR_MESSAGE.COMP_MIN_ONE_QUESTION,
         code: HTTP_STATUS.BAD_REQUEST.CODE,
       });
     }
-    if (req.body.status === OPPORTUNITY_STATUS.PUBLISH && req.body.qualityOfIdea && req.body.qualityOfIdea.questions && req.body.qualityOfIdea.questions.length < 1) {
+    if (
+      req.body.status === OPPORTUNITY_STATUS.PUBLISH &&
+      req.body.qualityOfIdea &&
+      req.body.qualityOfIdea.questions &&
+      req.body.qualityOfIdea.questions.length < 1
+    ) {
       return errorResp(res, {
         msg: ERROR_MESSAGE.QOA_MIN_ONE_QUESTION,
         code: HTTP_STATUS.BAD_REQUEST.CODE,
@@ -216,6 +226,26 @@ exports.removeOpportunityMember = async (req, res, next) => {
     const { user } = req.body;
     await OpportunityService.getOpportunityById(opportunityId)
       .then(async (opportunityInfo) => {
+        if(opportunityInfo.createdById !== user._id){
+          return errorResp(res, {
+            msg: ERROR_MESSAGE.NOT_ALLOWED,
+            code: HTTP_STATUS.BAD_REQUEST.CODE
+          })
+        }
+        const userResponse = await OpportunityService.getOpportunityResponseByIdUserId(
+          opportunityId,
+          userId
+        )
+        const userResponseEvaluation = await OpportunityService.getOpportunityEvaluationByResponseIdUserId(
+          userResponse._id,
+          userId
+        )
+        if(userResponse || userResponseEvaluation){
+          return errorResp(res, {
+            msg: ERROR_MESSAGE.PARTICIPANT_RESPONDED,
+            code: HTTP_STATUS.BAD_REQUEST.CODE
+          })
+        }
         const participants = opportunityInfo.participants.filter(
           (part) => part.toString() !== userId.toString()
         );
@@ -251,6 +281,16 @@ exports.removeOpportunityMember = async (req, res, next) => {
 exports.deleteOpportunity = async (req, res, next) => {
   try {
     const { opportunityId } = req.params;
+    const { user } = req.body;
+    const opportunityInfo = await OpportunityService.getOpportunityById(
+      opportunityId
+    );
+    if(opportunityInfo.createdById !== user._id){
+      return errorResp(res, {
+        msg: ERROR_MESSAGE.NOT_ALLOWED,
+        code: HTTP_STATUS.BAD_REQUEST.CODE
+      })
+    }
     await OpportunityService.deleteOpportunity(opportunityId)
       .then(() => {
         return successResp(res, {
@@ -336,15 +376,15 @@ exports.getOpportunityResponsesById = async (req, res, next) => {
       opportunityId
     )
       .then(async (opportunityResponses) => {
-        // console.log(opportunityResponses);
+        console.log(opportunityResponses);
         let responses = [];
         await Promise.all(
           opportunityResponses.map(async (obj, key) => {
             const opportunityEvaluations =
-            await OpportunityService.getOpportunityEvaluationByResponseIdUserId(
-              opportunityResponseId,
-              user._id
-            );
+              await OpportunityService.getOpportunityEvaluationByResponseIdUserId(
+                obj._id,
+                user._id
+              );
             let evaluation = "";
             if (
               opportunityEvaluations &&
@@ -363,24 +403,27 @@ exports.getOpportunityResponsesById = async (req, res, next) => {
                 (que) => que._id.toString() === comp.questionId
               );
               console.log(queObj);
-              comprehension_answers[compKey] = {
-                question: queObj.question,
-                answer: comp.answer,
-                order: queObj.order,
-              };
+              if(queObj){
+                comprehension_answers[compKey] = {
+                  question: queObj.question,
+                  answer: comp.answer,
+                  order: queObj.order,
+                };
+              }
             });
             let qualityOfIdea_answers = [];
             obj.qualityOfIdea.answers.map((qoa, compKey) => {
               let qoaObj = opportunityInfo.qualityOfIdea.questions.find(
                 (que) => que._id.toString() === qoa.questionId
               );
-              qualityOfIdea_answers[compKey] = {
-                question: qoaObj.question,
-                answer: qoa.answer,
-                order: qoaObj.order,
-              };
+              if(qoaObj){
+                qualityOfIdea_answers[compKey] = {
+                  question: qoaObj.question,
+                  answer: qoa.answer,
+                  order: qoaObj.order,
+                };
+              }
             });
-            console.log();
             responses[key] = {
               _id: obj._id,
               opportunityId: obj.opportunityId,
@@ -416,14 +459,28 @@ exports.answerOpportunity = async (req, res, next) => {
   try {
     const { opportunityId } = req.params;
     const { user } = req.body;
-    const requestBody = {
-      userId: user._id,
-      teamId: user.teamId,
-      opportunityId: opportunityId,
-      status: req.body.status,
-      comprehension: req.body.comprehension || undefined,
-      qualityOfIdea: req.body.qualityOfIdea || undefined,
-    };
+    if (
+      req.body.status === OPPORTUNITY_STATUS.PUBLISH &&
+      req.body.comprehension &&
+      req.body.comprehension.answers &&
+      req.body.comprehension.answers.length < 1
+    ) {
+      return errorResp(res, {
+        msg: ERROR_MESSAGE.COMP_MIN_ONE_ANSWER,
+        code: HTTP_STATUS.BAD_REQUEST.CODE,
+      });
+    }
+    if (
+      req.body.status === OPPORTUNITY_STATUS.PUBLISH &&
+      req.body.qualityOfIdea &&
+      req.body.qualityOfIdea.answers &&
+      req.body.qualityOfIdea.answers.length < 1
+    ) {
+      return errorResp(res, {
+        msg: ERROR_MESSAGE.QOA_MIN_ONE_ANSWER,
+        code: HTTP_STATUS.BAD_REQUEST.CODE,
+      });
+    }
     const participantAllowed = await isParticipantAllowed(opportunityId, user);
     console.log(participantAllowed);
     if (!participantAllowed) {
@@ -432,6 +489,15 @@ exports.answerOpportunity = async (req, res, next) => {
         code: HTTP_STATUS.BAD_REQUEST.CODE,
       });
     }
+    const requestBody = {
+      userId: user._id,
+      teamId: user.teamId,
+      opportunityId: opportunityId,
+      status: req.body.status,
+      comprehension: req.body.comprehension || undefined,
+      qualityOfIdea: req.body.qualityOfIdea || undefined,
+    };
+    
     const opportunityresponse =
       await OpportunityService.getOpportunityResponseByIdUserId(
         opportunityId,
@@ -532,7 +598,16 @@ exports.evaluateAnswerOpportunity = async (req, res, next) => {
       await OpportunityService.getOpportunityResponseById(
         opportunityResponseId
       );
+    console.log(opportunityresponse);
     const opportunityId = opportunityresponse.opportunityId;
+    const participantAllowed = await isParticipantAllowed(opportunityId, user);
+    console.log(participantAllowed);
+    if (!participantAllowed) {
+      return errorResp(res, {
+        msg: ERROR_MESSAGE.NOT_ALLOWED,
+        code: HTTP_STATUS.BAD_REQUEST.CODE,
+      });
+    }
     const requestBody = {
       userId: user._id,
       teamId: user.teamId,
@@ -607,7 +682,7 @@ const evaluateAnswerOpportunityResponse = async (
   const filterParticipants = opportunityInfo.participants;
   if (opportunityEvaluation.length == filterParticipants.length) {
     await OpportunityService.updateOpportunity(opportunityId, {
-      stauts: OPPORTUNITY_STATUS.COMPLETED,
+      stauts: OPPORTUNITY_STATUS.COMPLETED,b
     });
   } else {
     await OpportunityService.updateOpportunity(opportunityId, {
@@ -628,62 +703,117 @@ exports.evalutationResultsByParticipants = async (req, res, next) => {
     const opportunityInfo = await OpportunityService.getOpportunityById(
       opportunityId
     );
+    if(opportunityInfo.createdById !== user._id){
+      return errorResp(res, {
+        msg: ERROR_MESSAGE.NOT_ALLOWED,
+        code: HTTP_STATUS.BAD_REQUEST.CODE
+      })
+    }
     await OpportunityService.getOpportunityResponsesByOpportunityId(
       opportunityId
     )
       .then(async (results) => {
         let participantResults = [];
         await Promise.all(
-          resluts.map(async (obj, key) =>{
+          results.map(async (obj, key) => {
+            console.log(obj);
             const userInfo = await UserService.getUserById(obj.userId);
-            const evaluationResults = await OpportunityService.getOpportunityEvaluationByResponseId(
-              opportunityResponseId
-            );
-            let evaluationScores = [];
-            let totalEvaluationScore = 0;
-            let totalAverageEvaluationScore = 0;
-            evaluationResults.map(async (el, elKey) => {
-              const elUserInfo = await UserService.getUserById(el.userId);
-              evaluationScores[key] = {
-                firstName: elUserInfo.firstName,
-                lastName: elUserInfo.lastName,
-                comprehension: el.comprehension.score,
-                qualityOfIdea: el.qualityOfIdea.score
-              }
-            })
-            let comprehension_answers = [];
-            obj.comprehension.answers.map((comp, compKey) => {
-              let queObj = opportunityInfo.comprehension.questions.find(
-                (que) => que._id.toString() === comp.questionId
+            const evaluationResults =
+              await OpportunityService.getOpportunityEvaluationByResponseId(
+                obj._id
               );
-              comprehension_answers[compKey] = {
-                question: queObj.question,
-                answer: comp.answer,
-                order: queObj.order,
-              };
-            });
-            let qualityOfIdea_answers = [];
-            obj.qualityOfIdea.answers.map((qoa, compKey) => {
-              let qoaObj = opportunityInfo.qualityOfIdea.questions.find(
-                (que) => que._id.toString() === qoa.questionId
+            if (evaluationResults.length) {
+              let evaluationComprehensionScores = [];
+              let evaluationQualityOfIdeaScores = [];
+              let totalComprehensionEvaluationScore = 0;
+              let totalQualityOfIdeaEvaluationScore = 0;
+              let totalComprehensionAverageEvaluationScore = 0;
+              let totalQualityOfIdeaAverageEvaluationScore = 0;
+              // console.log(evaluationResults);return
+              await Promise.all(
+                evaluationResults.map(async (el, elKey) => {
+                  const elUserInfo = await UserService.getUserById(el.userId);
+
+                  evaluationComprehensionScores[elKey] = {
+                    firstName: elUserInfo.firstName,
+                    lastName: elUserInfo.lastName,
+                    evaluation: Number(el.comprehension.score),
+                  };
+
+                  console.log(evaluationComprehensionScores);
+
+                  evaluationQualityOfIdeaScores[elKey] = {
+                    firstName: elUserInfo.firstName,
+                    lastName: elUserInfo.lastName,
+                    evaluation: Number(el.qualityOfIdea.score),
+                  };
+                })
               );
-              qualityOfIdea_answers[compKey] = {
-                question: qoaObj.question,
-                answer: qoa.answer,
-                order: qoaObj.order,
+              evaluationComprehensionScores.map((compE) => {
+                totalComprehensionEvaluationScore += compE.evaluation;
+              });
+              totalComprehensionAverageEvaluationScore =
+                totalComprehensionEvaluationScore /
+                evaluationComprehensionScores.length;
+
+              evaluationQualityOfIdeaScores.map((compE) => {
+                totalQualityOfIdeaEvaluationScore +=
+                  compE.evaluation * totalComprehensionEvaluationScore;
+                console.log(totalQualityOfIdeaEvaluationScore);
+              });
+              totalQualityOfIdeaAverageEvaluationScore =
+                totalQualityOfIdeaEvaluationScore /
+                evaluationQualityOfIdeaScores.length;
+
+              let comprehension_answers = [];
+              obj.comprehension.answers.map((comp, compKey) => {
+                let queObj = opportunityInfo.comprehension.questions.find(
+                  (que) => que._id.toString() === comp.questionId
+                );
+                comprehension_answers[compKey] = {
+                  question: queObj.question,
+                  answer: comp.answer,
+                  order: queObj.order,
+                };
+              });
+              let qualityOfIdea_answers = [];
+              obj.qualityOfIdea.answers.map((qoa, compKey) => {
+                let qoaObj = opportunityInfo.qualityOfIdea.questions.find(
+                  (que) => que._id.toString() === qoa.questionId
+                );
+                qualityOfIdea_answers[compKey] = {
+                  question: qoaObj.question,
+                  answer: qoa.answer,
+                  order: qoaObj.order,
+                };
+              });
+              participantResults[key] = {
+                _id: obj._id,
+                opportunityId: obj.opportunityId,
+                firstName: userInfo.firstName,
+                lastName: userInfo.lastName,
+                status: obj.status,
+                // totalComprehensionEvaluationScore,
+                totalComprehensionAverageEvaluationScore,
+                // totalQualityOfIdeaEvaluationScore,
+                totalQualityOfIdeaAverageEvaluationScore,
+                comprehension: {
+                  qa: comprehension_answers,
+                  evaluation: evaluationComprehensionScores,
+                },
+                qualityOfIdea: {
+                  qa: qualityOfIdea_answers,
+                  evaluation: evaluationQualityOfIdeaScores,
+                },
               };
-            });
-            participantResults[key] = {
-              _id: obj._id,
-              opportunityId: obj.opportunityId,
-              firstName: userInfo.firstName,
-              lastName: userInfo.lastName,
-              status: obj.status,
-              comprehension: {qa : comprehension_answers, evaluation: ''},
-              qualityOfIdea: qualityOfIdea_answers,
-            };
+            }
           })
-        )
+        );
+        return successResp(res, {
+          msg: SUCCESS_MESSAGE.DATA_FETCHED,
+          code: HTTP_STATUS.SUCCESS.CODE,
+          data: participantResults,
+        });
       })
       .catch((error) => {
         console.log(error);

@@ -96,7 +96,8 @@ const ManageParticipants = ({
                         disabled={
                           loading ||
                           opportunityLoading ||
-                          opportunity.createdById != userId
+                          opportunity.createdById !== userId ||
+                          opportunity.participants.length <= 2
                         }
                         className='btn-link-danger'
                       >
@@ -104,7 +105,7 @@ const ManageParticipants = ({
                       </Button>
                     </List.Content>
                   ) : (
-                    opportunity.status == 'draft' && (
+                    opportunity.status === 'draft' && (
                       <List.Content floated='right'>
                         <Button
                           onClick={() =>
@@ -115,7 +116,7 @@ const ManageParticipants = ({
                           disabled={
                             loading ||
                             opportunityLoading ||
-                            opportunity.createdById != userId
+                            opportunity.createdById !== userId
                           }
                           className='btn-link'
                         >
