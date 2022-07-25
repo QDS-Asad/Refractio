@@ -10,13 +10,47 @@ import { useForm } from 'react-hook-form';
 import ResponseForm from '../../../components/ResponseForm';
 import PublishResponse from './PublishResponse';
 
+const apiResponseFormat = (allQuestions, opportunity, data) => {
+  let comprehensionAnswer = [];
+  let qualityAnswer = [];
+  allQuestions.map((question, index) => {
+    if (index >= opportunity.comprehension.questions.length) {
+      qualityAnswer.push({
+        answer: data[`q${index + 1}`] || '',
+        questionId: question._id,
+      });
+    } else {
+      comprehensionAnswer.push({
+        answer: data[`q${index + 1}`] || '',
+        questionId: question._id,
+      });
+    }
+  });
+  return {
+    comprehension: {
+      questions: comprehensionAnswer,
+    },
+    qualityOfIdea: {
+      questions: qualityAnswer,
+    },
+  };
+};
 const OpportunityResponse = () => {
   const [viewSubmit, setViewSubmit] = useState(false);
   const [viewMessage, setViewMessage] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(1);
   const [allQuestions, setAllQuestions] = useState([]);
+  const [answerArray, setAnswer] = useState(null);
   const { id } = useParams();
-  const { register, setValue, handleSubmit, errors, trigger, watch } = useForm({
+  const {
+    register,
+    setValue,
+    handleSubmit,
+    errors,
+    trigger,
+    watch,
+    getValues,
+  } = useForm({
     mode: 'onBlur',
   });
 
@@ -64,13 +98,20 @@ const OpportunityResponse = () => {
   }, [allQuestions]);
 
   const handleEdit = (data) => {
+    setAnswer(apiResponseFormat(allQuestions, opportunity, data));
     setViewSubmit(true);
   };
-  const onSubmittion = async () => {
+  const onSubmittion = async (status) => {
+    let finalobject = { ...answerArray, status };
     setViewMessage(true);
     setTimeout(() => {
       setViewMessage(false);
     }, 3000);
+  };
+  const values = getValues();
+
+  const handleDraft = () => {
+    const apiData = apiResponseFormat(allQuestions, opportunity, values);
   };
   return (
     <>
@@ -101,7 +142,7 @@ const OpportunityResponse = () => {
                 onSubmittion={onSubmittion}
               />
               <Button
-                onClick={onSubmittion}
+                onClick={handleDraft}
                 primary
                 className='btn-outline me-3'
                 floated='right'

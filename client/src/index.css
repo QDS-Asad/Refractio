@@ -196,7 +196,7 @@ label {
   position: static;
   height: auto;
 }
-.ui.fluid.card {
+.opportunity.ui.fluid.card {
   min-height: 273px !important;
 }
 .ui.card > .content > .meta + .description {

@@ -32,7 +32,7 @@ function QuestionsOpportunityForm({
           error={!!errors.comprehensionQ1}
           value={watchComprehensionQ1}
           disabled={
-            opportunity.status !== 'draft' || opportunity.createdById != userId
+            opportunity.status !== 'draft' || opportunity.createdById !== userId
           }
           placeholder='e.g. What is the best reason for Team to pursue Opportunity'
         />
@@ -51,7 +51,7 @@ function QuestionsOpportunityForm({
           error={!!errors.comprehensionQ2}
           value={watchComprehensionQ2}
           disabled={
-            opportunity.status !== 'draft' || opportunity.createdById != userId
+            opportunity.status !== 'draft' || opportunity.createdById !== userId
           }
           placeholder='e.g. What is the best reason for Team to NOT pursue Opportunity'
         />
@@ -76,7 +76,7 @@ function QuestionsOpportunityForm({
           error={!!errors.qualityOfIdeaQ1}
           value={watchQualityOfIdeaQ1}
           disabled={
-            opportunity.status !== 'draft' || opportunity.createdById != userId
+            opportunity.status !== 'draft' || opportunity.createdById !== userId
           }
           placeholder='e.g. Describe the Stakeholders involved in the Idea you are submitting'
         />
@@ -95,7 +95,7 @@ function QuestionsOpportunityForm({
           error={!!errors.qualityOfIdeaQ2}
           value={watchQualityOfIdeaQ2}
           disabled={
-            opportunity.status !== 'draft' || opportunity.createdById != userId
+            opportunity.status !== 'draft' || opportunity.createdById !== userId
           }
           placeholder='e.g. Describe the EXPECTED RESULTS from action taken to pursue Opportunity'
         />
@@ -114,7 +114,7 @@ function QuestionsOpportunityForm({
           error={!!errors.qualityOfIdeaQ3}
           value={watchQualityOfIdeaQ3}
           disabled={
-            opportunity.status !== 'draft' || opportunity.createdById != userId
+            opportunity.status !== 'draft' || opportunity.createdById !== userId
           }
           placeholder='e.g. Describe the EXPECTED RESULTS from action taken to pursue Opportunity'
         />
@@ -133,7 +133,7 @@ function QuestionsOpportunityForm({
           error={!!errors.qualityOfIdeaQ4}
           value={watchQualityOfIdeaQ4}
           disabled={
-            opportunity.status !== 'draft' || opportunity.createdById != userId
+            opportunity.status !== 'draft' || opportunity.createdById !== userId
           }
           placeholder='e.g. Describe the RISKS from action taken to pursue Opportunity'
         />
@@ -152,7 +152,7 @@ function QuestionsOpportunityForm({
           error={!!errors.qualityOfIdeaQ5}
           value={watchQualityOfIdeaQ5}
           disabled={
-            opportunity.status !== 'draft' || opportunity.createdById != userId
+            opportunity.status !== 'draft' || opportunity.createdById !== userId
           }
           placeholder='e.g. WHEN can or should Team work on pursuing Opportunity? What are DEPENDENCIES?'
         />

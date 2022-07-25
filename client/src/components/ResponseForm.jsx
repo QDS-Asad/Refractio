@@ -25,7 +25,7 @@ const ResponseForm = memo(
         </div>
         <Form.Field className='mb-3'>
           <label>
-            <Header>{opportunity}</Header>
+            <Header>{opportunity.question}</Header>
           </label>
           <span className='float-end'>({watchAnswer.length}/ 600)</span>
           <Form.Input
