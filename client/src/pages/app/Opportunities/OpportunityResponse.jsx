@@ -25,6 +25,7 @@ const apiResponseFormat = (allQuestions, opportunity, data) => {
         questionId: question._id,
       });
     }
+    return question;
   });
   return {
     comprehension: {
