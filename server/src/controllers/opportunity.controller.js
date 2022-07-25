@@ -226,6 +226,26 @@ exports.removeOpportunityMember = async (req, res, next) => {
     const { user } = req.body;
     await OpportunityService.getOpportunityById(opportunityId)
       .then(async (opportunityInfo) => {
+        if(opportunityInfo.createdById !== user._id){
+          return errorResp(res, {
+            msg: ERROR_MESSAGE.NOT_ALLOWED,
+            code: HTTP_STATUS.BAD_REQUEST.CODE
+          })
+        }
+        const userResponse = await OpportunityService.getOpportunityResponseByIdUserId(
+          opportunityId,
+          userId
+        )
+        const userResponseEvaluation = await OpportunityService.getOpportunityEvaluationByResponseIdUserId(
+          userResponse._id,
+          userId
+        )
+        if(userResponse || userResponseEvaluation){
+          return errorResp(res, {
+            msg: ERROR_MESSAGE.PARTICIPANT_RESPONDED,
+            code: HTTP_STATUS.BAD_REQUEST.CODE
+          })
+        }
         const participants = opportunityInfo.participants.filter(
           (part) => part.toString() !== userId.toString()
         );
@@ -261,6 +281,16 @@ exports.removeOpportunityMember = async (req, res, next) => {
 exports.deleteOpportunity = async (req, res, next) => {
   try {
     const { opportunityId } = req.params;
+    const { user } = req.body;
+    const opportunityInfo = await OpportunityService.getOpportunityById(
+      opportunityId
+    );
+    if(opportunityInfo.createdById !== user._id){
+      return errorResp(res, {
+        msg: ERROR_MESSAGE.NOT_ALLOWED,
+        code: HTTP_STATUS.BAD_REQUEST.CODE
+      })
+    }
     await OpportunityService.deleteOpportunity(opportunityId)
       .then(() => {
         return successResp(res, {
@@ -639,6 +669,12 @@ exports.evalutationResultsByParticipants = async (req, res, next) => {
     const opportunityInfo = await OpportunityService.getOpportunityById(
       opportunityId
     );
+    // if(opportunityInfo.createdById !== user._id){
+    //   return errorResp(res, {
+    //     msg: ERROR_MESSAGE.NOT_ALLOWED,
+    //     code: HTTP_STATUS.BAD_REQUEST.CODE
+    //   })
+    // }
     await OpportunityService.getOpportunityResponsesByOpportunityId(
       opportunityId
     )
@@ -667,7 +703,7 @@ exports.evalutationResultsByParticipants = async (req, res, next) => {
                   evaluationComprehensionScores[elKey] = {
                     firstName: elUserInfo.firstName,
                     lastName: elUserInfo.lastName,
-                    comprehension: Number(el.comprehension.score),
+                    evaluation: Number(el.comprehension.score),
                   };
 
                   console.log(evaluationComprehensionScores);
@@ -675,12 +711,12 @@ exports.evalutationResultsByParticipants = async (req, res, next) => {
                   evaluationQualityOfIdeaScores[elKey] = {
                     firstName: elUserInfo.firstName,
                     lastName: elUserInfo.lastName,
-                    qualityOfIdea: Number(el.qualityOfIdea.score),
+                    evaluation: Number(el.qualityOfIdea.score),
                   };
                 })
               );
               evaluationComprehensionScores.map((compE) => {
-                totalComprehensionEvaluationScore += compE.comprehension;
+                totalComprehensionEvaluationScore += compE.evaluation;
               });
               totalComprehensionAverageEvaluationScore =
                 totalComprehensionEvaluationScore /
@@ -688,7 +724,7 @@ exports.evalutationResultsByParticipants = async (req, res, next) => {
 
               evaluationQualityOfIdeaScores.map((compE) => {
                 totalQualityOfIdeaEvaluationScore +=
-                  compE.qualityOfIdea * totalComprehensionEvaluationScore;
+                  compE.evaluation * totalComprehensionEvaluationScore;
                 console.log(totalQualityOfIdeaEvaluationScore);
               });
               totalQualityOfIdeaAverageEvaluationScore =
@@ -723,9 +759,9 @@ exports.evalutationResultsByParticipants = async (req, res, next) => {
                 firstName: userInfo.firstName,
                 lastName: userInfo.lastName,
                 status: obj.status,
-                totalComprehensionEvaluationScore,
+                // totalComprehensionEvaluationScore,
                 totalComprehensionAverageEvaluationScore,
-                totalQualityOfIdeaEvaluationScore,
+                // totalQualityOfIdeaEvaluationScore,
                 totalQualityOfIdeaAverageEvaluationScore,
                 comprehension: {
                   qa: comprehension_answers,
