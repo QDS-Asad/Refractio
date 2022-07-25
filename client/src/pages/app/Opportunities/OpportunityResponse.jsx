@@ -168,30 +168,34 @@ const OpportunityResponse = () => {
             )}
             <Header as='h3' className='primary-dark-color'>
               {opportunity.name}
-              <Button
-                primary
-                type='submit'
-                form='create-opportunity'
-                className='btn-secondary'
-                floated='right'
-                disabled={loading}
-              >
-                Submit
-              </Button>
-              <PublishResponse
-                viewSubmit={viewSubmit}
-                setViewSubmit={setViewSubmit}
-                onSubmittion={onSubmittion}
-              />
-              <Button
-                onClick={handleDraft}
-                primary
-                className='btn-outline me-3'
-                floated='right'
-                disabled={loading}
-              >
-                Save as Draft
-              </Button>
+              {!responsePublished && (
+                <>
+                  <Button
+                    primary
+                    type='submit'
+                    form='create-opportunity'
+                    className='btn-secondary'
+                    floated='right'
+                    disabled={loading}
+                  >
+                    Submit
+                  </Button>
+                  <PublishResponse
+                    viewSubmit={viewSubmit}
+                    setViewSubmit={setViewSubmit}
+                    onSubmittion={onSubmittion}
+                  />
+                  <Button
+                    onClick={handleDraft}
+                    primary
+                    className='btn-outline me-3'
+                    floated='right'
+                    disabled={loading}
+                  >
+                    Save as Draft
+                  </Button>
+                </>
+              )}
             </Header>
             <div style={{ padding: '1em' }}>
               <Form
