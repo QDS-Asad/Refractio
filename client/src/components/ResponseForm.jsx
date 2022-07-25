@@ -10,6 +10,8 @@ const ResponseForm = memo(
     watch,
     allQuestions,
     setCurrentQuestion,
+    loading,
+    responsePublished,
   }) => {
     const watchAnswer = watch(`q${index + 1}`, '');
     return (
@@ -25,7 +27,7 @@ const ResponseForm = memo(
         </div>
         <Form.Field className='mb-3'>
           <label>
-            <Header>{opportunity}</Header>
+            <Header>{opportunity.question}</Header>
           </label>
           <span className='float-end'>({watchAnswer.length}/ 600)</span>
           <Form.Input
@@ -35,6 +37,7 @@ const ResponseForm = memo(
             value={watch(`q${index + 1}`)}
             onChange={handleChange}
             onBlur={handleChange}
+            disabled={loading || responsePublished}
             error={!!errors[`q${index + 1}`]}
             placeholder='Enter response...'
           />

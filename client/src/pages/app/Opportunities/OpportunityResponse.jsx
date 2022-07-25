@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchOpportunity,
+  getResponse,
   opportunityResponseSelector,
+  resetResponse,
+  respondOpportunity,
 } from '../../../features/opportunities/opportunityResponseSlice';
 import { Button, Form, Grid, Header, Message } from 'semantic-ui-react';
 import { useParams } from 'react-router-dom';
@@ -10,13 +13,49 @@ import { useForm } from 'react-hook-form';
 import ResponseForm from '../../../components/ResponseForm';
 import PublishResponse from './PublishResponse';
 
+const apiResponseFormat = (allQuestions, opportunity, data) => {
+  let comprehensionAnswer = [];
+  let qualityAnswer = [];
+  allQuestions.map((question, index) => {
+    if (index >= opportunity.comprehension.questions.length) {
+      qualityAnswer.push({
+        answer: data[`q${index + 1}`] || '',
+        questionId: question._id,
+      });
+    } else {
+      comprehensionAnswer.push({
+        answer: data[`q${index + 1}`] || '',
+        questionId: question._id,
+      });
+    }
+    return question;
+  });
+  return {
+    comprehension: {
+      answers: comprehensionAnswer,
+    },
+    qualityOfIdea: {
+      answers: qualityAnswer,
+    },
+  };
+};
 const OpportunityResponse = () => {
   const [viewSubmit, setViewSubmit] = useState(false);
-  const [viewMessage, setViewMessage] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(1);
   const [allQuestions, setAllQuestions] = useState([]);
+  const [displayMessage, setDisplayMessage] = useState(false);
+  const [answerArray, setAnswer] = useState(null);
+  const [responsePublished, setResponsePublished] = useState(false);
   const { id } = useParams();
-  const { register, setValue, handleSubmit, errors, trigger, watch } = useForm({
+  const {
+    register,
+    setValue,
+    handleSubmit,
+    errors,
+    trigger,
+    watch,
+    getValues,
+  } = useForm({
     mode: 'onBlur',
   });
 
@@ -24,9 +63,14 @@ const OpportunityResponse = () => {
   const dispatch = useDispatch();
 
   // fetch data from our store
-  const { loading, error, opportunity } = useSelector(
-    opportunityResponseSelector
-  );
+  const {
+    loading,
+    error,
+    opportunity,
+    response,
+    success,
+    message,
+  } = useSelector(opportunityResponseSelector);
   const handleChange = (e) => {
     e.persist();
     setValue(e.target.name, e.target.value);
@@ -35,7 +79,13 @@ const OpportunityResponse = () => {
 
   // hook to fetch items
   useEffect(() => {
+    return () => {
+      dispatch(resetResponse());
+    };
+  }, []);
+  useEffect(() => {
     dispatch(fetchOpportunity(id));
+    dispatch(getResponse(id));
   }, [dispatch, id]);
   useEffect(() => {
     if (opportunity && opportunity.comprehension.questions) {
@@ -62,52 +112,90 @@ const OpportunityResponse = () => {
       }
     }
   }, [allQuestions]);
+  useEffect(() => {
+    if (response) {
+      if (response.comprehension) {
+        response.comprehension.answers.map((answer, idx) => {
+          setValue(`q${idx + 1}`, answer.answer);
+          return answer;
+        });
+      }
+      if (response.qualityOfIdea) {
+        response.qualityOfIdea.answers.map((answer, idx) => {
+          setValue(
+            `q${response.comprehension.answers.length + idx + 1}`,
+            answer.answer
+          );
+          return answer;
+        });
+      }
+      if (response.status === 'publish') {
+        setResponsePublished(true);
+      }
+    }
+  }, [response]);
+  useEffect(() => {
+    if (success) {
+      setDisplayMessage(true);
+      setTimeout(() => {
+        setDisplayMessage(false);
+      }, 4000);
+    }
+  }, [success]);
 
   const handleEdit = (data) => {
+    setAnswer(apiResponseFormat(allQuestions, opportunity, data));
     setViewSubmit(true);
   };
-  const onSubmittion = async () => {
-    setViewMessage(true);
-    setTimeout(() => {
-      setViewMessage(false);
-    }, 3000);
+  const onSubmittion = async (status) => {
+    let finalobject = { ...answerArray, status };
+    dispatch(respondOpportunity(id, finalobject));
+  };
+  const values = getValues();
+
+  const handleDraft = () => {
+    const apiData = apiResponseFormat(allQuestions, opportunity, values);
+    let finalobject = { ...apiData, status: 'draft' };
+    dispatch(respondOpportunity(id, finalobject));
   };
   return (
     <>
       {opportunity && (
         <Grid stretched>
           <Grid.Column width={11}>
-            {viewMessage && (
-              <Message
-                positive
-                content='Your response has been saved.'
-                className='error-message mb-3'
-              />
+            {displayMessage && (
+              <Message header={message} success className='success-message' />
             )}
             <Header as='h3' className='primary-dark-color'>
               {opportunity.name}
-              <Button
-                primary
-                type='submit'
-                form='create-opportunity'
-                className='btn-secondary'
-                floated='right'
-              >
-                Submit
-              </Button>
-              <PublishResponse
-                viewSubmit={viewSubmit}
-                setViewSubmit={setViewSubmit}
-                onSubmittion={onSubmittion}
-              />
-              <Button
-                onClick={onSubmittion}
-                primary
-                className='btn-outline me-3'
-                floated='right'
-              >
-                Save as Draft
-              </Button>
+              {!responsePublished && (
+                <>
+                  <Button
+                    primary
+                    type='submit'
+                    form='create-opportunity'
+                    className='btn-secondary'
+                    floated='right'
+                    disabled={loading}
+                  >
+                    Submit
+                  </Button>
+                  <PublishResponse
+                    viewSubmit={viewSubmit}
+                    setViewSubmit={setViewSubmit}
+                    onSubmittion={onSubmittion}
+                  />
+                  <Button
+                    onClick={handleDraft}
+                    primary
+                    className='btn-outline me-3'
+                    floated='right'
+                    disabled={loading}
+                  >
+                    Save as Draft
+                  </Button>
+                </>
+              )}
             </Header>
             <div style={{ padding: '1em' }}>
               <Form
@@ -133,6 +221,8 @@ const OpportunityResponse = () => {
                         watch={watch}
                         allQuestions={allQuestions.length}
                         setCurrentQuestion={setCurrentQuestion}
+                        loading={loading}
+                        responsePublished={responsePublished}
                       />
                     )}
                   </div>
