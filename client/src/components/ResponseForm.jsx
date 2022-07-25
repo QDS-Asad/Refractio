@@ -10,6 +10,8 @@ const ResponseForm = memo(
     watch,
     allQuestions,
     setCurrentQuestion,
+    loading,
+    responsePublished,
   }) => {
     const watchAnswer = watch(`q${index + 1}`, '');
     return (
@@ -35,6 +37,7 @@ const ResponseForm = memo(
             value={watch(`q${index + 1}`)}
             onChange={handleChange}
             onBlur={handleChange}
+            disabled={loading || responsePublished}
             error={!!errors[`q${index + 1}`]}
             placeholder='Enter response...'
           />

@@ -23,7 +23,7 @@ const PublishResponse = ({ viewSubmit, setViewSubmit, onSubmittion }) => {
           content='Submit'
           onClick={() => {
             setViewSubmit(false);
-            onSubmittion('draft');
+            onSubmittion('publish');
           }}
           className='btn'
         />

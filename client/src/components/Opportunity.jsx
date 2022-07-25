@@ -37,8 +37,10 @@ const Opportunity = ({ opportunity }) => {
                 ) : (
                   <>{opportunity.description.substr(0, 203)}... </>
                 )}
-                <span style={style} onClick={() => setShowMore((prev) => !prev)}>
-                  {' '}
+                <span
+                  style={style}
+                  onClick={() => setShowMore((prev) => !prev)}
+                >
                   {showMore ? 'Show Less' : 'Show More'}
                 </span>
               </>
@@ -46,7 +48,7 @@ const Opportunity = ({ opportunity }) => {
               opportunity.description
             )}
           </Card.Description>
-          {application ? (
+          {application && opportunity.status !== 'draft' ? (
             <>
               <Divider />
               <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -90,7 +92,8 @@ const Opportunity = ({ opportunity }) => {
             </>
           )}
         </Card.Content>
-      </Card></span>
+      </Card>
+    </span>
   );
 };
 
