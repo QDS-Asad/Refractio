@@ -226,25 +226,30 @@ exports.removeOpportunityMember = async (req, res, next) => {
     const { user } = req.body;
     await OpportunityService.getOpportunityById(opportunityId)
       .then(async (opportunityInfo) => {
-        if(opportunityInfo.createdById !== user._id){
+        if (opportunityInfo.createdById !== user._id) {
           return errorResp(res, {
             msg: ERROR_MESSAGE.NOT_ALLOWED,
-            code: HTTP_STATUS.BAD_REQUEST.CODE
-          })
+            code: HTTP_STATUS.BAD_REQUEST.CODE,
+          });
         }
-        const userResponse = await OpportunityService.getOpportunityResponseByIdUserId(
-          opportunityId,
-          userId
-        )
-        const userResponseEvaluation = await OpportunityService.getOpportunityEvaluationByResponseIdUserId(
-          userResponse._id,
-          userId
-        )
-        if(userResponse || userResponseEvaluation){
-          return errorResp(res, {
-            msg: ERROR_MESSAGE.PARTICIPANT_RESPONDED,
-            code: HTTP_STATUS.BAD_REQUEST.CODE
-          })
+        const userResponse =
+          await OpportunityService.getOpportunityResponseByIdUserId(
+            opportunityId,
+            userId
+          );
+        if (userResponse) {
+          const userResponseEvaluation =
+            await OpportunityService.getOpportunityEvaluationByResponseIdUserId(
+              userResponse._id,
+              userId
+            );
+
+          if (userResponse || userResponseEvaluation) {
+            return errorResp(res, {
+              msg: ERROR_MESSAGE.PARTICIPANT_RESPONDED,
+              code: HTTP_STATUS.BAD_REQUEST.CODE,
+            });
+          }
         }
         const participants = opportunityInfo.participants.filter(
           (part) => part.toString() !== userId.toString()
@@ -255,11 +260,12 @@ exports.removeOpportunityMember = async (req, res, next) => {
         await OpportunityService.updateOpportunity(opportunityId, requestBody)
           .then((opportunityRes) => {
             return successResp(res, {
-              msg: SUCCESS_MESSAGE.UPDATED,
+              msg: SUCCESS_MESSAGE.DELETED,
               code: HTTP_STATUS.SUCCESS.CODE,
             });
           })
           .catch((error) => {
+            console.log(error);
             return errorResp(res, {
               msg: ERROR_MESSAGE.NOT_FOUND,
               code: HTTP_STATUS.BAD_REQUEST.CODE,
@@ -267,6 +273,7 @@ exports.removeOpportunityMember = async (req, res, next) => {
           });
       })
       .catch((error) => {
+        console.log(error);
         return errorResp(res, {
           msg: ERROR_MESSAGE.NOT_FOUND,
           code: HTTP_STATUS.BAD_REQUEST.CODE,
@@ -285,11 +292,11 @@ exports.deleteOpportunity = async (req, res, next) => {
     const opportunityInfo = await OpportunityService.getOpportunityById(
       opportunityId
     );
-    if(opportunityInfo.createdById !== user._id){
+    if (opportunityInfo.createdById !== user._id) {
       return errorResp(res, {
         msg: ERROR_MESSAGE.NOT_ALLOWED,
-        code: HTTP_STATUS.BAD_REQUEST.CODE
-      })
+        code: HTTP_STATUS.BAD_REQUEST.CODE,
+      });
     }
     await OpportunityService.deleteOpportunity(opportunityId)
       .then(() => {
@@ -403,7 +410,7 @@ exports.getOpportunityResponsesById = async (req, res, next) => {
                 (que) => que._id.toString() === comp.questionId
               );
               console.log(queObj);
-              if(queObj){
+              if (queObj) {
                 comprehension_answers[compKey] = {
                   question: queObj.question,
                   answer: comp.answer,
@@ -416,7 +423,7 @@ exports.getOpportunityResponsesById = async (req, res, next) => {
               let qoaObj = opportunityInfo.qualityOfIdea.questions.find(
                 (que) => que._id.toString() === qoa.questionId
               );
-              if(qoaObj){
+              if (qoaObj) {
                 qualityOfIdea_answers[compKey] = {
                   question: qoaObj.question,
                   answer: qoa.answer,
@@ -497,7 +504,7 @@ exports.answerOpportunity = async (req, res, next) => {
       comprehension: req.body.comprehension || undefined,
       qualityOfIdea: req.body.qualityOfIdea || undefined,
     };
-    
+
     const opportunityresponse =
       await OpportunityService.getOpportunityResponseByIdUserId(
         opportunityId,
@@ -682,7 +689,8 @@ const evaluateAnswerOpportunityResponse = async (
   const filterParticipants = opportunityInfo.participants;
   if (opportunityEvaluation.length == filterParticipants.length) {
     await OpportunityService.updateOpportunity(opportunityId, {
-      stauts: OPPORTUNITY_STATUS.COMPLETED,b
+      stauts: OPPORTUNITY_STATUS.COMPLETED,
+      b,
     });
   } else {
     await OpportunityService.updateOpportunity(opportunityId, {
@@ -703,11 +711,11 @@ exports.evalutationResultsByParticipants = async (req, res, next) => {
     const opportunityInfo = await OpportunityService.getOpportunityById(
       opportunityId
     );
-    if(opportunityInfo.createdById !== user._id){
+    if (opportunityInfo.createdById !== user._id) {
       return errorResp(res, {
         msg: ERROR_MESSAGE.NOT_ALLOWED,
-        code: HTTP_STATUS.BAD_REQUEST.CODE
-      })
+        code: HTTP_STATUS.BAD_REQUEST.CODE,
+      });
     }
     await OpportunityService.getOpportunityResponsesByOpportunityId(
       opportunityId
