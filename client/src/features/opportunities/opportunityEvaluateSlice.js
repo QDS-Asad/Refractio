@@ -6,6 +6,7 @@ export const initialState = {
   loading: false,
   error: null,
   opportunity: null,
+  responses: null,
 };
 
 // our slice
@@ -21,6 +22,11 @@ const opportunityEvaluateSlice = createSlice({
       state.error = false;
       state.opportunity = payload;
     },
+    setResponses: (state, { payload }) => {
+      state.loading = false;
+      state.error = false;
+      state.responses = payload;
+    },
     setError: (state, { payload }) => {
       state.loading = false;
       state.error = payload;
@@ -32,6 +38,7 @@ export const {
   setLoading,
   setOpportunity,
   setError,
+  setResponses,
 } = opportunityEvaluateSlice.actions;
 
 // export the selector (".items" being same as in slices/index.js's "items: something")
@@ -56,10 +63,11 @@ export const fetchOpportunity = (id) => async (dispatch) => {
 };
 export const fetchResponses = (id) => async (dispatch) => {
   try {
+    dispatch(setLoading());
     let { data: response } = await refractioApi.get(
       `/opportunities/opportunity-responses/${id}`
     );
-    debugger;
+    dispatch(setResponses(response.data));
   } catch (error) {
     const errorMessage =
       error.response && error.response.data

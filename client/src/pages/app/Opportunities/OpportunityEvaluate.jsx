@@ -14,21 +14,16 @@ const OpportunityEvaluate = () => {
   const [viewSubmit, setViewSubmit] = useState(false);
   const [viewMessage, setViewMessage] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(1);
-  const [comprehensionRating, setComprehensionRating] = useState('1');
-  const [ideaRating, setIdeaRating] = useState('1');
+  const [currentParticipant, setCurrentParticipant] = useState(1);
   const { id } = useParams();
 
   // set up dispatch
   const dispatch = useDispatch();
 
   // fetch data from our store
-  const { error, opportunity } = useSelector(opportunityEvaluateSelector);
-  const handleComprehensionChange = (e, { value }) => {
-    setComprehensionRating(value);
-  };
-  const handleIdeaChange = (e, { value }) => {
-    setIdeaRating(value);
-  };
+  const { error, opportunity, responses } = useSelector(
+    opportunityEvaluateSelector
+  );
   // hook to fetch items
   useEffect(() => {
     dispatch(fetchResponses(id));
@@ -82,22 +77,26 @@ const OpportunityEvaluate = () => {
                   {error}
                 </Message>
               )}
-              <EvaluateForm
-                handleIdeaChange={handleIdeaChange}
-                ideaRating={ideaRating}
-                comprehensionRating={comprehensionRating}
-                setCurrentQuestion={setCurrentQuestion}
-                currentQuestion={currentQuestion}
-                handleComprehensionChange={handleComprehensionChange}
-                quality={opportunity.comprehension.questions}
-                comprehension={opportunity.qualityOfIdea.questions}
-                allQuestions={
-                  [
-                    ...opportunity.comprehension.questions,
-                    ...opportunity.qualityOfIdea.questions,
-                  ].length
-                }
-              />
+              {responses &&
+                responses.map(
+                  (response, index) =>
+                    currentParticipant === index + 1 && (
+                      <EvaluateForm
+                        setCurrentQuestion={setCurrentQuestion}
+                        currentQuestion={currentQuestion}
+                        response={response}
+                        currentParticipant={currentParticipant}
+                        setCurrentParticipant={setCurrentParticipant}
+                        totalParticipants={responses.length}
+                        quality={response.comprehension}
+                        comprehension={response.qualityOfIdea}
+                        allQuestions={
+                          response.comprehension.length +
+                          response.qualityOfIdea.length
+                        }
+                      />
+                    )
+                )}
             </div>
           </Grid.Column>
           <>

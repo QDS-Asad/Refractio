@@ -1,4 +1,5 @@
 import React, { memo } from 'react';
+import { useState } from 'react';
 import { Button, Header, Divider } from 'semantic-ui-react';
 import RadioLabel from './RadioLabel';
 
@@ -13,15 +14,23 @@ const answer =
   "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it.";
 const EvaluateForm = memo(
   ({
-    handleIdeaChange,
     setCurrentQuestion,
     quality,
     comprehension,
-    ideaRating,
     currentQuestion,
-    comprehensionRating,
-    handleComprehensionChange,
+    response,
+    setCurrentParticipant,
+    currentParticipant,
+    totalParticipants,
   }) => {
+    const [comprehensionRating, setComprehensionRating] = useState('1');
+    const [ideaRating, setIdeaRating] = useState('1');
+    const handleComprehensionChange = (e, { value }) => {
+      setComprehensionRating(value);
+    };
+    const handleIdeaChange = (e, { value }) => {
+      setIdeaRating(value);
+    };
     return (
       <>
         <div
@@ -31,7 +40,7 @@ const EvaluateForm = memo(
           }}
           className='primary-dark-color pb-3 mb-3'
         >
-          Participant 1 -{' '}
+          {response.name} -{' '}
           {currentQuestion === 1
             ? 'Evaluation of comprehension'
             : 'Evaluation of Quality of Idea-Response'}
@@ -43,7 +52,7 @@ const EvaluateForm = memo(
                   <Header key={index} size='medium' color='grey'>
                     {ques.question}
                     <Header.Subheader className='mt-3' color='black'>
-                      {answer}
+                      {ques.answer}
                     </Header.Subheader>
                   </Header>
                   <Divider />
@@ -54,7 +63,7 @@ const EvaluateForm = memo(
                   <Header key={index} size='medium' color='grey'>
                     {ques.question}
                     <Header.Subheader className='mt-3' color='black'>
-                      {answer}
+                      {ques.answer}
                     </Header.Subheader>
                   </Header>
                   <Divider />
@@ -77,17 +86,36 @@ const EvaluateForm = memo(
             options={options}
           />
           <div className='mt-5'>
-            {currentQuestion === 1 && (
+            {currentParticipant <= totalParticipants && (
               <Button
-                onClick={() => setCurrentQuestion((prev) => prev + 1)}
+                onClick={() => {
+                  if (currentQuestion === 2) {
+                    setCurrentParticipant((prev) => prev + 1);
+                    setCurrentQuestion(1);
+                  } else {
+                    setCurrentQuestion((prev) => prev + 1);
+                  }
+                }}
+                disabled={
+                  currentParticipant === totalParticipants &&
+                  currentQuestion === 2
+                }
                 primary
                 className='btn float-end'
                 content='Next'
               />
             )}
-            {currentQuestion === 2 && (
+            {currentParticipant >= 1 && (
               <Button
-                onClick={() => setCurrentQuestion((prev) => prev - 1)}
+                onClick={() => {
+                  if (currentQuestion === 1) {
+                    setCurrentParticipant((prev) => prev - 1);
+                    setCurrentQuestion(2);
+                  } else {
+                    setCurrentQuestion((prev) => prev - 1);
+                  }
+                }}
+                disabled={currentParticipant === 1 && currentQuestion === 1}
                 primary
                 className='btn float-start'
                 content='Back'
