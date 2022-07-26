@@ -5,7 +5,6 @@ import {
   fetchOpportunity,
   opportunityDetailSelector,
   resetOpportunity,
-  setDelete,
   updateOpportunity,
 } from '../../../features/opportunities/opportunityDetailSlice';
 import {
@@ -18,7 +17,7 @@ import {
   Tab,
   Segment,
 } from 'semantic-ui-react';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import OpportunityStatus from '../../../components/OpportunityStatus';
 import PublishOpportunity from './PublishOpportunity';
 import ManageParticipants from './ManageParticipants';

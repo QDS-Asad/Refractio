@@ -94,6 +94,7 @@ const ManageParticipants = ({
                             opportunity.participants.length <= 2 &&
                             opportunity.status !== 'draft'
                           ) {
+                            setViewParticipant(false);
                             onDeletingOpportunity();
                           } else {
                             dispatch(
