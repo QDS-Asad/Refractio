@@ -363,6 +363,7 @@ const OpportunityDetail = () => {
                     primary
                     className='btn-outline me-3'
                     floated='right'
+                    disabled={loading}
                   >
                     Save as Draft
                   </Button>
@@ -382,6 +383,7 @@ const OpportunityDetail = () => {
                   negative
                   className='me-3'
                   floated='right'
+                  disabled={loading}
                 >
                   Delete
                 </Button>

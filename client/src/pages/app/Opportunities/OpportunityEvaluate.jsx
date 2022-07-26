@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchOpportunity,
+  fetchResponses,
   opportunityEvaluateSelector,
 } from '../../../features/opportunities/opportunityEvaluateSlice';
 import { Button, Grid, Header, Message } from 'semantic-ui-react';
@@ -30,6 +31,7 @@ const OpportunityEvaluate = () => {
   };
   // hook to fetch items
   useEffect(() => {
+    dispatch(fetchResponses(id));
     dispatch(fetchOpportunity(id));
   }, [dispatch, id]);
 
@@ -87,11 +89,11 @@ const OpportunityEvaluate = () => {
                 setCurrentQuestion={setCurrentQuestion}
                 currentQuestion={currentQuestion}
                 handleComprehensionChange={handleComprehensionChange}
-                quality={opportunity.comprehension.question}
+                quality={opportunity.comprehension.questions}
                 comprehension={opportunity.qualityOfIdea.questions}
                 allQuestions={
                   [
-                    ...opportunity.comprehension.question,
+                    ...opportunity.comprehension.questions,
                     ...opportunity.qualityOfIdea.questions,
                   ].length
                 }

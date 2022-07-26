@@ -54,3 +54,17 @@ export const fetchOpportunity = (id) => async (dispatch) => {
     dispatch(setError(errorMessage));
   }
 };
+export const fetchResponses = (id) => async (dispatch) => {
+  try {
+    let { data: response } = await refractioApi.get(
+      `/opportunities/opportunity-responses/${id}`
+    );
+    debugger;
+  } catch (error) {
+    const errorMessage =
+      error.response && error.response.data
+        ? error.response.data.message
+        : error.message;
+    dispatch(setError(errorMessage));
+  }
+};

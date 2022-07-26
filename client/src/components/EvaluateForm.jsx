@@ -41,7 +41,7 @@ const EvaluateForm = memo(
             ? comprehension.map((ques, index) => (
                 <>
                   <Header key={index} size='medium' color='grey'>
-                    {ques}
+                    {ques.question}
                     <Header.Subheader className='mt-3' color='black'>
                       {answer}
                     </Header.Subheader>
@@ -52,7 +52,7 @@ const EvaluateForm = memo(
             : quality.map((ques, index) => (
                 <>
                   <Header key={index} size='medium' color='grey'>
-                    {ques}
+                    {ques.question}
                     <Header.Subheader className='mt-3' color='black'>
                       {answer}
                     </Header.Subheader>
