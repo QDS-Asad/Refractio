@@ -87,12 +87,12 @@ const OpportunityEvaluate = () => {
                 setCurrentQuestion={setCurrentQuestion}
                 currentQuestion={currentQuestion}
                 handleComprehensionChange={handleComprehensionChange}
-                quality={opportunity.questions.quality}
-                comprehension={opportunity.questions.comprehension}
+                quality={opportunity.comprehension.question}
+                comprehension={opportunity.qualityOfIdea.questions}
                 allQuestions={
                   [
-                    ...opportunity.questions.quality,
-                    ...opportunity.questions.comprehension,
+                    ...opportunity.comprehension.question,
+                    ...opportunity.qualityOfIdea.questions,
                   ].length
                 }
               />
