@@ -8,6 +8,7 @@ export const initialState = {
   opportunity: null,
   success: false,
   message: '',
+  deleted: false,
 };
 
 // our slice
@@ -31,6 +32,7 @@ const opportunityDetailSlice = createSlice({
     },
     setSuccess: (state, { payload }) => {
       state.error = null;
+      state.loading = false;
       state.success = true;
       state.message = payload;
     },
@@ -40,6 +42,10 @@ const opportunityDetailSlice = createSlice({
       state.opportunity = null;
       state.message = '';
       state.success = false;
+      state.deleted = false;
+    },
+    setDelete: (state, { payload }) => {
+      state.deleted = payload;
     },
   },
 });
@@ -50,6 +56,7 @@ export const {
   setError,
   reset,
   setSuccess,
+  setDelete,
 } = opportunityDetailSlice.actions;
 
 // export the selector (".items" being same as in slices/index.js's "items: something")
@@ -85,6 +92,22 @@ export const updateOpportunity = (id, status, bodyData) => async (dispatch) => {
       dispatch(setSuccess('Opportunity published successfully.'));
     }
     dispatch(fetchOpportunity(id));
+  } catch (error) {
+    const errorMessage =
+      error.response && error.response.data
+        ? error.response.data.message
+        : error.message;
+    dispatch(setError(errorMessage));
+  }
+};
+export const deleteOpportunity = (id) => async (dispatch) => {
+  try {
+    dispatch(setLoading());
+    await refractioApi.delete(`/opportunities/delete/${id}`);
+    dispatch(setSuccess('Opportunity deleted successfully.'));
+    setTimeout(() => {
+      dispatch(setDelete(true));
+    }, 1000);
   } catch (error) {
     const errorMessage =
       error.response && error.response.data

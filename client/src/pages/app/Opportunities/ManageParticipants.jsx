@@ -24,6 +24,7 @@ const ManageParticipants = ({
   setViewParticipant,
   opportunity,
   userId,
+  onDeletingOpportunity,
 }) => {
   const [displayMessage, setDisplayMessage] = useState(false);
   const dispatch = useDispatch();
@@ -88,16 +89,25 @@ const ManageParticipants = ({
                   {opportunity.participants.includes(member._id) ? (
                     <List.Content floated='right'>
                       <Button
-                        onClick={() =>
-                          dispatch(
-                            removeMemberOpportunity(opportunity._id, member._id)
-                          )
-                        }
+                        onClick={() => {
+                          if (
+                            opportunity.participants.length <= 2 &&
+                            opportunity.status !== 'draft'
+                          ) {
+                            onDeletingOpportunity();
+                          } else {
+                            dispatch(
+                              removeMemberOpportunity(
+                                opportunity._id,
+                                member._id
+                              )
+                            );
+                          }
+                        }}
                         disabled={
                           loading ||
                           opportunityLoading ||
-                          opportunity.createdById !== userId ||
-                          opportunity.participants.length <= 2
+                          opportunity.createdById !== userId
                         }
                         className='btn-link-danger'
                       >

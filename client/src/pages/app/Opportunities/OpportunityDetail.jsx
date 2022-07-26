@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+  deleteOpportunity,
   fetchOpportunity,
   opportunityDetailSelector,
   resetOpportunity,
+  setDelete,
   updateOpportunity,
 } from '../../../features/opportunities/opportunityDetailSlice';
 import {
@@ -16,7 +18,7 @@ import {
   Tab,
   Segment,
 } from 'semantic-ui-react';
-import { useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import OpportunityStatus from '../../../components/OpportunityStatus';
 import PublishOpportunity from './PublishOpportunity';
 import ManageParticipants from './ManageParticipants';
@@ -24,6 +26,7 @@ import OpportunityCreate from './OpportunityCreate';
 import { useForm } from 'react-hook-form';
 import QuestionsOpportunityForm from './QuestionsOpportunityForm';
 import { authLoginSelector } from '../../../features/auth/authLoginSlice';
+import DeleteOpportunity from './DeleteOpportunity';
 const maxLengthObject = {
   value: 120,
   message: 'Maximum characters are 120.',
@@ -84,10 +87,15 @@ const questionFormationArray = (data) => {
 const OpportunityDetail = () => {
   const [viewParticipant, setViewParticipant] = useState(false);
   const [viewPublish, setViewPublish] = useState(false);
+  const [viewDelete, setViewDelete] = useState(false);
   const [editOpportunity, setEditOpportunity] = useState(false);
   const [formValues, setFormValues] = useState(null);
   const [displayMessage, setDisplayMessage] = useState(false);
+  const [deleteText, setDeleteText] = useState(
+    'Once the opportunity is deleted, it cannot be undone. Are you sure ?'
+  );
   const { id } = useParams();
+  const navigate = useNavigate();
   const { register, setValue, handleSubmit, errors, trigger, watch } = useForm({
     mode: 'onBlur',
     defaultValues: {
@@ -108,6 +116,15 @@ const OpportunityDetail = () => {
   const onPublishResponse = () => {
     dispatch(updateOpportunity(id, 'publish', formValues));
     setViewPublish(false);
+  };
+  const onDeletingOpportunity = () => {
+    setDeleteText(
+      'Atleast 2 participants are required. Removing them would delete this opportunity.'
+    );
+    setViewDelete(true);
+  };
+  const onDeleteOpportunity = () => {
+    dispatch(deleteOpportunity(id));
   };
   const handleSubmittion = (data) => {
     let apiData = questionFormationArray(data);
@@ -167,13 +184,20 @@ const OpportunityDetail = () => {
   const dispatch = useDispatch();
 
   // fetch data from our store
-  const { loading, error, opportunity, success, message } = useSelector(
-    opportunityDetailSelector
-  );
+  const {
+    loading,
+    error,
+    opportunity,
+    success,
+    message,
+    deleted,
+  } = useSelector(opportunityDetailSelector);
   const { userLogin } = useSelector(authLoginSelector);
   // hook to fetch items
   useEffect(() => {
-    dispatch(fetchOpportunity(id));
+    if (!deleted) {
+      dispatch(fetchOpportunity(id));
+    }
   }, [dispatch, id]);
   useEffect(() => {
     if (opportunity) {
@@ -193,6 +217,13 @@ const OpportunityDetail = () => {
       }, 4000);
     }
   }, [success]);
+  useEffect(() => {
+    if (deleted) {
+      navigate({
+        pathname: '/opportunities',
+      });
+    }
+  }, [deleted]);
   const watchComprehensionQ1 = watch('comprehensionQ1', '');
   const watchComprehensionQ2 = watch('comprehensionQ2', '');
   const watchQualityOfIdeaQ1 = watch('qualityOfIdeaQ1', '');
@@ -303,48 +334,73 @@ const OpportunityDetail = () => {
                   viewParticipant={viewParticipant}
                   setViewParticipant={setViewParticipant}
                   userId={userLogin.id}
+                  onDeletingOpportunity={onDeletingOpportunity}
                 />
               </Header.Subheader>
             </Header>
           )}
         </Grid.Column>
+        {opportunity && (
+          <Grid.Column width={8}>
+            {opportunity.status === 'draft' &&
+              userLogin.id === opportunity.createdById && (
+                <>
+                  <Button
+                    primary
+                    className='btn-secondary'
+                    floated='right'
+                    type='submit'
+                    form='create-opportunity'
+                  >
+                    Publish
+                  </Button>
+                  <PublishOpportunity
+                    viewPublish={viewPublish}
+                    setViewPublish={setViewPublish}
+                    onSubmittion={onPublishResponse}
+                  />
+                  <Button
+                    onClick={handleDraft}
+                    primary
+                    className='btn-outline me-3'
+                    floated='right'
+                  >
+                    Save as Draft
+                  </Button>
+                </>
+              )}
+            {userLogin.id === opportunity.createdById && (
+              <>
+                <DeleteOpportunity
+                  viewDelete={viewDelete}
+                  setViewDelete={setViewDelete}
+                  deleteText={deleteText}
+                  setDeleteText={setDeleteText}
+                  onSubmittion={onDeleteOpportunity}
+                />
+                <Button
+                  onClick={() => setViewDelete(true)}
+                  negative
+                  className='me-3'
+                  floated='right'
+                >
+                  Delete
+                </Button>
+              </>
+            )}
+          </Grid.Column>
+        )}
+
         {opportunity &&
           opportunity.status === 'draft' &&
           userLogin.id === opportunity.createdById && (
-            <>
-              <Grid.Column width={8}>
-                <Button
-                  primary
-                  className='btn-secondary'
-                  floated='right'
-                  type='submit'
-                  form='create-opportunity'
-                >
-                  Publish
-                </Button>
-                <PublishOpportunity
-                  viewPublish={viewPublish}
-                  setViewPublish={setViewPublish}
-                  onSubmittion={onPublishResponse}
-                />
-                <Button
-                  onClick={handleDraft}
-                  primary
-                  className='btn-outline me-3'
-                  floated='right'
-                >
-                  Save as Draft
-                </Button>
-              </Grid.Column>
-
-              <Grid.Column width={16}>
-                <p>
-                  To publish an Opportunity you need at least one question for
-                  Comprehension and one for Quality of Idea-Response. You need
-                  to select the Team Members you want to respond with an Idea.
-                </p>
-              </Grid.Column>
-            </>
+            <Grid.Column width={16}>
+              <p>
+                To publish an Opportunity you need at least one question for
+                Comprehension and one for Quality of Idea-Response. You need to
+                select the Team Members you want to respond with an Idea.
+              </p>
+            </Grid.Column>
           )}
       </Grid>
       <Grid>
