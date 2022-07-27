@@ -126,8 +126,10 @@ const EvaluateForm = memo(
                   }
                 }}
                 disabled={
-                  currentParticipant === totalParticipants &&
-                  currentQuestion === 2
+                  (currentParticipant === totalParticipants &&
+                    currentQuestion === 2) ||
+                  (qualityChecked === '' && currentQuestion === 2) ||
+                  (comprehensionCheck === '' && currentQuestion === 1)
                 }
                 primary
                 className='btn float-end'

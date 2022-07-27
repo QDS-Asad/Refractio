@@ -321,7 +321,7 @@ const OpportunityDetail = () => {
                 </span>
 
                 <span
-                  className='ms-2 fw-bold primary-color'
+                  className='ms-2 fw-bold primary-color hoverable'
                   onClick={() => !loading && setViewParticipant(true)}
                 >
                   {opportunity.participants.length > 0
