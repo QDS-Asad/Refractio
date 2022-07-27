@@ -89,6 +89,7 @@ const EvaluateForm = memo(
                 name={`comprehension_${response.name}`}
                 handleChange={handleChange}
                 errors={errors}
+                evaluation={response.evaluation}
               />
               {errors && errors[`comprehension_${response.name}`] && (
                 <Message
@@ -105,6 +106,7 @@ const EvaluateForm = memo(
                 name={`qualityOfIdea_${response.name}`}
                 handleChange={handleChange}
                 errors={errors}
+                evaluation={response.evaluation}
               />
               {errors && errors[`qualityOfIdea_${response.name}`] && (
                 <Message

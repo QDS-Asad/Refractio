@@ -1,7 +1,14 @@
 import React, { memo } from 'react';
 import { Form } from 'semantic-ui-react';
 
-function RadioLabel({ options, rating, handleChange, name, errors }) {
+function RadioLabel({
+  options,
+  rating,
+  handleChange,
+  name,
+  errors,
+  evaluation,
+}) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-around' }}>
       {options.map((option, index) => (
@@ -22,7 +29,7 @@ function RadioLabel({ options, rating, handleChange, name, errors }) {
                 checked={rating === option.value}
                 onChange={handleChange}
                 error={!!errors[name]}
-                F
+                disabled={evaluation !== 'pending'}
               />
             </div>
             <div
