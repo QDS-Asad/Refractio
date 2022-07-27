@@ -1,6 +1,5 @@
 import React, { memo } from 'react';
-import { useState } from 'react';
-import { Button, Header, Divider } from 'semantic-ui-react';
+import { Button, Header, Divider, Message } from 'semantic-ui-react';
 import RadioLabel from './RadioLabel';
 
 const options = [
@@ -10,8 +9,6 @@ const options = [
   { key: '4', text: '4', value: '4', subText: 'Agree' },
   { key: '5', text: '5', value: '5', subText: 'Strongly Agree' },
 ];
-const answer =
-  "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it.";
 const EvaluateForm = memo(
   ({
     setCurrentQuestion,
@@ -22,14 +19,21 @@ const EvaluateForm = memo(
     setCurrentParticipant,
     currentParticipant,
     totalParticipants,
+    setValue,
+    trigger,
+    watch,
+    errors,
   }) => {
-    const [comprehensionRating, setComprehensionRating] = useState('1');
-    const [ideaRating, setIdeaRating] = useState('1');
-    const handleComprehensionChange = (e, { value }) => {
-      setComprehensionRating(value);
-    };
-    const handleIdeaChange = (e, { value }) => {
-      setIdeaRating(value);
+    const comprehensionCheck = watch(`comprehension_${response.name}`, '');
+    const qualityChecked = watch(`qualityOfIdea_${response.name}`, '');
+    const handleChange = (e, { value }) => {
+      if (currentQuestion === 1) {
+        setValue(`comprehension_${response.name}`, value);
+        trigger(`comprehension_${response.name}`);
+      } else {
+        setValue(`qualityOfIdea_${response.name}`, value);
+        trigger(`qualityOfIdea_${response.name}`);
+      }
     };
     return (
       <>
@@ -42,7 +46,7 @@ const EvaluateForm = memo(
         >
           {response.name} -{' '}
           {currentQuestion === 1
-            ? 'Evaluation of comprehension'
+            ? 'Evaluation of Comprehension'
             : 'Evaluation of Quality of Idea-Response'}
         </div>
         <div>
@@ -77,14 +81,39 @@ const EvaluateForm = memo(
               subject matter of this opportunity.
             </Header>
           </label>
-          <RadioLabel
-            handleIdeaChange={handleIdeaChange}
-            handleComprehensionChange={handleComprehensionChange}
-            currentQuestion={currentQuestion}
-            ideaRating={ideaRating}
-            comprehensionRating={comprehensionRating}
-            options={options}
-          />
+          {currentQuestion === 1 ? (
+            <>
+              <RadioLabel
+                rating={comprehensionCheck}
+                options={options}
+                name={`comprehension_${response.name}`}
+                handleChange={handleChange}
+                errors={errors}
+              />
+              {errors && errors[`comprehension_${response.name}`] && (
+                <Message
+                  error
+                  content={errors[`comprehension_${response.name}`].message}
+                />
+              )}
+            </>
+          ) : (
+            <>
+              <RadioLabel
+                rating={qualityChecked}
+                options={options}
+                name={`qualityOfIdea_${response.name}`}
+                handleChange={handleChange}
+                errors={errors}
+              />
+              {errors && errors[`qualityOfIdea_${response.name}`] && (
+                <Message
+                  error
+                  content={errors[`qualityOfIdea_${response.name}`].message}
+                />
+              )}
+            </>
+          )}
           <div className='mt-5'>
             {currentParticipant <= totalParticipants && (
               <Button

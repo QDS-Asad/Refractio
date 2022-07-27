@@ -231,6 +231,9 @@ i.icon.close:before {
   background: var(--primary-dark);
   color: var(--white);
 }
+.ui.form .inline.fields .field {
+  padding: 0px;
+}
 
 .ui.pagination.secondary.menu .item {
   border-radius: 50%;

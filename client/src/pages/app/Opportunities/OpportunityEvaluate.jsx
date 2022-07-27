@@ -5,8 +5,9 @@ import {
   fetchResponses,
   opportunityEvaluateSelector,
 } from '../../../features/opportunities/opportunityEvaluateSlice';
-import { Button, Grid, Header, Message } from 'semantic-ui-react';
+import { Button, Grid, Header, Message, Form } from 'semantic-ui-react';
 import { useParams } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
 import EvaluateForm from '../../../components/EvaluateForm';
 import PublishEvaluation from './PublishEvaluation';
 
@@ -16,12 +17,14 @@ const OpportunityEvaluate = () => {
   const [currentQuestion, setCurrentQuestion] = useState(1);
   const [currentParticipant, setCurrentParticipant] = useState(1);
   const { id } = useParams();
-
+  const { register, setValue, handleSubmit, errors, trigger, watch } = useForm({
+    mode: 'onBlur',
+  });
   // set up dispatch
   const dispatch = useDispatch();
 
   // fetch data from our store
-  const { error, opportunity, responses } = useSelector(
+  const { loading, error, opportunity, responses } = useSelector(
     opportunityEvaluateSelector
   );
   // hook to fetch items
@@ -29,12 +32,39 @@ const OpportunityEvaluate = () => {
     dispatch(fetchResponses(id));
     dispatch(fetchOpportunity(id));
   }, [dispatch, id]);
-
+  useEffect(() => {
+    if (responses && responses.length > 0) {
+      for (let i = 0; i < responses.length; i++) {
+        register(
+          { name: `comprehension_${responses[i].name}` },
+          {
+            required: 'Evaluation of comprehension is required.',
+          }
+        );
+        register(
+          { name: `qualityOfIdea_${responses[i].name}` },
+          {
+            required: 'Evaluation of quality of Idea-Response is required.',
+          }
+        );
+        setValue((`comprehension_${responses[i].name}`, ''));
+        setValue((`qualityOfIdea_${responses[i].name}`, ''));
+      }
+    }
+  }, [responses]);
   const onSubmittion = async () => {
     setViewMessage(true);
     setTimeout(() => {
       setViewMessage(false);
     }, 3000);
+  };
+  const handleChange = (e) => {
+    e.persist();
+    setValue(e.target.name, e.target.value);
+    trigger(e.target.name);
+  };
+  const handleEdit = (data) => {
+    setViewSubmit(true);
   };
   return (
     <>
@@ -51,9 +81,11 @@ const OpportunityEvaluate = () => {
             <Header as='h3' className='primary-dark-color'>
               {opportunity.name}
               <Button
-                onClick={() => setViewSubmit(true)}
+                type='submit'
+                form='submit-evaluation'
                 className='btn-secondary'
                 floated='right'
+                disabled={loading}
               >
                 Submit
               </Button>
@@ -72,31 +104,44 @@ const OpportunityEvaluate = () => {
               </Button>
             </Header>
             <div style={{ padding: '1em' }}>
-              {error && (
-                <Message color='red' className='error-message'>
-                  {error}
-                </Message>
-              )}
-              {responses &&
-                responses.map(
-                  (response, index) =>
-                    currentParticipant === index + 1 && (
-                      <EvaluateForm
-                        setCurrentQuestion={setCurrentQuestion}
-                        currentQuestion={currentQuestion}
-                        response={response}
-                        currentParticipant={currentParticipant}
-                        setCurrentParticipant={setCurrentParticipant}
-                        totalParticipants={responses.length}
-                        quality={response.comprehension}
-                        comprehension={response.qualityOfIdea}
-                        allQuestions={
-                          response.comprehension.length +
-                          response.qualityOfIdea.length
-                        }
-                      />
-                    )
+              <Form
+                id='submit-evaluation'
+                error
+                size='small'
+                onSubmit={handleSubmit(handleEdit)}
+                loading={loading}
+              >
+                {error && (
+                  <Message color='red' className='error-message'>
+                    {error}
+                  </Message>
                 )}
+                {responses &&
+                  responses.map(
+                    (response, index) =>
+                      currentParticipant === index + 1 && (
+                        <EvaluateForm
+                          setCurrentQuestion={setCurrentQuestion}
+                          currentQuestion={currentQuestion}
+                          response={response}
+                          currentParticipant={currentParticipant}
+                          setCurrentParticipant={setCurrentParticipant}
+                          totalParticipants={responses.length}
+                          quality={response.comprehension}
+                          comprehension={response.qualityOfIdea}
+                          handleChange={handleChange}
+                          trigger={trigger}
+                          setValue={setValue}
+                          watch={watch}
+                          errors={errors}
+                          allQuestions={
+                            response.comprehension.length +
+                            response.qualityOfIdea.length
+                          }
+                        />
+                      )
+                  )}
+              </Form>
             </div>
           </Grid.Column>
           <>
