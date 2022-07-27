@@ -647,7 +647,12 @@ exports.login = async (req, res) => {
           }
         );
         let userData = {};
+        let role = {};
         if (user.isVerified) {
+          if(user.isSuperAdmin){
+            const roleInfo = await RoleService.getRoleByRoleId(ROLES.SUPER_ADMIN);
+            role = { roleId: roleInfo.roleId, name: roleInfo.name }
+          }
           userData = {
             id: user._id,
             firstName: user.firstName,
@@ -655,6 +660,7 @@ exports.login = async (req, res) => {
             email: user.email,
             isVerified: user.isVerified,
             isSuperAdmin: user.isSuperAdmin,
+            ...(user.isSuperAdmin && {role}),
             isRegistered: user.isRegistered,
             token: token,
           };

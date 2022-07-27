@@ -29,11 +29,30 @@ exports.opportunitiesList = async (req, res, next) => {
   try {
     const { user } = req.body;
     await OpportunityService.getOpportunitiesByUser(user).then(
-      (opportunities) => {
+      async (opportunities) => {
+        let responses = [];
+        await Promise.all(
+          opportunities.map((opObj, opKey) => {
+            responses[opKey] = {
+              _id: opObj._id,
+              teamId: opObj.teamId,
+              createdById: opObj.createdById,
+              isOwner:
+                user._id.toString() === opObj.createdById.toString(),
+              name: opObj.name,
+              description: opObj.description,
+              status: opObj.status,
+              participants: opObj.participants,
+              comprehension: opObj.comprehension,
+              qualityOfIdea: opObj.qualityOfIdea,
+              
+            };
+          })
+        );
         return successResp(res, {
           msg: SUCCESS_MESSAGE.DATA_FETCHED,
           code: HTTP_STATUS.SUCCESS.CODE,
-          data: opportunities,
+          data: responses,
         });
       }
     );
