@@ -11,6 +11,7 @@ import { useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import EvaluateForm from '../../../components/EvaluateForm';
 import PublishEvaluation from './PublishEvaluation';
+import { current } from '@reduxjs/toolkit';
 
 const OpportunityEvaluate = () => {
   const [viewSubmit, setViewSubmit] = useState(false);
@@ -95,7 +96,7 @@ const OpportunityEvaluate = () => {
   const values = getValues();
   return (
     <>
-      {opportunity && (
+      {opportunity && responses && (
         <Grid stretched>
           <Grid.Column width={11}>
             {viewMessage && (
@@ -112,7 +113,7 @@ const OpportunityEvaluate = () => {
                 form='submit-evaluation'
                 className='btn-secondary'
                 floated='right'
-                disabled={loading}
+                disabled={loading || currentParticipant < responses.length}
               >
                 Submit
               </Button>
@@ -126,6 +127,7 @@ const OpportunityEvaluate = () => {
                 primary
                 className='btn-outline me-3'
                 floated='right'
+                disabled={loading}
               >
                 Save as Draft
               </Button>
