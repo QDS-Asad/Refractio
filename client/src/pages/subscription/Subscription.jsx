@@ -105,10 +105,6 @@ const Subscription = () => {
         value: 5,
         message: 'Enter at least 5 characters',
       },
-      pattern: {
-        value: /^[\w\-\s]+$/,
-        message: 'Only alphanumeric characters are allowed',
-      },
     },
     nameOnCard: {
       required: 'Name on card is required',
