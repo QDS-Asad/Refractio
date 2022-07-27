@@ -76,3 +76,21 @@ export const fetchResponses = (id) => async (dispatch) => {
     dispatch(setError(errorMessage));
   }
 };
+export const submitEvaluation = (id, opportunityId, body) => async (
+  dispatch
+) => {
+  try {
+    dispatch(setLoading());
+    await refractioApi.put(
+      `/opportunities/opportunity-response-evaluate/${id}`,
+      { ...body }
+    );
+    dispatch(fetchResponses(opportunityId));
+  } catch (error) {
+    const errorMessage =
+      error.response && error.response.data
+        ? error.response.data.message
+        : error.message;
+    dispatch(setError(errorMessage));
+  }
+};

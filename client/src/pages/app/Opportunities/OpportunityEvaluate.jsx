@@ -4,6 +4,7 @@ import {
   fetchOpportunity,
   fetchResponses,
   opportunityEvaluateSelector,
+  submitEvaluation,
 } from '../../../features/opportunities/opportunityEvaluateSlice';
 import { Button, Grid, Header, Message, Form } from 'semantic-ui-react';
 import { useParams } from 'react-router-dom';
@@ -17,7 +18,15 @@ const OpportunityEvaluate = () => {
   const [currentQuestion, setCurrentQuestion] = useState(1);
   const [currentParticipant, setCurrentParticipant] = useState(1);
   const { id } = useParams();
-  const { register, setValue, handleSubmit, errors, trigger, watch } = useForm({
+  const {
+    register,
+    setValue,
+    handleSubmit,
+    errors,
+    trigger,
+    watch,
+    getValues,
+  } = useForm({
     mode: 'onBlur',
   });
   // set up dispatch
@@ -52,11 +61,16 @@ const OpportunityEvaluate = () => {
       }
     }
   }, [responses]);
-  const onSubmittion = async () => {
-    setViewMessage(true);
-    setTimeout(() => {
-      setViewMessage(false);
-    }, 3000);
+  const onDrafting = async () => {
+    if (responses && responses.length > 0) {
+      const responseId = responses[currentParticipant - 1]._id;
+      const name = responses[currentParticipant - 1].name;
+      draftEvaluation(
+        values[`qualityOfIdea_${name}`],
+        values[`comprehension_${name}`],
+        responseId
+      );
+    }
   };
   const handleChange = (e) => {
     e.persist();
@@ -66,6 +80,19 @@ const OpportunityEvaluate = () => {
   const handleEdit = (data) => {
     setViewSubmit(true);
   };
+  const draftEvaluation = (comp = '', qual = '', resId) => {
+    const body = {
+      status: 'draft',
+      comprehension: {
+        score: comp,
+      },
+      qualityOfIdea: {
+        score: qual,
+      },
+    };
+    dispatch(submitEvaluation(resId, id, body));
+  };
+  const values = getValues();
   return (
     <>
       {opportunity && (
@@ -92,10 +119,10 @@ const OpportunityEvaluate = () => {
               <PublishEvaluation
                 viewSubmit={viewSubmit}
                 setViewSubmit={setViewSubmit}
-                onSubmittion={onSubmittion}
+                onSubmittion={onDrafting}
               />
               <Button
-                onClick={onSubmittion}
+                onClick={onDrafting}
                 primary
                 className='btn-outline me-3'
                 floated='right'
@@ -133,6 +160,7 @@ const OpportunityEvaluate = () => {
                           trigger={trigger}
                           setValue={setValue}
                           watch={watch}
+                          draftEvaluation={draftEvaluation}
                           errors={errors}
                           allQuestions={
                             response.comprehension.length +

@@ -23,6 +23,7 @@ const EvaluateForm = memo(
     trigger,
     watch,
     errors,
+    draftEvaluation,
   }) => {
     const comprehensionCheck = watch(`comprehension_${response.name}`, '');
     const qualityChecked = watch(`qualityOfIdea_${response.name}`, '');
@@ -123,6 +124,11 @@ const EvaluateForm = memo(
                   if (currentQuestion === 2) {
                     setCurrentParticipant((prev) => prev + 1);
                     setCurrentQuestion(1);
+                    draftEvaluation(
+                      qualityChecked,
+                      comprehensionCheck,
+                      response._id
+                    );
                   } else {
                     setCurrentQuestion((prev) => prev + 1);
                   }
