@@ -45,10 +45,10 @@ exports.opportunitiesList = async (req, res, next) => {
               participants: opObj.participants,
               comprehension: opObj.comprehension,
               qualityOfIdea: opObj.qualityOfIdea,
-              
             };
           })
         );
+        responses = responses.filter((obj) => (user._id.toString() === obj.createdById.toString()) || (user._id.toString() !== obj.createdById.toString() && obj.status !== OPPORTUNITY_STATUS.DRAFT))
         return successResp(res, {
           msg: SUCCESS_MESSAGE.DATA_FETCHED,
           code: HTTP_STATUS.SUCCESS.CODE,
