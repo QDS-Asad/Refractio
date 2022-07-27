@@ -1,64 +1,39 @@
-import React from 'react';
-import { Header, Pagination, Table } from 'semantic-ui-react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Header, Message, Pagination, Segment, Table } from 'semantic-ui-react';
+import {
+  billingListSelector,
+  fetchBillingList,
+} from '../../../features/billing/billingListSlice';
+import { formatDate } from '../../../utils/dateHelper';
 
 const PaymentHistory = () => {
-  const payments = [
-    {
-      id: 1,
-      status: 'Canceled',
-      date: '19/10/2021',
-      description: 'Team Plan',
-      amount: '7$',
-    },
-    {
-      id: 2,
-      status: 'Approved',
-      date: '19/09/2021',
-      description: 'Team Plan',
-      amount: '7$',
-    },
-    {
-      id: 3,
-      status: 'Approved',
-      date: '19/08/2021',
-      description: 'Team Plan',
-      amount: '7$',
-    },
-    {
-      id: 4,
-      status: 'Failed',
-      date: '19/07/2021',
-      description: 'Team Plan',
-      amount: '7$',
-    },
-    {
-      id: 5,
-      status: 'Approved',
-      date: '19/06/2021',
-      description: 'Team Plan',
-      amount: '7$',
-    },
-    {
-      id: 6,
-      status: 'Approved',
-      date: '19/5/2021',
-      description: 'Team Plan',
-      amount: '7$',
-    },
-    {
-      id: 7,
-      status: 'Approved',
-      date: '19/04/2021',
-      description: 'Team Plan',
-      amount: '7$',
-    },
-  ];
+  const dispatch = useDispatch();
+
+  // fetch data from our store
+  const { loading, error, billing, page, limit, totalPages } = useSelector(
+    billingListSelector
+  );
+
+  // hook to fetch items
+  useEffect(() => {
+    dispatch(fetchBillingList(page, limit));
+  }, []);
+
+  const onPageChange = (e, { activePage }) => {
+    dispatch(fetchBillingList(activePage, limit));
+  };
 
   return (
-    <>
+    <Segment loading={loading}>
       <Header as='h3' className='py-2'>
         Payment History
       </Header>
+      {error && (
+        <Message color='red' className='error-message mb-3'>
+          {error}
+        </Message>
+      )}
       <Table basic='very'>
         <Table.Header>
           <Table.Row>
@@ -70,15 +45,15 @@ const PaymentHistory = () => {
         </Table.Header>
 
         <Table.Body>
-          {payments.map((payment) => (
+          {billing.map((payment) => (
             <Table.Row
-              key={payment.id}
+              key={payment._id}
               negative={payment.status !== 'Approved'}
             >
               <Table.Cell className='px-2'>{payment.status}</Table.Cell>
-              <Table.Cell>{payment.date}</Table.Cell>
+              <Table.Cell>{formatDate(payment.createdAt)}</Table.Cell>
               <Table.Cell>{payment.description}</Table.Cell>
-              <Table.Cell>{payment.amount}</Table.Cell>
+              <Table.Cell>${payment.amount}</Table.Cell>
             </Table.Row>
           ))}
         </Table.Body>
@@ -89,21 +64,22 @@ const PaymentHistory = () => {
               <Pagination
                 floated='right'
                 boundaryRange={0}
-                defaultActivePage={1}
+                defaultActivePage={page}
                 ellipsisItem={null}
                 firstItem={null}
                 lastItem={null}
                 siblingRange={2}
-                totalPages={3}
+                totalPages={totalPages}
                 secondary
                 prevItem={null}
                 nextItem={null}
+                onPageChange={onPageChange}
               />
             </Table.HeaderCell>
           </Table.Row>
         </Table.Footer>
       </Table>
-    </>
+    </Segment>
   );
 };
 

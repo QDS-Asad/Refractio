@@ -5,6 +5,7 @@ const {
   USER_STATUS,
 } = require("../lib/constants");
 const { Team } = require("../models/teams");
+const users = require("../models/users");
 const { User } = require("../models/users");
 
 exports.createTeam = async (obj) => {
@@ -20,7 +21,7 @@ exports.getTeamById = async (teamId) => {
 };
 
 exports.getTeam = async (obj) => {
-  const { page, page_size, user, teamId, roleIds } = obj;
+  const { page, page_size, teamId, user, OwnerId } = obj;
   const options = {
     page: page || DEFAULT_PAGE_NO,
     limit: page_size || DEFAULT_PAGE_SIZE,
@@ -29,20 +30,67 @@ exports.getTeam = async (obj) => {
     },
     select: {
       stripeDetails: 0,
-      password:0,
-      token:0,
-      autoRenew:0,
-      tokenExpiry:0,
-      createdBy:0,
-      updatedBy:0
+      password: 0,
+      token: 0,
+      autoRenew: 0,
+      tokenExpiry: 0,
+      createdBy: 0,
+      updatedBy: 0,
     },
   };
   return await User.paginate(
     {
-      teamId,
-      roleId: { $nin: roleIds },
-      status: { $nin: USER_STATUS.DISABLED },
+      // ...(!user.isOwner && {_id: {$nin: OwnerId}}),
+      teams: {
+        $elemMatch: {
+          teamId: ObjectId(teamId),
+          status: { $nin: USER_STATUS.DISABLED },
+        },
+      },
+      // "teams.teamId": ObjectId(teamId),
+      // "teams.roleId": { $in: roleIds },
+      // "teams.status": { $nin: USER_STATUS.DISABLED },
     },
     options
   );
+};
+
+exports.getUsersByTeamId = async (teamId) => {
+  return await User.find({
+    teams: {
+      $elemMatch: {
+        teamId: ObjectId(teamId),
+        status: { $nin: USER_STATUS.DISABLED },
+      },
+    },
+  });
+};
+
+exports.getTeamMembers = async (user) => {
+  return await User.find({
+    // _id: { $nin: user._id },
+    teams: {
+      $elemMatch: {
+        teamId: ObjectId(user.teamId),
+        status: { $in: [USER_STATUS.ACTIVE] },
+      },
+    },
+  }).select({ _id: 1, firstName: 1, lastName: 1, email: 1 });
+};
+
+exports.getUsersByTeamIdRoleId = async (user) => {
+  return await User.find({
+    _id: { $nin: user._id },
+    teams: {
+      $elemMatch: {
+        teamId: ObjectId(user.teamId),
+        roleId: ObjectId(user.roleId),
+        status: { $nin: USER_STATUS.DISABLED },
+      },
+    },
+  }).select({ _id: 1, firstName: 1, lastName: 1, email: 1 });
+};
+
+exports.getUserSelectedTeamByTeamId = (user, teamId) => {
+  return user.teams.find((obj) => obj.teamId.toString() === teamId);
 };

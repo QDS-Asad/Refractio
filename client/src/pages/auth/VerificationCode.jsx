@@ -47,8 +47,12 @@ const VerificationCode = () => {
   const handleChange = (e) => {
     e.persist();
     setValue(e.target.name, e.target.value);
+  };
+
+  const handleBlur = (e) => {
     trigger(e.target.name);
   };
+
   const handleVerification = ({ verificationCode }) => {
     dispatch(codeVerification(userId, verificationCode));
   };
@@ -134,6 +138,9 @@ const VerificationCode = () => {
               className='error-message mb-3'
             />
           )}
+          {error && (
+            <Message negative content={error} className='error-message mb-3' />
+          )}
           <Form
             onSubmit={handleSubmit(handleVerification)}
             loading={loading}
@@ -146,7 +153,8 @@ const VerificationCode = () => {
                 placeholder='Verification code'
                 name='verificationCode'
                 fluid
-                onBlur={handleChange}
+                onBlur={handleBlur}
+                onChange={handleChange}
                 error={!!errors.verificationCode}
               />
               {errors && errors.verificationCode && (

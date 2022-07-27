@@ -1,7 +1,27 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button, Message, Modal } from 'semantic-ui-react';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+  CancelUserSubscription,
+  resetSubscriptionCancel,
+  subscriptionCancelSelector,
+} from '../../../features/subscriptions/subscriptionCancelSlice';
 const CancelSubscription = ({ cancelSubscription, setCancelSubscription }) => {
-  const error = null;
+  const dispatch = useDispatch();
+
+  const { loading, error, success } = useSelector(subscriptionCancelSelector);
+
+  const handleCancel = () => {
+    dispatch(CancelUserSubscription());
+  };
+
+  useEffect(() => {
+    if (success) {
+      setCancelSubscription(false);
+      dispatch(resetSubscriptionCancel());
+    }
+  }, [success]);
+
   return (
     <Modal
       onClose={() => setCancelSubscription(false)}
@@ -30,7 +50,8 @@ const CancelSubscription = ({ cancelSubscription, setCancelSubscription }) => {
         <Button
           content='Cancel Subscription'
           className='btn-danger'
-          onClick={() => setCancelSubscription(false)}
+          onClick={() => handleCancel()}
+          loading={loading}
         />
       </Modal.Actions>
     </Modal>

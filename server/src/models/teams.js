@@ -1,8 +1,12 @@
 const mongoose = require("mongoose");
+const { TEAM_STATUS } = require("../lib/constants");
 const Schema = mongoose.Schema;
 
 const TeamSchema = new Schema(
   {
+    name: {
+      type: String,
+    },
     createdById: {
       type: Schema.Types.ObjectId,
       required: true,
@@ -14,9 +18,17 @@ const TeamSchema = new Schema(
         },
         roleId: {
           type: Number,
-        },
+        }
       },
     ],
+    status: {
+      type: String,
+      enum: [
+        TEAM_STATUS.ACTIVE,
+        TEAM_STATUS.DISABLED
+      ],
+      default: TEAM_STATUS.ACTIVE,
+    },
     createdBy: {
       type: String,
     },

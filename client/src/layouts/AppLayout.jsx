@@ -16,15 +16,18 @@ const AppLayout = () => {
     return <Navigate to='/auth/verify-code' />;
   }
 
-  // TODO: This will be uncommented as will complete subscription screen
-  // if (
-  //   userLogin &&
-  //   userLogin.role &&
-  //   userLogin.role.roleId === ROLES.ADMIN &&
-  //   userLogin.status === USER_STATUS.SUBSCRIPTION_PENDING
-  // ) {
-  //   return <Navigate to='/subscription' />;
-  // }
+  if (userLogin && userLogin.isRegistered) {
+    return <Navigate to='/subscription' />;
+  }
+
+  if (
+    userLogin &&
+    !userLogin.isRegistered &&
+    userLogin.role === undefined &&
+    !userLogin.isSuperAdmin
+  ) {
+    return <Navigate to='/workspaces' />;
+  }
 
   return <SideBar />;
 };

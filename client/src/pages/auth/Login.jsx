@@ -14,7 +14,6 @@ import {
   loginUser,
 } from '../../features/auth/authLoginSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { ROLES } from '../../common/constants';
 
 const Login = () => {
   const { register, setValue, handleSubmit, errors, trigger } = useForm({
@@ -35,6 +34,9 @@ const Login = () => {
   const handleChange = (e) => {
     e.persist();
     setValue(e.target.name, e.target.value);
+  };
+
+  const handleBlur = (e) => {
     trigger(e.target.name);
   };
 
@@ -72,7 +74,7 @@ const Login = () => {
 
   useEffect(() => {
     if (userLogin) {
-      if (userLogin.role.roleId === ROLES.SUPER_ADMIN) {
+      if (userLogin.isSuperAdmin === true) {
         navigate('/admin');
       } else {
         navigate('/');
@@ -100,7 +102,8 @@ const Login = () => {
             name='email'
             fluid
             placeholder='Enter your Email'
-            onBlur={handleChange}
+            onBlur={handleBlur}
+            onChange={handleChange}
             error={!!errors.email}
             tabIndex='1'
           />
@@ -118,7 +121,8 @@ const Login = () => {
             type='password'
             fluid
             placeholder='Enter your Password'
-            onBlur={handleChange}
+            onBlur={handleBlur}
+            onChange={handleChange}
             error={!!errors.password}
             tabIndex='2'
           />
@@ -137,6 +141,9 @@ const Login = () => {
         <Button type='submit' fluid primary className='mt-3 btn' tabIndex='4'>
           Log In
         </Button>
+        <div className='backToLogin'>
+          Not have an account? <Link to='/auth/register'>Sign up</Link>
+        </div>
       </Form>
     </Container>
   );

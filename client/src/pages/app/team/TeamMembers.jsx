@@ -13,6 +13,7 @@ import {
 import { fetchRoles, roleListSelector } from '../../../features/roles/roleList';
 import {
   fetchTeamList,
+  setPageNumber,
   teamListSelector,
 } from '../../../features/team/teamListSlice';
 import CancelInvitation from './CancelInvitation';
@@ -23,12 +24,14 @@ import RemoveTeamMember from './RemoveTeamMember';
 import ResendInvitation from './ResendInvitation';
 import { ROLES, USER_STATUS } from '../../../common/constants';
 import { authLoginSelector } from '../../../features/auth/authLoginSlice';
+import OwnershipTransfer from './OwnershipTransfer';
 
 const TeamMembers = () => {
   const [inviteTeamMember, setInviteTeamMember] = useState(false);
   const [removeTeamMember, setRemoveTeamMember] = useState(false);
   const [cancelInvitation, setCancelInvitation] = useState(false);
   const [resendInvitation, setResendInvitation] = useState(false);
+  const [transferOwner, setTransferOwner] = useState(false);
   const [deleteAccount, setDeleteAccount] = useState(false);
   const [changeMemberRole, setChangeMemberRole] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
@@ -52,10 +55,22 @@ const TeamMembers = () => {
       !resendInvitation &&
       !changeMemberRole &&
       !removeTeamMember &&
+      !deleteAccount &&
       dispatch(fetchTeamList(page, limit)) &&
       dispatch(fetchRoles());
-  }, [inviteTeamMember, cancelInvitation, resendInvitation, changeMemberRole, removeTeamMember]);
-
+  }, [
+    inviteTeamMember,
+    cancelInvitation,
+    resendInvitation,
+    changeMemberRole,
+    removeTeamMember,
+    deleteAccount,
+  ]);
+  useEffect(() => {
+    return () => {
+      dispatch(setPageNumber(1));
+    };
+  }, []);
   const removeTeamMemberHandler = (id) => {
     setSelectedMember(id);
     setRemoveTeamMember(true);
@@ -84,6 +99,11 @@ const TeamMembers = () => {
     setSelectedMember(userId);
     setSelectedRole(newRoleId);
     setChangeMemberRole(true);
+  };
+
+  const transferOwnership = () => {
+    setDeleteAccount(false);
+    setTransferOwner(true);
   };
 
   return (
@@ -127,6 +147,11 @@ const TeamMembers = () => {
             <DeleteAccount
               deleteAccount={deleteAccount}
               setDeleteAccount={setDeleteAccount}
+              transferOwnership={transferOwnership}
+            />
+            <OwnershipTransfer
+              transferOwner={transferOwner}
+              setTransferOwner={setTransferOwner}
               member={selectedMember}
             />
             <ChangeRole
@@ -155,7 +180,8 @@ const TeamMembers = () => {
                     userLogin.role.roleId === ROLES.ORGANIZER) && (
                     <Table.HeaderCell>Role</Table.HeaderCell>
                   )}
-                  {userLogin.role.roleId === ROLES.ADMIN && (
+                  {(userLogin.role.roleId === ROLES.ADMIN ||
+                    userLogin.role.roleId === ROLES.ORGANIZER) && (
                     <Table.HeaderCell></Table.HeaderCell>
                   )}
                 </Table.Row>
@@ -167,60 +193,79 @@ const TeamMembers = () => {
                     <Table.Cell>
                       {user.status === 'invite_sent'
                         ? 'Pending Invitation'
-                        : user.fullName}
+                        : user.firstName + ' ' + user.lastName}
                     </Table.Cell>
                     <Table.Cell>{user.email}</Table.Cell>
                     {(userLogin.role.roleId === ROLES.ADMIN ||
                       userLogin.role.roleId === ROLES.ORGANIZER) && (
                       <Table.Cell>
-                        <Dropdown
-                          onChange={(e, { value }) =>
-                            handleRoleChange(value, user._id)
-                          }
-                          fluid
-                          selection
-                          disabled={userLogin.id === user._id}
-                          defaultValue={user.role.roleId}
-                          options={roles.map((role) => {
-                            return {
-                              key: role.roleId,
-                              text: role.name,
-                              value: role.roleId,
-                            };
-                          })}
-                        />
+                        {userLogin.role.roleId === ROLES.ORGANIZER &&
+                        user.role.roleId === ROLES.ADMIN ? (
+                          <Dropdown disabled={true} fluid>
+                            <Dropdown.Item selected value={user.role.roleId}>
+                              {user.role.name}
+                            </Dropdown.Item>
+                          </Dropdown>
+                        ) : (
+                          <Dropdown
+                            onChange={(e, { value }) =>
+                              handleRoleChange(value, user._id)
+                            }
+                            fluid
+                            selection
+                            disabled={userLogin.id === user._id || user.isOwner}
+                            defaultValue={user.role.roleId}
+                            options={roles.map((role) => {
+                              return {
+                                key: role.roleId,
+                                text: role.name,
+                                value: role.roleId,
+                              };
+                            })}
+                          />
+                        )}
                       </Table.Cell>
                     )}
-                    {userLogin.role.roleId === ROLES.ADMIN && (
+                    {(userLogin.role.roleId === ROLES.ADMIN ||
+                      userLogin.role.roleId === ROLES.ORGANIZER) && (
                       <Table.Cell className='clearfix'>
-                        {user.status === USER_STATUS.ACTIVE && (
-                          <Button
-                            className='btn-link'
-                            floated='right'
-                            onClick={() => removeTeamMemberHandler(user._id)}
-                          >
-                            Remove
-                          </Button>
-                        )}
-                        {user.status === USER_STATUS.INVITE_SENT && (
-                          <>
+                        {userLogin.role.roleId === ROLES.ADMIN &&
+                          userLogin.id !== user._id &&
+                          !user.isOwner &&
+                          user.status === USER_STATUS.ACTIVE && (
                             <Button
                               className='btn-link'
                               floated='right'
-                              onClick={() => resendInvitationHandler(user._id)}
+                              onClick={() => removeTeamMemberHandler(user._id)}
                             >
-                              Resend invitation
+                              Remove
                             </Button>
-                            <Button
-                              className='btn-link'
-                              floated='right'
-                              onClick={() => cancelInvitationHandler(user._id)}
-                            >
-                              Cancel invitation
-                            </Button>
-                          </>
-                        )}
+                          )}
+                        {user.role.roleId >= userLogin.role.roleId &&
+                          user.status === USER_STATUS.INVITE_SENT && (
+                            <>
+                              <Button
+                                className='btn-link'
+                                floated='right'
+                                onClick={() =>
+                                  resendInvitationHandler(user._id)
+                                }
+                              >
+                                Resend invitation
+                              </Button>
+                              <Button
+                                className='btn-link'
+                                floated='right'
+                                onClick={() =>
+                                  cancelInvitationHandler(user._id)
+                                }
+                              >
+                                Cancel invitation
+                              </Button>
+                            </>
+                          )}
                         {userLogin.id === user._id &&
+                          user.isOwner &&
                           user.role.roleId === ROLES.ADMIN && (
                             <Button
                               className='btn-link-danger'

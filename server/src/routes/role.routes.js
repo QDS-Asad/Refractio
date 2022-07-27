@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Role = require('../controllers/role.controller');
+const Auth = require('../middlewares/auth');
 
 // /**
 //  * @swagger
@@ -63,7 +64,7 @@ const Role = require('../controllers/role.controller');
 //  *                     type: object
 //  *                 example:
 //  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
-//  * 
+//  *
 //  * components:
 //  *  schemas:
 //  *   Role:
@@ -143,8 +144,8 @@ const Role = require('../controllers/role.controller');
  *                     type: object
  *                 example:
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
- * 
+ *
  */
-router.get('/', Role.getRoles)
+router.get('/', Auth, Role.getRoles);
 
 module.exports = router;

@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { localAPI } from '../../common/refractioApi';
+import refractioApi from '../../common/refractioApi';
+import { fetchOpportunities } from './opportunityListSlice';
 
 // initial state
 export const initialState = {
@@ -43,16 +44,18 @@ export const opportunityCreateSelector = (state) => state.opportunityCreate;
 // export the default reducer
 export default opportunityCreateSlice.reducer;
 
-// fetch opportunity details
+// create opportunity
 export const createOpportunity = (opportunity) => async (dispatch) => {
   try {
     dispatch(setLoading());
-    let { data } = await localAPI.get('/opportunities.json');
-    console.log(data);
-    setTimeout(() => {
-      dispatch(setOpportunity(opportunity));
-    }, 1500);
+    await refractioApi.post('/opportunities/create', opportunity);
+    dispatch(setOpportunity(opportunity));
+    dispatch(fetchOpportunities());
   } catch (error) {
-    dispatch(setError(error.message));
+    const errorMessage =
+      error.response && error.response.data
+        ? error.response.data.message
+        : error.message;
+    dispatch(setError(errorMessage));
   }
 };

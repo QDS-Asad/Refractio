@@ -30,6 +30,9 @@ const NewPassword = () => {
   const handleChange = (e) => {
     e.persist();
     setValue(e.target.name, e.target.value);
+  };
+
+  const handleBlur = (e) => {
     trigger(e.target.name);
   };
 
@@ -104,7 +107,8 @@ const NewPassword = () => {
                 name='newPassword'
                 placeholder='Enter new password'
                 fluid
-                onBlur={handleChange}
+                onBlur={handleBlur}
+                onChange={handleChange}
                 error={!!errors.newPassword}
               ></Form.Input>
               {errors && errors.newPassword && (
@@ -118,7 +122,8 @@ const NewPassword = () => {
                 name='confirmPassword'
                 placeholder='Enter confirm password'
                 fluid
-                onBlur={handleChange}
+                onBlur={handleBlur}
+                onChange={handleChange}
                 error={!!errors.confirmPassword}
               />
               {errors && errors.confirmPassword && (

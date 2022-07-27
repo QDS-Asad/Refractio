@@ -15,6 +15,7 @@ const authRegisterMemberSlice = createSlice({
   reducers: {
     setLoading: (state) => {
       state.loading = true;
+      state.error = null;
     },
     setRegisterMember: (state, { payload }) => {
       state.loading = false;
@@ -47,11 +48,13 @@ export const authRegisterMemberSelector = (state) => state.authRegisterMember;
 export default authRegisterMemberSlice.reducer;
 
 // code Verification
-export const memberRegistration = (userId, body) => async (dispatch) => {
+export const memberRegistration = (userId, teamId, body) => async (
+  dispatch
+) => {
   try {
     dispatch(setLoading());
     let { data: response } = await refractioApi.put(
-      `/users/register-invite-account/${userId}`,
+      `/users/register-invite-account/${userId}/${teamId}`,
       body
     );
     dispatch(setRegisterMember(response.message));

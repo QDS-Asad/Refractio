@@ -5,11 +5,14 @@ const Schema = mongoose.Schema;
 
 const UserSchema = new Schema(
   {
-    roleId: {
-      type: Schema.Types.ObjectId,
-      required: true,
+    // roleId: {
+    //   type: Schema.Types.ObjectId,
+    //   required: true,
+    // },
+    firstName: {
+      type: String,
     },
-    fullName: {
+    lastName: {
       type: String,
     },
     email: {
@@ -37,85 +40,118 @@ const UserSchema = new Schema(
       enum: [true, false],
       default: false,
     },
-    status: {
-      type: String,
-      enum: [
-        USER_STATUS.ACTIVE,
-        USER_STATUS.INVITE_SENT,
-        USER_STATUS.SUBSCRIPTION_PENDING,
-        USER_STATUS.DISABLED,
-      ],
-      default: USER_STATUS.DISABLED,
-    },
-    teamId: {
-      type: Schema.Types.ObjectId,
-    },
-
-    nameOnCard: {
-      type: String,
-    },
-    stripeDetails: {
-      paymentMethod: {
-        paymentMethodId: {
-          type: String,
-          default: "",
-        },
-        type: {
-          type: String,
-          default: "",
-        },
-        brand: {
-          type: String,
-          default: "",
-        },
-        expMonth: {
-          type: String,
-          default: "",
-        },
-        expYear: {
-          type: String,
-          default: "",
-        },
-        last4Digits: {
-          type: String,
-          default: "",
-        },
-      },
-      customerId: {
-        type: String,
-        default: "",
-      },
-      subscription: {
-        subscriptionId: {
-          type: String,
-          default: "",
-        },
-        planId: {
-          type: String,
-          default: "",
-        },
-        priceId: {
-          type: String,
-          default: "",
-        },
-        startDate: {
-          type: String,
-          default: "",
-        },
-        endDate: {
-          type: String,
-          default: "",
-        },
-        status: {
-          type: String,
-          enum: [SUBSCRIPTION_STATUS.SUCCESS, SUBSCRIPTION_STATUS.FAILED],
-        },
-      },
-    },
-    autoRenew: {
+    isSuperAdmin: {
       type: Boolean,
       enum: [true, false],
       default: false,
+    },
+    // status: {
+    //   type: String,
+    //   enum: [
+    //     USER_STATUS.ACTIVE,
+    //     USER_STATUS.INVITE_SENT,
+    //     USER_STATUS.SUBSCRIPTION_PENDING,
+    //     USER_STATUS.DISABLED,
+    //   ],
+    //   default: USER_STATUS.DISABLED,
+    // },
+    // teamId: {
+    //   type: Schema.Types.ObjectId,
+    // },
+    isRegistered: {
+      type: Boolean,
+      default: false,
+    },
+    teams: [
+      {
+        teamId: {
+          type: Schema.Types.ObjectId,
+        },
+        roleId: {
+          type: Schema.Types.ObjectId,
+        },
+        status: {
+          type: String,
+          enum: [
+            USER_STATUS.ACTIVE,
+            USER_STATUS.INVITE_SENT,
+            USER_STATUS.SUBSCRIPTION_PENDING,
+            USER_STATUS.DISABLED,
+          ],
+          default: USER_STATUS.DISABLED,
+        },
+        stripeDetails: {
+          paymentMethod: {
+            paymentMethodId: {
+              type: String,
+              default: "",
+            },
+            nameOnCard: {
+              type: String,
+            },
+            type: {
+              type: String,
+              default: "",
+            },
+            brand: {
+              type: String,
+              default: "",
+            },
+            expMonth: {
+              type: String,
+              default: "",
+            },
+            expYear: {
+              type: String,
+              default: "",
+            },
+            last4Digits: {
+              type: String,
+              default: "",
+            },
+          },
+          subscription: {
+            subscriptionId: {
+              type: String,
+              default: "",
+            },
+            planId: {
+              type: String,
+              default: "",
+            },
+            priceId: {
+              type: String,
+              default: "",
+            },
+            startDate: {
+              type: String,
+              default: "",
+            },
+            endDate: {
+              type: String,
+              default: "",
+            },
+            canceledDate: {
+              type: String,
+              default: "",
+            },
+            status: {
+              type: String,
+              enum: [SUBSCRIPTION_STATUS.SUCCESS, SUBSCRIPTION_STATUS.FAILED],
+            },
+            autoRenew: {
+              type: Boolean,
+              enum: [true, false],
+              default: false,
+            },
+          },
+        },
+        
+      },
+    ],
+    customerId: {
+      type: String,
+      default: "",
     },
     createdBy: {
       type: String,

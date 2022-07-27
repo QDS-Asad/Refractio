@@ -21,13 +21,13 @@ module.exports.validateSubscribe = [
     check('cardCvv')
     .exists().bail().withMessage(ERROR_MESSAGE.REQUIRED)
     .notEmpty().bail().withMessage(ERROR_MESSAGE.NOT_EMPTY),
+    check('teamName')
+    .exists().bail().withMessage(ERROR_MESSAGE.REQUIRED)
+    .notEmpty().bail().withMessage(ERROR_MESSAGE.NOT_EMPTY),
     check('autoRenew')
     .exists().bail().withMessage(ERROR_MESSAGE.REQUIRED)
     .notEmpty().bail().withMessage(ERROR_MESSAGE.NOT_EMPTY)
     .isBoolean().bail().withMessage(ERROR_MESSAGE.MUST_BOOLEAN),
-    check('couponCode')
-    .exists().bail().withMessage(ERROR_MESSAGE.REQUIRED)
-    .notEmpty().bail().withMessage(ERROR_MESSAGE.NOT_EMPTY),
     (req, res, next) => {
         try {
             const errors = validationResult(req);

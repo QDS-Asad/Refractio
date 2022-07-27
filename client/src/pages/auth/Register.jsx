@@ -21,17 +21,21 @@ const Register = () => {
   // fetch data from our store
   const { loading, error, userRegister } = useSelector(authRegisterSelector);
 
-  const handleSignup = ({ fullName, email, password }) => {
-    dispatch(registerUser(fullName, email, password));
+  const handleSignup = ({ firstName, lastName, email, password }) => {
+    dispatch(registerUser(firstName, lastName, email, password));
   };
 
   const handleChange = (e) => {
     e.persist();
     if (e.target.type === 'checkbox') {
       setValue(e.target.name, e.target.checked);
+      trigger(e.target.name);
     } else {
       setValue(e.target.name, e.target.value);
     }
+  };
+
+  const handleBlur = (e) => {
     trigger(e.target.name);
   };
 
@@ -42,11 +46,18 @@ const Register = () => {
   }, [userRegister]);
 
   const signupOptions = {
-    fullName: {
-      required: 'Full Name is required',
+    firstName: {
+      required: 'First Name is required',
       pattern: {
-        value: /^[a-zA-Z ]*$/,
-        message: 'Invalid Full Name. Only letters are allowed.',
+        value: /^[\w\-\s]+$/,
+        message: 'Invalid First Name. Only alpha-numeric letters are allowed.',
+      },
+    },
+    lastName: {
+      required: 'Last Name is required',
+      pattern: {
+        value: /^[\w\-\s]+$/,
+        message: 'Invalid Last Name. Only alpha-numeric letters are allowed.',
       },
     },
     email: {
@@ -70,7 +81,8 @@ const Register = () => {
   };
 
   useEffect(() => {
-    register({ name: 'fullName' }, signupOptions.fullName);
+    register({ name: 'firstName' }, signupOptions.firstName);
+    register({ name: 'lastName' }, signupOptions.lastName);
     register({ name: 'email' }, signupOptions.email);
     register({ name: 'password' }, signupOptions.password);
     register({ name: 'agreement' }, signupOptions.agreement);
@@ -88,16 +100,31 @@ const Register = () => {
       )}
       <Form onSubmit={handleSubmit(handleSignup)} loading={loading} error>
         <Form.Field className='mb-3'>
-          <label>Full Name </label>
+          <label>First Name </label>
           <Form.Input
-            name='fullName'
+            name='firstName'
             fluid
-            placeholder='Enter your Name'
-            error={!!errors.fullName}
-            onBlur={handleChange}
+            placeholder='Enter your First Name'
+            error={!!errors.firstName}
+            onBlur={handleBlur}
+            onChange={handleChange}
           />
-          {errors && errors.fullName && (
-            <Message error content={errors.fullName.message} />
+          {errors && errors.firstName && (
+            <Message error content={errors.firstName.message} />
+          )}
+        </Form.Field>
+        <Form.Field className='mb-3'>
+          <label>Last Name </label>
+          <Form.Input
+            name='lastName'
+            fluid
+            placeholder='Enter your Last Name'
+            error={!!errors.lastName}
+            onBlur={handleBlur}
+            onChange={handleChange}
+          />
+          {errors && errors.lastName && (
+            <Message error content={errors.lastName.message} />
           )}
         </Form.Field>
         <Form.Field className='mb-3'>
@@ -108,7 +135,8 @@ const Register = () => {
             fluid
             placeholder='Enter your email'
             error={!!errors.email}
-            onBlur={handleChange}
+            onBlur={handleBlur}
+            onChange={handleChange}
           />
           {errors && errors.email && (
             <Message error content={errors.email.message} />
@@ -121,7 +149,8 @@ const Register = () => {
             placeholder='Enter new password'
             type='password'
             error={!!errors.password}
-            onBlur={handleChange}
+            onBlur={handleBlur}
+            onChange={handleChange}
           />
           {errors && errors.password && (
             <Message error content={errors.password.message} />

@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import refractioApi from '../../common/refractioApi';
+import { logoutWorkspace } from '../workspace/workspaceSelectSlice';
 
 let userInfoFromStorage = window.localStorage.getItem('userInfo')
   ? window.localStorage.getItem('userInfo')
@@ -71,6 +72,7 @@ export const loginUser = (email, password, rememberMe = false) => async (
       password,
       rememberMe,
     });
+
     dispatch(setUserLogin(response.data));
     window.localStorage.setItem('userInfo', JSON.stringify(response.data));
   } catch (error) {
@@ -85,5 +87,24 @@ export const loginUser = (email, password, rememberMe = false) => async (
 // logout user
 export const logoutUser = () => async (dispatch) => {
   dispatch(setLogout());
+  dispatch(logoutWorkspace());
   window.localStorage.removeItem('userInfo');
+};
+
+export const updateUserStatus = () => async (dispatch, getState) => {
+  let userInfo = Object.assign({}, getState().authLogin.userLogin);
+  userInfo.isRegistered = false;
+  dispatch(setUserLogin(userInfo));
+  window.localStorage.setItem('userInfo', JSON.stringify(userInfo));
+};
+
+export const updateUserProfile = (firstName, lastName) => async (
+  dispatch,
+  getState
+) => {
+  let userInfo = Object.assign({}, getState().authLogin.userLogin);
+  userInfo.firstName = firstName;
+  userInfo.lastName = lastName;
+  dispatch(setUserLogin(userInfo));
+  window.localStorage.setItem('userInfo', JSON.stringify(userInfo));
 };

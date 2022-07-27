@@ -1,4 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
+import { interceptor } from '../common/refractioApi';
 import authForgetPasswordSlice from './auth/authForgetPasswordSlice';
 import authLoginSlice from './auth/authLoginSlice';
 import authNewPasswordSlice from './auth/authNewPasswordSlice';
@@ -20,8 +21,25 @@ import addPlanSlice from './plans/addPlanSlice';
 import editPlanSlice from './plans/editPlanSlice';
 import removePlanSlice from './plans/removePlanSlice';
 import removeMemberSlice from './team/removeMemberSlice';
+import subscriptionSlice from './subscriptions/subscriptionSlice';
+import billingListSlice from './billing/billingListSlice';
+import subscriptionDetailSlice from './subscriptions/subscriptionDetailSlice';
+import changeCardSlice from './billing/changeCardSlice';
+import subscriptionCancelSlice from './subscriptions/subscriptionCancelSlice';
+import subscriptionResumeSlice from './subscriptions/subscriptionResumeSlice';
+import workspaceListSlice from './workspace/workspaceListSlice';
+import workspaceSelectSlice from './workspace/workspaceSelectSlice';
+import workspaceJoinSlice from './workspace/workspaceJoinSlice';
+import orderListSlice from './orders/orderListSlice';
+import opportunityManageListSlice from './opportunities/opportunityManageListSlice';
+import opportunityResponseSlice from './opportunities/opportunityResponseSlice';
+import opportunityEvaluateSlice from './opportunities/opportunityEvaluateSlice';
+import editProfileSlice from './opportunities/opportunityEvaluateSlice';
+import deleteMemberSlice from './team/deleteMemberSlice';
+import transferOwnerSlice from './team/transferOwnerSlice';
+import teamParticipantsSlice from './team/teamParticipantsSlice';
 
-export default configureStore({
+const store = configureStore({
   reducer: {
     authLogin: authLoginSlice,
     authRegister: authRegisterSlice,
@@ -30,6 +48,7 @@ export default configureStore({
     authNewPassword: authNewPasswordSlice,
     authVerifyMember: authVerifyMemberSlice,
     authRegisterMember: authRegisterMemberSlice,
+    subscription: subscriptionSlice,
     roleList: roleListSlice,
     opportunityList: opportunityListSlice,
     opportunityDetail: opportunityDetailSlice,
@@ -44,5 +63,24 @@ export default configureStore({
     addPlan: addPlanSlice,
     editPlan: editPlanSlice,
     removePlan: removePlanSlice,
+    billingList: billingListSlice,
+    subscriptionDetail: subscriptionDetailSlice,
+    changeCard: changeCardSlice,
+    subscriptionCancel: subscriptionCancelSlice,
+    subscriptionResume: subscriptionResumeSlice,
+    opportunityResponse: opportunityResponseSlice,
+    opportunityEvaluate: opportunityEvaluateSlice,
+    workspaceList: workspaceListSlice,
+    workspaceSelect: workspaceSelectSlice,
+    workspaceJoin: workspaceJoinSlice,
+    orderList: orderListSlice,
+    opportunityManageList: opportunityManageListSlice,
+    editProfile: editProfileSlice,
+    deleteMember: deleteMemberSlice,
+    transferOwner: transferOwnerSlice,
+    teamParticipants: teamParticipantsSlice,
   },
 });
+
+interceptor(store);
+export default store;
