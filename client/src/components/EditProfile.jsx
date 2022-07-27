@@ -40,16 +40,16 @@ const EditProfile = ({ editProfile, setEditProfile, userInfo }) => {
   const createOptions = {
     firstName: {
       required: 'First Name is required',
-      pattern: {
-        value: /^[\w\-\s]+$/,
-        message: 'Invalid First Name. Only alpha-numeric letters are allowed.',
+      maxLength: {
+        value: 50,
+        message: 'First Name cannot be more than 50 characters.',
       },
     },
     lastName: {
       required: 'Last Name is required',
-      pattern: {
-        value: /^[\w\-\s]+$/,
-        message: 'Invalid First Name. Only alpha-numeric letters are allowed.',
+      maxLength: {
+        value: 50,
+        message: 'First Name cannot be more than 50 characters.',
       },
     },
   };

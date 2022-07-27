@@ -63,7 +63,7 @@ const Opportunity = ({ opportunity }) => {
                   content='Start'
                 />
               </div>
-              {/* <div
+              <div
                 className='mt-3'
                 style={{ display: 'flex', justifyContent: 'center' }}
               >
@@ -77,7 +77,7 @@ const Opportunity = ({ opportunity }) => {
                   className='btn'
                   content='Evaluate'
                 />
-              </div> */}
+              </div>
             </>
           ) : (
             <>

@@ -30,7 +30,6 @@ const teamParticipantsSlice = createSlice({
       state.loading = false;
       state.error = payload;
       state.success = false;
-      state.members = [];
     },
     setSuccess: (state, { payload }) => {
       state.loading = false;

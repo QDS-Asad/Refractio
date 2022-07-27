@@ -1,11 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { localAPI } from '../../common/refractioApi';
+import refractioApi from '../../common/refractioApi';
 
 // initial state
 export const initialState = {
   loading: false,
   error: null,
   opportunity: null,
+  responses: null,
 };
 
 // our slice
@@ -21,6 +22,11 @@ const opportunityEvaluateSlice = createSlice({
       state.error = false;
       state.opportunity = payload;
     },
+    setResponses: (state, { payload }) => {
+      state.loading = false;
+      state.error = false;
+      state.responses = payload;
+    },
     setError: (state, { payload }) => {
       state.loading = false;
       state.error = payload;
@@ -32,6 +38,7 @@ export const {
   setLoading,
   setOpportunity,
   setError,
+  setResponses,
 } = opportunityEvaluateSlice.actions;
 
 // export the selector (".items" being same as in slices/index.js's "items: something")
@@ -44,18 +51,46 @@ export default opportunityEvaluateSlice.reducer;
 export const fetchOpportunity = (id) => async (dispatch) => {
   try {
     dispatch(setLoading());
-    let { data } = await localAPI.get('/opportunities.json');
-    let opportunity = data.find((o) => o._id === id);
-    if (opportunity) {
-      setTimeout(() => {
-        dispatch(setOpportunity(opportunity));
-      }, 1500);
-    } else {
-      setTimeout(() => {
-        dispatch(setError('Opportunity not found.'));
-      }, 1500);
-    }
+    let { data: response } = await refractioApi.get(`/opportunities/${id}`);
+    dispatch(setOpportunity(response.data));
   } catch (error) {
-    dispatch(setError(error.message));
+    const errorMessage =
+      error.response && error.response.data
+        ? error.response.data.message
+        : error.message;
+    dispatch(setError(errorMessage));
+  }
+};
+export const fetchResponses = (id) => async (dispatch) => {
+  try {
+    dispatch(setLoading());
+    let { data: response } = await refractioApi.get(
+      `/opportunities/opportunity-responses/${id}`
+    );
+    dispatch(setResponses(response.data));
+  } catch (error) {
+    const errorMessage =
+      error.response && error.response.data
+        ? error.response.data.message
+        : error.message;
+    dispatch(setError(errorMessage));
+  }
+};
+export const submitEvaluation = (id, opportunityId, body) => async (
+  dispatch
+) => {
+  try {
+    dispatch(setLoading());
+    await refractioApi.put(
+      `/opportunities/opportunity-response-evaluate/${id}`,
+      { ...body }
+    );
+    dispatch(fetchResponses(opportunityId));
+  } catch (error) {
+    const errorMessage =
+      error.response && error.response.data
+        ? error.response.data.message
+        : error.message;
+    dispatch(setError(errorMessage));
   }
 };

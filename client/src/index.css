@@ -226,10 +226,15 @@ i.icon.close:before {
 .ui.action.input > .button {
   display: block;
 }
-
+.hoverable:hover {
+  cursor: pointer;
+}
 .ui.pagination.secondary.menu .active.item {
   background: var(--primary-dark);
   color: var(--white);
+}
+.ui.form .inline.fields .field {
+  padding: 0px;
 }
 
 .ui.pagination.secondary.menu .item {

@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { Button, Header, Divider } from 'semantic-ui-react';
+import { Button, Header, Divider, Message } from 'semantic-ui-react';
 import RadioLabel from './RadioLabel';
 
 const options = [
@@ -9,19 +9,33 @@ const options = [
   { key: '4', text: '4', value: '4', subText: 'Agree' },
   { key: '5', text: '5', value: '5', subText: 'Strongly Agree' },
 ];
-const answer =
-  "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it.";
 const EvaluateForm = memo(
   ({
-    handleIdeaChange,
     setCurrentQuestion,
     quality,
     comprehension,
-    ideaRating,
     currentQuestion,
-    comprehensionRating,
-    handleComprehensionChange,
+    response,
+    setCurrentParticipant,
+    currentParticipant,
+    totalParticipants,
+    setValue,
+    trigger,
+    watch,
+    errors,
+    draftEvaluation,
   }) => {
+    const comprehensionCheck = watch(`comprehension_${response.name}`, '');
+    const qualityChecked = watch(`qualityOfIdea_${response.name}`, '');
+    const handleChange = (e, { value }) => {
+      if (currentQuestion === 1) {
+        setValue(`comprehension_${response.name}`, value);
+        trigger(`comprehension_${response.name}`);
+      } else {
+        setValue(`qualityOfIdea_${response.name}`, value);
+        trigger(`qualityOfIdea_${response.name}`);
+      }
+    };
     return (
       <>
         <div
@@ -31,9 +45,9 @@ const EvaluateForm = memo(
           }}
           className='primary-dark-color pb-3 mb-3'
         >
-          Participant 1 -{' '}
+          {response.name} -{' '}
           {currentQuestion === 1
-            ? 'Evaluation of comprehension'
+            ? 'Evaluation of Comprehension'
             : 'Evaluation of Quality of Idea-Response'}
         </div>
         <div>
@@ -41,9 +55,9 @@ const EvaluateForm = memo(
             ? comprehension.map((ques, index) => (
                 <>
                   <Header key={index} size='medium' color='grey'>
-                    {ques}
+                    {ques.question}
                     <Header.Subheader className='mt-3' color='black'>
-                      {answer}
+                      {ques.answer}
                     </Header.Subheader>
                   </Header>
                   <Divider />
@@ -52,9 +66,9 @@ const EvaluateForm = memo(
             : quality.map((ques, index) => (
                 <>
                   <Header key={index} size='medium' color='grey'>
-                    {ques}
+                    {ques.question}
                     <Header.Subheader className='mt-3' color='black'>
-                      {answer}
+                      {ques.answer}
                     </Header.Subheader>
                   </Header>
                   <Divider />
@@ -68,26 +82,79 @@ const EvaluateForm = memo(
               subject matter of this opportunity.
             </Header>
           </label>
-          <RadioLabel
-            handleIdeaChange={handleIdeaChange}
-            handleComprehensionChange={handleComprehensionChange}
-            currentQuestion={currentQuestion}
-            ideaRating={ideaRating}
-            comprehensionRating={comprehensionRating}
-            options={options}
-          />
+          {currentQuestion === 1 ? (
+            <>
+              <RadioLabel
+                rating={comprehensionCheck}
+                options={options}
+                name={`comprehension_${response.name}`}
+                handleChange={handleChange}
+                errors={errors}
+                evaluation={response.evaluation}
+              />
+              {errors && errors[`comprehension_${response.name}`] && (
+                <Message
+                  error
+                  content={errors[`comprehension_${response.name}`].message}
+                />
+              )}
+            </>
+          ) : (
+            <>
+              <RadioLabel
+                rating={qualityChecked}
+                options={options}
+                name={`qualityOfIdea_${response.name}`}
+                handleChange={handleChange}
+                errors={errors}
+                evaluation={response.evaluation}
+              />
+              {errors && errors[`qualityOfIdea_${response.name}`] && (
+                <Message
+                  error
+                  content={errors[`qualityOfIdea_${response.name}`].message}
+                />
+              )}
+            </>
+          )}
           <div className='mt-5'>
-            {currentQuestion === 1 && (
+            {currentParticipant <= totalParticipants && (
               <Button
-                onClick={() => setCurrentQuestion((prev) => prev + 1)}
+                onClick={() => {
+                  if (currentQuestion === 2) {
+                    setCurrentParticipant((prev) => prev + 1);
+                    setCurrentQuestion(1);
+                    draftEvaluation(
+                      qualityChecked,
+                      comprehensionCheck,
+                      response._id
+                    );
+                  } else {
+                    setCurrentQuestion((prev) => prev + 1);
+                  }
+                }}
+                disabled={
+                  (currentParticipant === totalParticipants &&
+                    currentQuestion === 2) ||
+                  (qualityChecked === '' && currentQuestion === 2) ||
+                  (comprehensionCheck === '' && currentQuestion === 1)
+                }
                 primary
                 className='btn float-end'
                 content='Next'
               />
             )}
-            {currentQuestion === 2 && (
+            {currentParticipant >= 1 && (
               <Button
-                onClick={() => setCurrentQuestion((prev) => prev - 1)}
+                onClick={() => {
+                  if (currentQuestion === 1) {
+                    setCurrentParticipant((prev) => prev - 1);
+                    setCurrentQuestion(2);
+                  } else {
+                    setCurrentQuestion((prev) => prev - 1);
+                  }
+                }}
+                disabled={currentParticipant === 1 && currentQuestion === 1}
                 primary
                 className='btn float-start'
                 content='Back'

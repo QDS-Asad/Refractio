@@ -181,7 +181,7 @@ const OpportunityEdit = () => {
                   onOpen={() => setViewParticipant(true)}
                   open={viewParticipant}
                   trigger={
-                    <span className='ms-2 fw-bold primary-color'>
+                    <span className='ms-2 fw-bold primary-color hoverable'>
                       View Participants
                     </span>
                   }
