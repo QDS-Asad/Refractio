@@ -22,10 +22,8 @@ const WorkspaceLayout = () => {
             textAlign='center'
           />
           <Header as='h2' className='text-center my-5'>
-            Welcome back! Stay hydrated!
-            <Header.Subheader>
-              Choose a workspace below to get back to working with your team.
-            </Header.Subheader>
+            Welcome back!
+            <Header.Subheader>Choose a team.</Header.Subheader>
           </Header>
           <Outlet />
         </Grid.Column>

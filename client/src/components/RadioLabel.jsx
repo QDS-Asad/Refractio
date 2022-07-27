@@ -1,44 +1,50 @@
 import React, { memo } from 'react';
-import { Radio } from 'semantic-ui-react';
+import { Form } from 'semantic-ui-react';
 
 function RadioLabel({
   options,
-  currentQuestion,
-  comprehensionRating,
-  ideaRating,
-  handleComprehensionChange,
-  handleIdeaChange,
+  rating,
+  handleChange,
+  name,
+  errors,
+  evaluation,
 }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-around' }}>
       {options.map((option, index) => (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-          key={index}
-        >
-          <div style={{ alignSelf: 'center' }}>
-            {currentQuestion === 1 ? (
-              <Radio
+        <Form.Group inline>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+            className='radiolabelcustom'
+            key={index}
+          >
+            <div style={{ alignSelf: 'center' }}>
+              <Form.Radio
                 key={option.key}
                 value={option.value}
-                checked={ideaRating === option.value}
-                onChange={handleIdeaChange}
+                name={name}
+                checked={rating === option.value}
+                onChange={handleChange}
+                error={!!errors[name]}
+                disabled={evaluation !== 'pending'}
               />
-            ) : (
-              <Radio
-                key={option.key}
-                value={option.value}
-                checked={comprehensionRating === option.value}
-                onChange={handleComprehensionChange}
-              />
-            )}
+            </div>
+            <div
+              style={{
+                alignSelf: 'center',
+                color: !!errors[name] ? '#9f3a38' : 'black',
+              }}
+            >
+              {option.text}
+            </div>
+            <div style={{ color: !!errors[name] ? '#9f3a38' : 'black' }}>
+              {option.subText}
+            </div>
           </div>
-          <div style={{ alignSelf: 'center' }}>{option.text}</div>
-          <div>{option.subText}</div>
-        </div>
+        </Form.Group>
       ))}
     </div>
   );
