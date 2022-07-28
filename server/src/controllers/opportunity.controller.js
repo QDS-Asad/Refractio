@@ -702,6 +702,11 @@ const evaluateAnswerOpportunityResponse = async (
   opportunityId,
   opportunityResponseId
 ) => {
+  if (req.body.status === OPPORTUNITY_STATUS.PUBLISH) {
+    await OpportunityService.updateOpportunityEvaluationsByResponseIdUserId(opportunityId, req.body.user._id, {
+      status: OPPORTUNITY_STATUS.PUBLISH
+    });
+  }
   const opportunityInfo = await OpportunityService.getOpportunityById(
     opportunityId
   );
@@ -710,18 +715,13 @@ const evaluateAnswerOpportunityResponse = async (
       opportunityId
     );
   const filterParticipants = opportunityInfo.participants;
-  if (req.body.status === OPPORTUNITY_STATUS.PUBLISH) {
-    await OpportunityService.updateOpportunityEvaluationsByResponseIdUserId(opportunityId, req.body.user._id, {
-      stauts: OPPORTUNITY_STATUS.PUBLISH
-    });
-  }
   if (req.body.status === OPPORTUNITY_STATUS.PUBLISH && opportunityEvaluation.length == filterParticipants.length) {
     await OpportunityService.updateOpportunity(opportunityId, {
-      stauts: OPPORTUNITY_STATUS.COMPLETED
+      status: OPPORTUNITY_STATUS.COMPLETED
     });
   } else {
     await OpportunityService.updateOpportunity(opportunityId, {
-      stauts: OPPORTUNITY_STATUS.EVALUATING,
+      status: OPPORTUNITY_STATUS.EVALUATING,
     });
     return successResp(res, {
       msg: SUCCESS_MESSAGE.EVALUATED,

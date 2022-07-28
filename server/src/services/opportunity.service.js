@@ -78,10 +78,10 @@ exports.updateEvaluateOpportunity = async (id, obj) => {
 };
 
 exports.updateOpportunityEvaluationsByResponseIdUserId = async (id, userId, obj) => {
-  return await OpportunityEvaluation.findOneAndUpdate(
+  return await OpportunityEvaluation.updateMany(
     {
       opportunityId: ObjectId(id),
-      userId
+      userId: ObjectId(userId),
     },
     obj
   );
