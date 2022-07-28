@@ -712,8 +712,8 @@ const evaluateAnswerOpportunityResponse = async (
     opportunityId
   );
   const opportunityEvaluation =
-    await OpportunityService.getOpportunityEvaluationByResponseId(
-      opportunityResponseId
+    await OpportunityService.getOpportunityEvaluationsByOpportunityId(
+      opportunityId
     );
   const filterParticipants = opportunityInfo.participants.filter((obj) => obj.toString() !== req.body.user._id.toString());
   console.log(req.body.status, opportunityEvaluation.length, filterParticipants.length);
