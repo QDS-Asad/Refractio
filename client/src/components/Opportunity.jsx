@@ -51,7 +51,8 @@ const Opportunity = ({ opportunity }) => {
           {application && opportunity.status !== 'draft' ? (
             <>
               <Divider />
-              {opportunity.status === 'publish' && (
+              {(opportunity.status === 'publish' ||
+                opportunity.status === 'answering') && (
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                   <Button
                     onClick={() =>
