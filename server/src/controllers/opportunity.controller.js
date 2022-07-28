@@ -721,6 +721,10 @@ const evaluateAnswerOpportunityResponse = async (
     await OpportunityService.updateOpportunity(opportunityId, {
       status: OPPORTUNITY_STATUS.COMPLETED
     });
+    return successResp(res, {
+      msg: SUCCESS_MESSAGE.UPDATED,
+      code: HTTP_STATUS.SUCCESS.CODE,
+    });
   } else {
     await OpportunityService.updateOpportunity(opportunityId, {
       status: OPPORTUNITY_STATUS.EVALUATING,
