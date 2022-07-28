@@ -17,6 +17,7 @@ const OpportunityEvaluate = () => {
   const [viewMessage, setViewMessage] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(1);
   const [currentParticipant, setCurrentParticipant] = useState(1);
+  const [publishResponse, setPublishResponse] = useState(null);
   const { id } = useParams();
   const {
     register,
@@ -56,8 +57,22 @@ const OpportunityEvaluate = () => {
             required: 'Evaluation of quality of Idea-Response is required.',
           }
         );
-        setValue((`comprehension_${responses[i].name}`, ''));
-        setValue((`qualityOfIdea_${responses[i].name}`, ''));
+        if (responses[i].opportunityEvaluations.comprehensionScore) {
+          setValue(
+            `comprehension_${responses[i].name}`,
+            responses[i].opportunityEvaluations.comprehensionScore
+          );
+        } else {
+          setValue(`comprehension_${responses[i].name}`, '');
+        }
+        if (responses[i].opportunityEvaluations.qualityOfIdeaScore) {
+          setValue(
+            `qualityOfIdea_${responses[i].name}`,
+            responses[i].opportunityEvaluations.qualityOfIdeaScore
+          );
+        } else {
+          setValue(`qualityOfIdea_${responses[i].name}`, '');
+        }
       }
       for (let i = 0; i < responses.length; i++) {
         if (responses[i].evaluation === 'pending') {
@@ -85,15 +100,24 @@ const OpportunityEvaluate = () => {
     trigger(e.target.name);
   };
   const handleSubmittion = (data) => {
-    setViewSubmit(true);
     if (responses && responses.length > 0) {
       const responseId = responses[responses.length - 1]._id;
       const name = responses[responses.length - 1].name;
+      setPublishResponse({
+        responseId,
+        comprehension: data[`qualityOfIdea_${name}`],
+        quality: data[`comprehension_${name}`],
+      });
+      setViewSubmit(true);
+    }
+  };
+  const onPublishResponse = () => {
+    if (publishResponse) {
       draftEvaluation(
         'publish',
-        data[`qualityOfIdea_${name}`],
-        data[`comprehension_${name}`],
-        responseId
+        publishResponse.comprehension,
+        publishResponse.quality,
+        publishResponse.responseId
       );
     }
   };
@@ -124,29 +148,38 @@ const OpportunityEvaluate = () => {
             )}
             <Header as='h3' className='primary-dark-color'>
               {opportunity.name}
-              <Button
-                type='submit'
-                form='submit-evaluation'
-                className='btn-secondary'
-                floated='right'
-                disabled={loading || currentParticipant < responses.length}
-              >
-                Submit
-              </Button>
-              <PublishEvaluation
-                viewSubmit={viewSubmit}
-                setViewSubmit={setViewSubmit}
-                onSubmittion={onDrafting}
-              />
-              <Button
-                onClick={onDrafting}
-                primary
-                className='btn-outline me-3'
-                floated='right'
-                disabled={loading}
-              >
-                Save as Draft
-              </Button>
+              {!(
+                responses[currentParticipant - 1].opportunityEvaluations &&
+                responses[currentParticipant - 1].opportunityEvaluations
+                  .status === 'publish'
+              ) && (
+                <>
+                  <Button
+                    type='submit'
+                    form='submit-evaluation'
+                    className='btn-secondary'
+                    floated='right'
+                    disabled={loading || currentParticipant < responses.length}
+                  >
+                    Submit
+                  </Button>
+                  <PublishEvaluation
+                    viewSubmit={viewSubmit}
+                    setViewSubmit={setViewSubmit}
+                    onSubmittion={onPublishResponse}
+                  />
+                  <Button
+                    onClick={onDrafting}
+                    primary
+                    type='button'
+                    className='btn-outline me-3'
+                    floated='right'
+                    disabled={loading}
+                  >
+                    Save as Draft
+                  </Button>
+                </>
+              )}
             </Header>
             <div style={{ padding: '1em' }}>
               <Form
@@ -165,26 +198,28 @@ const OpportunityEvaluate = () => {
                   responses.map(
                     (response, index) =>
                       currentParticipant === index + 1 && (
-                        <EvaluateForm
-                          setCurrentQuestion={setCurrentQuestion}
-                          currentQuestion={currentQuestion}
-                          response={response}
-                          currentParticipant={currentParticipant}
-                          setCurrentParticipant={setCurrentParticipant}
-                          totalParticipants={responses.length}
-                          quality={response.comprehension}
-                          comprehension={response.qualityOfIdea}
-                          handleChange={handleChange}
-                          trigger={trigger}
-                          setValue={setValue}
-                          watch={watch}
-                          draftEvaluation={draftEvaluation}
-                          errors={errors}
-                          allQuestions={
-                            response.comprehension.length +
-                            response.qualityOfIdea.length
-                          }
-                        />
+                        <span key={index}>
+                          <EvaluateForm
+                            setCurrentQuestion={setCurrentQuestion}
+                            currentQuestion={currentQuestion}
+                            response={response}
+                            currentParticipant={currentParticipant}
+                            setCurrentParticipant={setCurrentParticipant}
+                            totalParticipants={responses.length}
+                            quality={response.comprehension}
+                            comprehension={response.qualityOfIdea}
+                            handleChange={handleChange}
+                            trigger={trigger}
+                            setValue={setValue}
+                            watch={watch}
+                            draftEvaluation={draftEvaluation}
+                            errors={errors}
+                            allQuestions={
+                              response.comprehension.length +
+                              response.qualityOfIdea.length
+                            }
+                          />
+                        </span>
                       )
                   )}
               </Form>
