@@ -712,9 +712,10 @@ const evaluateAnswerOpportunityResponse = async (
   );
   const opportunityEvaluation =
     await OpportunityService.getOpportunityEvaluationByResponseId(
-      opportunityId
+      opportunityResponseId
     );
   const filterParticipants = opportunityInfo.participants;
+  console.log(req.body.status, opportunityEvaluation.length, filterParticipants.length);
   if (req.body.status === OPPORTUNITY_STATUS.PUBLISH && opportunityEvaluation.length == filterParticipants.length) {
     await OpportunityService.updateOpportunity(opportunityId, {
       status: OPPORTUNITY_STATUS.COMPLETED
