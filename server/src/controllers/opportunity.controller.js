@@ -715,7 +715,7 @@ const evaluateAnswerOpportunityResponse = async (
     await OpportunityService.getOpportunityEvaluationByResponseId(
       opportunityResponseId
     );
-  const filterParticipants = opportunityInfo.participants.filter((obj) => obj.toString() !== req.body.user._id.toString());
+  const filterParticipants = opportunityInfo.participants;//.filter((obj) => obj.toString() !== req.body.user._id.toString());
   console.log(req.body.status, opportunityEvaluation.length, filterParticipants.length);
   if (req.body.status === OPPORTUNITY_STATUS.PUBLISH && opportunityEvaluation.length == filterParticipants.length) {
     await OpportunityService.updateOpportunity(opportunityId, {
