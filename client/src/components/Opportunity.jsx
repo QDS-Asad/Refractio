@@ -84,16 +84,12 @@ const Opportunity = ({ opportunity }) => {
                 </div>
               )}
               {opportunity.status === 'completed' && (
-                <>
-                  <Image
-                    src='/images/team.svg'
-                    className='d-inline-block'
-                    verticalAlign='middle'
-                  />
-                  <span className='secondary-color'>
-                    {opportunity.participants.length}
-                  </span>
-                </>
+                <div
+                  className='mt-3'
+                  style={{ display: 'flex', justifyContent: 'center' }}
+                >
+                  <Button primary className='btn' content='View Results' />
+                </div>
               )}
             </>
           ) : (

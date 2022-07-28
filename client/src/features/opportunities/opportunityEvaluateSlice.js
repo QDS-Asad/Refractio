@@ -96,7 +96,7 @@ export const fetchResponses = (id) => async (dispatch) => {
     dispatch(setError(errorMessage));
   }
 };
-export const submitEvaluation = (id, opportunityId, body, flag) => async (
+export const submitEvaluation = (id, opportunityId, body, flag = 0) => async (
   dispatch
 ) => {
   try {
