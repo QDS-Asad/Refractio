@@ -576,10 +576,12 @@ const answerOpportunityResponse = async (req, res, opportunityRes) => {
         opportunityId
       );
     const filterParticipants = opportunityInfo.participants;
-    if (opportunityResponses.length == filterParticipants.length) {
-      await OpportunityService.updateOpportunity(opportunityId, {
-        stauts: OPPORTUNITY_STATUS.EVALUATING,
+    console.log('length', opportunityResponses.length, filterParticipants.length);
+    if (req.body.status === OPPORTUNITY_STATUS.PUBLISH && opportunityResponses.length == filterParticipants.length) {
+      const opportunityURes = await OpportunityService.updateOpportunity(opportunityId, {
+        status: OPPORTUNITY_STATUS.EVALUATING,
       });
+      console.log('opportunityURes --',opportunityURes);
       const participantsEmails = await UserService.getParticipants(
         opportunityRes.participants
       );
@@ -604,7 +606,7 @@ const answerOpportunityResponse = async (req, res, opportunityRes) => {
         });
     } else {
       await OpportunityService.updateOpportunity(opportunityId, {
-        stauts: OPPORTUNITY_STATUS.ANSWERING,
+        status: OPPORTUNITY_STATUS.ANSWERING,
       });
       return successResp(res, {
         msg: SUCCESS_MESSAGE.ANSWERED,
@@ -700,6 +702,11 @@ const evaluateAnswerOpportunityResponse = async (
   opportunityId,
   opportunityResponseId
 ) => {
+  if (req.body.status === OPPORTUNITY_STATUS.PUBLISH) {
+    await OpportunityService.updateOpportunityEvaluationsByResponseIdUserId(opportunityId, req.body.user._id, {
+      status: OPPORTUNITY_STATUS.PUBLISH
+    });
+  }
   const opportunityInfo = await OpportunityService.getOpportunityById(
     opportunityId
   );
@@ -708,14 +715,13 @@ const evaluateAnswerOpportunityResponse = async (
       opportunityId
     );
   const filterParticipants = opportunityInfo.participants;
-  if (opportunityEvaluation.length == filterParticipants.length) {
+  if (req.body.status === OPPORTUNITY_STATUS.PUBLISH && opportunityEvaluation.length == filterParticipants.length) {
     await OpportunityService.updateOpportunity(opportunityId, {
-      stauts: OPPORTUNITY_STATUS.COMPLETED,
-      b,
+      status: OPPORTUNITY_STATUS.COMPLETED
     });
   } else {
     await OpportunityService.updateOpportunity(opportunityId, {
-      stauts: OPPORTUNITY_STATUS.EVALUATING,
+      status: OPPORTUNITY_STATUS.EVALUATING,
     });
     return successResp(res, {
       msg: SUCCESS_MESSAGE.EVALUATED,

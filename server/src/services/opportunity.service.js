@@ -77,6 +77,16 @@ exports.updateEvaluateOpportunity = async (id, obj) => {
   );
 };
 
+exports.updateOpportunityEvaluationsByResponseIdUserId = async (id, userId, obj) => {
+  return await OpportunityEvaluation.updateMany(
+    {
+      opportunityId: ObjectId(id),
+      userId: ObjectId(userId),
+    },
+    obj
+  );
+};
+
 exports.getOpportunityResponsesByOpportunityId = async (id) => {
   return await OpportunityResponse.find({
     opportunityId: id,
