@@ -4,6 +4,7 @@ import {
   fetchOpportunity,
   fetchResponses,
   opportunityEvaluateSelector,
+  resetEvaluation,
   submitEvaluation,
 } from '../../../features/opportunities/opportunityEvaluateSlice';
 import { Button, Grid, Header, Message, Form } from 'semantic-ui-react';
@@ -34,10 +35,20 @@ const OpportunityEvaluate = () => {
   const dispatch = useDispatch();
 
   // fetch data from our store
-  const { loading, error, opportunity, responses } = useSelector(
-    opportunityEvaluateSelector
-  );
+  const {
+    loading,
+    error,
+    opportunity,
+    responses,
+    success,
+    message,
+  } = useSelector(opportunityEvaluateSelector);
   // hook to fetch items
+  useEffect(() => {
+    return () => {
+      dispatch(resetEvaluation());
+    };
+  }, []);
   useEffect(() => {
     dispatch(fetchResponses(id));
     dispatch(fetchOpportunity(id));
@@ -82,6 +93,14 @@ const OpportunityEvaluate = () => {
       }
     }
   }, [responses]);
+  useEffect(() => {
+    if (success) {
+      setViewMessage(true);
+      setTimeout(() => {
+        setViewMessage(false);
+      }, 4000);
+    }
+  }, [success]);
   const onDrafting = async () => {
     if (responses && responses.length > 0) {
       const responseId = responses[currentParticipant - 1]._id;
@@ -90,7 +109,8 @@ const OpportunityEvaluate = () => {
         'draft',
         values[`qualityOfIdea_${name}`],
         values[`comprehension_${name}`],
-        responseId
+        responseId,
+        0
       );
     }
   };
@@ -117,11 +137,18 @@ const OpportunityEvaluate = () => {
         'publish',
         publishResponse.comprehension,
         publishResponse.quality,
-        publishResponse.responseId
+        publishResponse.responseId,
+        0
       );
     }
   };
-  const draftEvaluation = (status = 'draft', comp = '', qual = '', resId) => {
+  const draftEvaluation = (
+    status = 'draft',
+    comp = '',
+    qual = '',
+    resId,
+    flag = 0
+  ) => {
     const body = {
       status,
       comprehension: {
@@ -131,7 +158,7 @@ const OpportunityEvaluate = () => {
         score: qual,
       },
     };
-    dispatch(submitEvaluation(resId, id, body));
+    dispatch(submitEvaluation(resId, id, body, flag));
   };
   const values = getValues();
   return (
@@ -142,15 +169,15 @@ const OpportunityEvaluate = () => {
             {viewMessage && (
               <Message
                 positive
-                content='Your response has been saved.'
+                content={message}
                 className='error-message mb-3'
               />
             )}
             <Header as='h3' className='primary-dark-color'>
               {opportunity.name}
               {!(
-                responses[currentParticipant - 1].opportunityEvaluations &&
-                responses[currentParticipant - 1].opportunityEvaluations
+                responses[responses.length - 1].opportunityEvaluations &&
+                responses[responses.length - 1].opportunityEvaluations
                   .status === 'publish'
               ) && (
                 <>

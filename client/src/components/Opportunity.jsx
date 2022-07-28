@@ -51,7 +51,8 @@ const Opportunity = ({ opportunity }) => {
           {application && opportunity.status !== 'draft' ? (
             <>
               <Divider />
-              {opportunity.status === 'publish' && (
+              {(opportunity.status === 'publish' ||
+                opportunity.status === 'answering') && (
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                   <Button
                     onClick={() =>
@@ -81,6 +82,18 @@ const Opportunity = ({ opportunity }) => {
                     content='Evaluate'
                   />
                 </div>
+              )}
+              {opportunity.status === 'completed' && (
+                <>
+                  <Image
+                    src='/images/team.svg'
+                    className='d-inline-block'
+                    verticalAlign='middle'
+                  />
+                  <span className='secondary-color'>
+                    {opportunity.participants.length}
+                  </span>
+                </>
               )}
             </>
           ) : (
