@@ -403,6 +403,7 @@ exports.getOpportunityResponsesById = async (req, res, next) => {
     )
       .then(async (opportunityResponses) => {
         console.log(opportunityResponses);
+        opportunityResponses = opportunityResponses.filter((obj) => obj.userId !== user._id);
         let responses = [];
         await Promise.all(
           opportunityResponses.map(async (obj, key) => {
@@ -714,7 +715,7 @@ const evaluateAnswerOpportunityResponse = async (
     await OpportunityService.getOpportunityEvaluationByResponseId(
       opportunityResponseId
     );
-  const filterParticipants = opportunityInfo.participants;
+  const filterParticipants = opportunityInfo.participants.filter((obj) => obj.toString() !== req.body.user._id.toString());
   console.log(req.body.status, opportunityEvaluation.length, filterParticipants.length);
   if (req.body.status === OPPORTUNITY_STATUS.PUBLISH && opportunityEvaluation.length == filterParticipants.length) {
     await OpportunityService.updateOpportunity(opportunityId, {
