@@ -11,7 +11,6 @@ import { useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import EvaluateForm from '../../../components/EvaluateForm';
 import PublishEvaluation from './PublishEvaluation';
-import { current } from '@reduxjs/toolkit';
 
 const OpportunityEvaluate = () => {
   const [viewSubmit, setViewSubmit] = useState(false);
@@ -60,6 +59,12 @@ const OpportunityEvaluate = () => {
         setValue((`comprehension_${responses[i].name}`, ''));
         setValue((`qualityOfIdea_${responses[i].name}`, ''));
       }
+      for (let i = 0; i < responses.length; i++) {
+        if (responses[i].evaluation === 'pending') {
+          setCurrentParticipant(i + 1);
+          break;
+        }
+      }
     }
   }, [responses]);
   const onDrafting = async () => {
@@ -67,6 +72,7 @@ const OpportunityEvaluate = () => {
       const responseId = responses[currentParticipant - 1]._id;
       const name = responses[currentParticipant - 1].name;
       draftEvaluation(
+        'draft',
         values[`qualityOfIdea_${name}`],
         values[`comprehension_${name}`],
         responseId
@@ -78,12 +84,22 @@ const OpportunityEvaluate = () => {
     setValue(e.target.name, e.target.value);
     trigger(e.target.name);
   };
-  const handleEdit = (data) => {
+  const handleSubmittion = (data) => {
     setViewSubmit(true);
+    if (responses && responses.length > 0) {
+      const responseId = responses[responses.length - 1]._id;
+      const name = responses[responses.length - 1].name;
+      draftEvaluation(
+        'publish',
+        data[`qualityOfIdea_${name}`],
+        data[`comprehension_${name}`],
+        responseId
+      );
+    }
   };
-  const draftEvaluation = (comp = '', qual = '', resId) => {
+  const draftEvaluation = (status = 'draft', comp = '', qual = '', resId) => {
     const body = {
-      status: 'draft',
+      status,
       comprehension: {
         score: comp,
       },
@@ -137,7 +153,7 @@ const OpportunityEvaluate = () => {
                 id='submit-evaluation'
                 error
                 size='small'
-                onSubmit={handleSubmit(handleEdit)}
+                onSubmit={handleSubmit(handleSubmittion)}
                 loading={loading}
               >
                 {error && (

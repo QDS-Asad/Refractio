@@ -125,6 +125,7 @@ const EvaluateForm = memo(
                     setCurrentParticipant((prev) => prev + 1);
                     setCurrentQuestion(1);
                     draftEvaluation(
+                      'draft',
                       qualityChecked,
                       comprehensionCheck,
                       response._id
