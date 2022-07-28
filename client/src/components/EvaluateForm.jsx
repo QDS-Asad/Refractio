@@ -128,7 +128,8 @@ const EvaluateForm = memo(
                       'draft',
                       qualityChecked,
                       comprehensionCheck,
-                      response._id
+                      response._id,
+                      1
                     );
                   } else {
                     setCurrentQuestion((prev) => prev + 1);
