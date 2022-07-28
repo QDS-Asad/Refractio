@@ -412,6 +412,7 @@ exports.getOpportunityResponsesById = async (req, res, next) => {
                 user._id
               );
             let evaluation = "";
+            let evalObj = {};
             if (
               opportunityEvaluations &&
               opportunityEvaluations.comprehension &&
@@ -419,9 +420,9 @@ exports.getOpportunityResponsesById = async (req, res, next) => {
               opportunityEvaluations.qualityOfIdea &&
               opportunityEvaluations.qualityOfIdea.score
             ) {
-              evaluation = OPPORTUNITY_EVALUATION_STATUS.COMPLETED;
+              evalObj = {evaluation: OPPORTUNITY_EVALUATION_STATUS.COMPLETED, status: opportunityEvaluations.status, comprehensionScore: opportunityEvaluations.comprehension.score, qualityOfIdeaScore: opportunityEvaluations.qualityOfIdea.score};
             } else {
-              evaluation = OPPORTUNITY_EVALUATION_STATUS.PENDING;
+              evalObj = {evaluation: OPPORTUNITY_EVALUATION_STATUS.PENDING};
             }
             let comprehension_answers = [];
             obj.comprehension.answers.map((comp, compKey) => {
@@ -458,6 +459,7 @@ exports.getOpportunityResponsesById = async (req, res, next) => {
               status: obj.status,
               comprehension: comprehension_answers,
               qualityOfIdea: qualityOfIdea_answers,
+              opportunityEvaluations: evalObj,
             };
           })
         );
