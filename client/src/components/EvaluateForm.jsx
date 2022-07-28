@@ -124,7 +124,10 @@ const EvaluateForm = memo(
                   if (currentQuestion === 2) {
                     setCurrentParticipant((prev) => prev + 1);
                     setCurrentQuestion(1);
-                    if (response.opportunityEvaluations.status === 'draft') {
+                    if (
+                      !response.opportunityEvaluations.status ||
+                      response.opportunityEvaluations.status !== 'publish'
+                    ) {
                       draftEvaluation(
                         'draft',
                         qualityChecked,
