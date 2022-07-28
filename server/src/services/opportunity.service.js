@@ -111,6 +111,13 @@ exports.getOpportunityEvaluationByResponseId = async (id) => {
   });
 };
 
+exports.getOpportunityEvaluationsByOpportunityId = async (id) => {
+  return await OpportunityEvaluation.find({
+    opportunityId: id,
+    status: OPPORTUNITY_STATUS.PUBLISH,
+  });
+};
+
 exports.getOpportunityEvaluationByResponseIdUserId = async (
   opportunityResponseId,
   userId
