@@ -53,26 +53,26 @@ const EvaluateForm = memo(
         <div>
           {currentQuestion === 1
             ? comprehension.map((ques, index) => (
-                <>
-                  <Header key={index} size='medium' color='grey'>
+                <span key={index}>
+                  <Header size='medium' color='grey'>
                     {ques.question}
                     <Header.Subheader className='mt-3' color='black'>
                       {ques.answer}
                     </Header.Subheader>
                   </Header>
                   <Divider />
-                </>
+                </span>
               ))
             : quality.map((ques, index) => (
-                <>
-                  <Header key={index} size='medium' color='grey'>
+                <span key={index}>
+                  <Header size='medium' color='grey'>
                     {ques.question}
                     <Header.Subheader className='mt-3' color='black'>
                       {ques.answer}
                     </Header.Subheader>
                   </Header>
                   <Divider />
-                </>
+                </span>
               ))}
         </div>
         <div className='mb-3 mt-3'>
@@ -90,7 +90,7 @@ const EvaluateForm = memo(
                 name={`comprehension_${response.name}`}
                 handleChange={handleChange}
                 errors={errors}
-                evaluation={response.evaluation}
+                evaluation={response.opportunityEvaluations.status}
               />
               {errors && errors[`comprehension_${response.name}`] && (
                 <Message
@@ -107,7 +107,7 @@ const EvaluateForm = memo(
                 name={`qualityOfIdea_${response.name}`}
                 handleChange={handleChange}
                 errors={errors}
-                evaluation={response.evaluation}
+                evaluation={response.opportunityEvaluations.status}
               />
               {errors && errors[`qualityOfIdea_${response.name}`] && (
                 <Message
@@ -143,6 +143,7 @@ const EvaluateForm = memo(
                 primary
                 className='btn float-end'
                 content='Next'
+                type='button'
               />
             )}
             {currentParticipant >= 1 && (
@@ -159,6 +160,7 @@ const EvaluateForm = memo(
                 primary
                 className='btn float-start'
                 content='Back'
+                type='button'
               />
             )}
           </div>

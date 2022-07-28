@@ -12,14 +12,13 @@ function RadioLabel({
   return (
     <div style={{ display: 'flex', justifyContent: 'space-around' }}>
       {options.map((option, index) => (
-        <Form.Group inline>
+        <Form.Group key={index} inline>
           <div
             style={{
               display: 'flex',
               flexDirection: 'column',
             }}
             className='radiolabelcustom'
-            key={index}
           >
             <div style={{ alignSelf: 'center' }}>
               <Form.Radio
@@ -29,7 +28,7 @@ function RadioLabel({
                 checked={rating === option.value}
                 onChange={handleChange}
                 error={!!errors[name]}
-                disabled={evaluation !== 'pending'}
+                disabled={evaluation && evaluation === 'publish'}
               />
             </div>
             <div
