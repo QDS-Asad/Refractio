@@ -143,7 +143,6 @@ const OpportunityCreate = ({ showCreate, setShowCreate, id }) => {
           content='Save'
           onClick={() => {
             handleSubmit(handleCreate)();
-            setShowCreate(false);
           }}
           className='btn'
         />
