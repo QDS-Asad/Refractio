@@ -51,33 +51,46 @@ const Opportunity = ({ opportunity }) => {
           {application && opportunity.status !== 'draft' ? (
             <>
               <Divider />
-              <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <Button
-                  onClick={() =>
-                    navigate({
-                      pathname: `/opportunityresponse/${opportunity._id}`,
-                    })
-                  }
-                  primary
-                  className='btn'
-                  content='Start'
-                />
-              </div>
-              <div
-                className='mt-3'
-                style={{ display: 'flex', justifyContent: 'center' }}
-              >
-                <Button
-                  onClick={() =>
-                    navigate({
-                      pathname: `/opportunityevaluate/${opportunity._id}`,
-                    })
-                  }
-                  primary
-                  className='btn'
-                  content='Evaluate'
-                />
-              </div>
+              {(opportunity.status === 'publish' ||
+                opportunity.status === 'answering') && (
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                  <Button
+                    onClick={() =>
+                      navigate({
+                        pathname: `/opportunityresponse/${opportunity._id}`,
+                      })
+                    }
+                    primary
+                    className='btn'
+                    content='Start'
+                  />
+                </div>
+              )}
+              {opportunity.status === 'evaluating' && (
+                <div
+                  className='mt-3'
+                  style={{ display: 'flex', justifyContent: 'center' }}
+                >
+                  <Button
+                    onClick={() =>
+                      navigate({
+                        pathname: `/opportunityevaluate/${opportunity._id}`,
+                      })
+                    }
+                    primary
+                    className='btn'
+                    content='Evaluate'
+                  />
+                </div>
+              )}
+              {opportunity.status === 'completed' && (
+                <div
+                  className='mt-3'
+                  style={{ display: 'flex', justifyContent: 'center' }}
+                >
+                  <Button primary className='btn' content='View Results' />
+                </div>
+              )}
             </>
           ) : (
             <>

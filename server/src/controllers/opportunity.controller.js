@@ -403,6 +403,7 @@ exports.getOpportunityResponsesById = async (req, res, next) => {
     )
       .then(async (opportunityResponses) => {
         console.log(opportunityResponses);
+        opportunityResponses = opportunityResponses.filter((obj) => obj.userId !== user._id);
         let responses = [];
         await Promise.all(
           opportunityResponses.map(async (obj, key) => {
@@ -412,6 +413,7 @@ exports.getOpportunityResponsesById = async (req, res, next) => {
                 user._id
               );
             let evaluation = "";
+            let evalObj = {};
             if (
               opportunityEvaluations &&
               opportunityEvaluations.comprehension &&
@@ -419,9 +421,9 @@ exports.getOpportunityResponsesById = async (req, res, next) => {
               opportunityEvaluations.qualityOfIdea &&
               opportunityEvaluations.qualityOfIdea.score
             ) {
-              evaluation = OPPORTUNITY_EVALUATION_STATUS.COMPLETED;
+              evalObj = {evaluation: OPPORTUNITY_EVALUATION_STATUS.COMPLETED, status: opportunityEvaluations.status, comprehensionScore: opportunityEvaluations.comprehension.score, qualityOfIdeaScore: opportunityEvaluations.qualityOfIdea.score};
             } else {
-              evaluation = OPPORTUNITY_EVALUATION_STATUS.PENDING;
+              evalObj = {evaluation: OPPORTUNITY_EVALUATION_STATUS.PENDING};
             }
             let comprehension_answers = [];
             obj.comprehension.answers.map((comp, compKey) => {
@@ -458,6 +460,7 @@ exports.getOpportunityResponsesById = async (req, res, next) => {
               status: obj.status,
               comprehension: comprehension_answers,
               qualityOfIdea: qualityOfIdea_answers,
+              opportunityEvaluations: evalObj,
             };
           })
         );
@@ -574,10 +577,12 @@ const answerOpportunityResponse = async (req, res, opportunityRes) => {
         opportunityId
       );
     const filterParticipants = opportunityInfo.participants;
-    if (opportunityResponses.length == filterParticipants.length) {
-      await OpportunityService.updateOpportunity(opportunityId, {
-        stauts: OPPORTUNITY_STATUS.EVALUATING,
+    console.log('length', opportunityResponses.length, filterParticipants.length);
+    if (req.body.status === OPPORTUNITY_STATUS.PUBLISH && opportunityResponses.length == filterParticipants.length) {
+      const opportunityURes = await OpportunityService.updateOpportunity(opportunityId, {
+        status: OPPORTUNITY_STATUS.EVALUATING,
       });
+      console.log('opportunityURes --',opportunityURes);
       const participantsEmails = await UserService.getParticipants(
         opportunityRes.participants
       );
@@ -602,7 +607,7 @@ const answerOpportunityResponse = async (req, res, opportunityRes) => {
         });
     } else {
       await OpportunityService.updateOpportunity(opportunityId, {
-        stauts: OPPORTUNITY_STATUS.ANSWERING,
+        status: OPPORTUNITY_STATUS.ANSWERING,
       });
       return successResp(res, {
         msg: SUCCESS_MESSAGE.ANSWERED,
@@ -698,22 +703,31 @@ const evaluateAnswerOpportunityResponse = async (
   opportunityId,
   opportunityResponseId
 ) => {
+  if (req.body.status === OPPORTUNITY_STATUS.PUBLISH) {
+    await OpportunityService.updateOpportunityEvaluationsByResponseIdUserId(opportunityId, req.body.user._id, {
+      status: OPPORTUNITY_STATUS.PUBLISH
+    });
+  }
   const opportunityInfo = await OpportunityService.getOpportunityById(
     opportunityId
   );
   const opportunityEvaluation =
-    await OpportunityService.getOpportunityEvaluationByResponseId(
+    await OpportunityService.getOpportunityEvaluationsByOpportunityId(
       opportunityId
     );
-  const filterParticipants = opportunityInfo.participants;
-  if (opportunityEvaluation.length == filterParticipants.length) {
+  const filterParticipants = opportunityInfo.participants.filter((obj) => obj.toString() !== req.body.user._id.toString());
+  console.log(req.body.status, opportunityEvaluation.length, filterParticipants.length);
+  if (req.body.status === OPPORTUNITY_STATUS.PUBLISH && opportunityEvaluation.length == (filterParticipants.length * 2)) {
     await OpportunityService.updateOpportunity(opportunityId, {
-      stauts: OPPORTUNITY_STATUS.COMPLETED,
-      b,
+      status: OPPORTUNITY_STATUS.COMPLETED
+    });
+    return successResp(res, {
+      msg: SUCCESS_MESSAGE.UPDATED,
+      code: HTTP_STATUS.SUCCESS.CODE,
     });
   } else {
     await OpportunityService.updateOpportunity(opportunityId, {
-      stauts: OPPORTUNITY_STATUS.EVALUATING,
+      status: OPPORTUNITY_STATUS.EVALUATING,
     });
     return successResp(res, {
       msg: SUCCESS_MESSAGE.EVALUATED,

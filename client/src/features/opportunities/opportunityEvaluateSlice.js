@@ -7,6 +7,8 @@ export const initialState = {
   error: null,
   opportunity: null,
   responses: null,
+  success: false,
+  message: '',
 };
 
 // our slice
@@ -15,6 +17,7 @@ const opportunityEvaluateSlice = createSlice({
   initialState,
   reducers: {
     setLoading: (state) => {
+      state.success = false;
       state.loading = true;
     },
     setOpportunity: (state, { payload }) => {
@@ -30,6 +33,21 @@ const opportunityEvaluateSlice = createSlice({
     setError: (state, { payload }) => {
       state.loading = false;
       state.error = payload;
+      state.success = false;
+    },
+    setSuccess: (state, { payload }) => {
+      state.loading = false;
+      state.error = null;
+      state.success = true;
+      state.message = payload;
+    },
+    reset: (state) => {
+      state.loading = false;
+      state.error = null;
+      state.opportunity = null;
+      state.message = '';
+      state.success = false;
+      state.responses = null;
     },
   },
 });
@@ -39,6 +57,8 @@ export const {
   setOpportunity,
   setError,
   setResponses,
+  setSuccess,
+  reset,
 } = opportunityEvaluateSlice.actions;
 
 // export the selector (".items" being same as in slices/index.js's "items: something")
@@ -76,7 +96,7 @@ export const fetchResponses = (id) => async (dispatch) => {
     dispatch(setError(errorMessage));
   }
 };
-export const submitEvaluation = (id, opportunityId, body) => async (
+export const submitEvaluation = (id, opportunityId, body, flag = 0) => async (
   dispatch
 ) => {
   try {
@@ -85,6 +105,13 @@ export const submitEvaluation = (id, opportunityId, body) => async (
       `/opportunities/opportunity-response-evaluate/${id}`,
       { ...body }
     );
+    if (flag === 0) {
+      if (body.status === 'draft') {
+        dispatch(setSuccess('Response saved as draft successfully.'));
+      } else {
+        dispatch(setSuccess('Response published successfully.'));
+      }
+    }
     dispatch(fetchResponses(opportunityId));
   } catch (error) {
     const errorMessage =
@@ -93,4 +120,7 @@ export const submitEvaluation = (id, opportunityId, body) => async (
         : error.message;
     dispatch(setError(errorMessage));
   }
+};
+export const resetEvaluation = () => async (dispatch) => {
+  dispatch(reset());
 };
