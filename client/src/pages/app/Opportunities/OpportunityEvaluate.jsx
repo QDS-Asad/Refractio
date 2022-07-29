@@ -107,8 +107,8 @@ const OpportunityEvaluate = () => {
       const name = responses[currentParticipant - 1].name;
       draftEvaluation(
         'draft',
-        values[`qualityOfIdea_${name}`],
         values[`comprehension_${name}`],
+        values[`qualityOfIdea_${name}`],
         responseId,
         0
       );
