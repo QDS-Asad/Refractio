@@ -26,6 +26,7 @@ import { useForm } from 'react-hook-form';
 import QuestionsOpportunityForm from './QuestionsOpportunityForm';
 import { authLoginSelector } from '../../../features/auth/authLoginSlice';
 import DeleteOpportunity from './DeleteOpportunity';
+import ResultsOpportunity from './ResultsOpportunity';
 const maxLengthObject = {
   value: 120,
   message: 'Maximum characters are 120.',
@@ -232,6 +233,21 @@ const OpportunityDetail = () => {
   const watchQualityOfIdeaQ5 = watch('qualityOfIdeaQ5', '');
 
   const panes = [
+    opportunity && userLogin.id === opportunity.createdById
+      ? {
+          menuItem: 'Results',
+          render: () => (
+            <Tab.Pane loading={loading} attached={false}>
+              <ResultsOpportunity />
+            </Tab.Pane>
+          ),
+        }
+      : null,
+  ];
+  if (!panes[0]) {
+    panes.pop();
+  }
+  panes.push(
     {
       menuItem: 'Questions',
       render: () => (
@@ -299,8 +315,8 @@ const OpportunityDetail = () => {
           )}
         </Tab.Pane>
       ),
-    },
-  ];
+    }
+  );
 
   return (
     <>
