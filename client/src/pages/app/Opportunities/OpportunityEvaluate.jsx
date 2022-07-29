@@ -125,8 +125,8 @@ const OpportunityEvaluate = () => {
       const name = responses[responses.length - 1].name;
       setPublishResponse({
         responseId,
-        comprehension: data[`qualityOfIdea_${name}`],
-        quality: data[`comprehension_${name}`],
+        comprehension: data[`comprehension_${name}`],
+        quality: data[`qualityOfIdea_${name}`],
       });
       setViewSubmit(true);
     }
