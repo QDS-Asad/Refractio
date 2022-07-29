@@ -5,6 +5,7 @@ import { Button, Form, Message, Modal } from 'semantic-ui-react';
 import {
   createOpportunity,
   opportunityCreateSelector,
+  resetCreateOpportunity,
 } from '../../../features/opportunities/opportunityCreateSlice';
 import {
   opportunityDetailSelector,
@@ -61,6 +62,9 @@ const OpportunityCreate = ({ showCreate, setShowCreate, id }) => {
   useEffect(() => {
     register({ name: 'name' }, createOptions.name);
     register({ name: 'description' }, createOptions.description);
+    return () => {
+      dispatch(resetCreateOpportunity());
+    };
   }, []);
 
   useEffect(() => {
@@ -143,7 +147,6 @@ const OpportunityCreate = ({ showCreate, setShowCreate, id }) => {
           content='Save'
           onClick={() => {
             handleSubmit(handleCreate)();
-            setShowCreate(false);
           }}
           className='btn'
         />
