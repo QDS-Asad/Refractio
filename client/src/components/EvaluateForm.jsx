@@ -130,8 +130,8 @@ const EvaluateForm = memo(
                     ) {
                       draftEvaluation(
                         'draft',
-                        qualityChecked,
                         comprehensionCheck,
+                        qualityChecked,
                         response._id,
                         1
                       );

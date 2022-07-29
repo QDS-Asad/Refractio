@@ -101,10 +101,6 @@ const Subscription = () => {
         value: 50,
         message: "Team name can't exceed from 50 characters",
       },
-      minLength: {
-        value: 5,
-        message: 'Enter at least 5 characters',
-      },
     },
     nameOnCard: {
       required: 'Name on card is required',
