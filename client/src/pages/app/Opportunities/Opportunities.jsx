@@ -59,7 +59,10 @@ const Opportunities = () => {
     return (
       <>
         {opportunities.length === 0 && (
-          <EmptyOpportunities setShowCreate={setShowCreate} />
+          <EmptyOpportunities
+            roleId={userLogin.role.roleId}
+            setShowCreate={setShowCreate}
+          />
         )}
         {opportunities.length > 0 && activeItem === 'all' && (
           <AllOpportunities opportunities={opportunities} />
