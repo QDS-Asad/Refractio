@@ -1166,14 +1166,13 @@ exports.disableUser = async (req, res, next) => {
 
 exports.disableMyAccount = async (req, res, next) => {
   try {
-    const { userId } = req.params;
     const { user } = req.body;
-    const userInfo = await UserService.getUserById(userId);
+    const userInfo = await UserService.getUserById(user._id);
       const userData = {
         canLogin: false,
         isVerified: false
       };
-      await UserService.updateUserById(userId, userData)
+      await UserService.updateUserById(user._id, userData)
         .then(async (userRes) => {
           const emailObj = {
             email: userInfo.email,

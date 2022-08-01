@@ -733,7 +733,72 @@ router.put("/reset-password/:token", validateResetPassword, User.resetPassword);
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
  */
 router.delete("/delete/:userId", Auth, User.disableUser);
-router.delete("/remove-my-account/:userId", Auth, User.disableMyAccount);
+
+/**
+ * @swagger
+ *   /api/users/remove-my-account:
+ *   delete:
+ *     description: cancel invited user
+ *     tags: [User]
+ *     schema:
+ *        type: integer
+ *     responses:
+ *        '200':
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                   success: true
+ *                   code: 200
+ *                   message: Operation successfull.
+ *        '404':
+ *           description: Operation Failed
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 404,"message": "Operation Failed."}
+ *
+ *        '422':
+ *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
+ */
+router.delete("/remove-my-account", Auth, User.disableMyAccount);
 
 //Team specific user routes
 
