@@ -733,6 +733,7 @@ router.put("/reset-password/:token", validateResetPassword, User.resetPassword);
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
  */
 router.delete("/delete/:userId", Auth, User.disableUser);
+router.delete("/remove-my-account/:userId", Auth, User.disableMyAccount);
 
 //Team specific user routes
 
