@@ -1107,6 +1107,7 @@ exports.disableUser = async (req, res, next) => {
               await OpportunityService.getOpportunitiesByUserAsParticipant({
                 _id: userInfo._id,
                 teamId: user.teamId,
+                status: OPPORTUNITY_STATUS.DRAFT
               });
             if (userOpportunites && userOpportunites.length) {
               await Promise.all(userOpportunites.map(async (opp) => {
