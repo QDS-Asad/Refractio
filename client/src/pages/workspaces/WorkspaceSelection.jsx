@@ -93,8 +93,7 @@ const WorkspaceSelection = () => {
             {workspaces.activeTeamList.map((workspace) => (
               <List.Item
                 key={workspace.teamId}
-                onClick={() => handleTeamSelection(workspace.teamId)}
-              >
+                onClick={() => handleTeamSelection(workspace.teamId)}>
                 <List.Content floated='right'>
                   <Icon name='arrow right' className='my-2' />
                 </List.Content>
@@ -147,8 +146,7 @@ const WorkspaceSelection = () => {
               {workspaces.invitedTeamList.map((workspace) => (
                 <List.Item
                   key={workspace.teamId}
-                  onClick={() => handleInvitation(workspace.teamId)}
-                >
+                  onClick={() => handleInvitation(workspace.teamId)}>
                   <List.Content floated='right'>
                     <Button basic loading={joinLoading}>
                       Join
@@ -171,6 +169,17 @@ const WorkspaceSelection = () => {
         <span className='primary-color cursor-pointer' onClick={logout}>
           Try a different email
         </span>
+      </div>
+      <div>
+        <Button primary onClick={logout} floated='right'>
+          Logout
+        </Button>
+        <Button
+          content='Remove'
+          className='btn-danger'
+          onClick={logout}
+          floated='left'
+        />
       </div>
     </>
   );
