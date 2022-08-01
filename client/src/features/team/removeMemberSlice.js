@@ -7,7 +7,7 @@ export const initialState = {
   error: null,
   success: false,
 };
-
+const abort = new AbortController();
 // our slice
 const removeMemberSlice = createSlice({
   name: 'removeMember',
@@ -28,6 +28,7 @@ const removeMemberSlice = createSlice({
       state.error = payload;
     },
     reset: (state) => {
+      abort.abort();
       state.loading = false;
       state.error = null;
       state.success = false;

@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import refractioApi from '../../common/refractioApi';
-import { setUserLogin } from '../auth/authLoginSlice';
+import { logoutUser, setUserLogin } from '../auth/authLoginSlice';
 
 let userInfoFromStorage = window.localStorage.getItem('userInfo')
   ? window.localStorage.getItem('userInfo')
@@ -67,6 +67,19 @@ export const selectWorkspace = (team) => async (dispatch) => {
     dispatch(setUserWorkspace(response.data));
     dispatch(setUserLogin(response.data));
     window.localStorage.setItem('userInfo', JSON.stringify(response.data));
+  } catch (error) {
+    const errorMessage =
+      error.response && error.response.data
+        ? error.response.data.message
+        : error.message;
+    dispatch(setError(errorMessage));
+  }
+};
+export const removeSelf = () => async (dispatch) => {
+  try {
+    dispatch(setLoading());
+    await refractioApi.delete(`/users/remove-my-account`);
+    dispatch(logoutUser());
   } catch (error) {
     const errorMessage =
       error.response && error.response.data
