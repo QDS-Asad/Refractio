@@ -1151,7 +1151,6 @@ exports.disableUser = async (req, res, next) => {
           });
         });
     } else {
-      console.log(error);
       return errorResp(res, {
         msg: ERROR_MESSAGE.NOT_FOUND,
         code: HTTP_STATUS.NOT_FOUND.CODE,
