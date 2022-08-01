@@ -1109,15 +1109,15 @@ exports.disableUser = async (req, res, next) => {
                 teamId: user.teamId,
               });
             if (userOpportunites && userOpportunites.length) {
-              userOpportunites.map((opp) => {
+              await Promise.all(userOpportunites.map(async (opp) => {
                 const filteredParticipants =
                   opp.participants.filter(
                     (part) => part.toString() !== userId.toString()
                   );
-                OpportunityService.updateOpportunity(opp._id, {
+                await OpportunityService.updateOpportunity(opp._id, {
                   participants: filteredParticipants,
                 });
-              });
+              }));
             }
             const emailObj = {
               email: userInfo.email,
