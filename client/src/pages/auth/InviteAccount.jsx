@@ -71,17 +71,17 @@ const InviteAccount = () => {
 
     firstName: {
       required: 'First Name is required',
-      pattern: {
-        value: /^[a-zA-Z]*$/,
-        message: 'Invalid First Name. Only letters are allowed.',
+      maxLength: {
+        value: 50,
+        message: 'First Name cannot be more than 50 characters.',
       },
     },
 
     lastName: {
       required: 'Last Name is required',
-      pattern: {
-        value: /^[a-zA-Z]*$/,
-        message: 'Invalid Last Name. Only letters are allowed.',
+      maxLength: {
+        value: 50,
+        message: 'First Name cannot be more than 50 characters.',
       },
     },
 

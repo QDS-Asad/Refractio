@@ -29,6 +29,12 @@ const opportunityCreateSlice = createSlice({
       state.error = payload;
       state.success = false;
     },
+    reset: (state) => {
+      state.loading = false;
+      state.error = null;
+      state.opportunity = null;
+      state.success = false;
+    },
   },
 });
 // export the actions
@@ -36,6 +42,7 @@ export const {
   setLoading,
   setOpportunity,
   setError,
+  reset,
 } = opportunityCreateSlice.actions;
 
 // export the selector (".items" being same as in slices/index.js's "items: something")
@@ -58,4 +65,7 @@ export const createOpportunity = (opportunity) => async (dispatch) => {
         : error.message;
     dispatch(setError(errorMessage));
   }
+};
+export const resetCreateOpportunity = () => async (dispatch) => {
+  dispatch(reset());
 };
