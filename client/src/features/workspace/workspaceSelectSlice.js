@@ -75,10 +75,10 @@ export const selectWorkspace = (team) => async (dispatch) => {
     dispatch(setError(errorMessage));
   }
 };
-export const removeSelf = (member) => async (dispatch) => {
+export const removeSelf = () => async (dispatch) => {
   try {
     dispatch(setLoading());
-    await refractioApi.delete(`/users/delete/${member}`);
+    await refractioApi.delete(`/users/remove-my-account`);
     dispatch(logoutUser());
   } catch (error) {
     const errorMessage =
