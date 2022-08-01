@@ -36,7 +36,6 @@ const opportunityResponseSlice = createSlice({
       state.success = false;
     },
     setSuccess: (state, { payload }) => {
-      // state.loading = false;
       state.error = null;
       state.success = true;
       state.message = payload;
@@ -87,7 +86,6 @@ export const respondOpportunity = (id, body) => async (dispatch) => {
     await refractioApi.put(`/opportunities/opportunity-response/${id}`, {
       ...body,
     });
-    dispatch(setSuccess());
     if (body.status === 'draft') {
       dispatch(setSuccess('Response saved as draft successfully.'));
     } else {

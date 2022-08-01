@@ -81,6 +81,7 @@ const OpportunityResponse = () => {
   useEffect(() => {
     return () => {
       dispatch(resetResponse());
+      setResponsePublished(false);
     };
   }, []);
   useEffect(() => {
@@ -113,19 +114,31 @@ const OpportunityResponse = () => {
     }
   }, [allQuestions]);
   useEffect(() => {
+    if (success) {
+      setDisplayMessage(true);
+      setTimeout(() => {
+        setDisplayMessage(false);
+      }, 4000);
+    }
+  }, [success]);
+  useEffect(() => {
     if (response) {
       if (response.comprehension) {
         response.comprehension.answers.map((answer, idx) => {
-          setValue(`q${idx + 1}`, answer.answer);
+          if (answer.answer) {
+            setValue(`q${idx + 1}`, answer.answer);
+          }
           return answer;
         });
       }
       if (response.qualityOfIdea) {
         response.qualityOfIdea.answers.map((answer, idx) => {
-          setValue(
-            `q${response.comprehension.answers.length + idx + 1}`,
-            answer.answer
-          );
+          if (answer.answer) {
+            setValue(
+              `q${response.comprehension.answers.length + idx + 1}`,
+              answer.answer
+            );
+          }
           return answer;
         });
       }
@@ -134,15 +147,6 @@ const OpportunityResponse = () => {
       }
     }
   }, [response]);
-  useEffect(() => {
-    if (success) {
-      setDisplayMessage(true);
-      setTimeout(() => {
-        setDisplayMessage(false);
-      }, 4000);
-    }
-  }, [success]);
-
   const handleEdit = (data) => {
     setAnswer(apiResponseFormat(allQuestions, opportunity, data));
     setViewSubmit(true);
@@ -176,7 +180,8 @@ const OpportunityResponse = () => {
                     form='create-opportunity'
                     className='btn-secondary'
                     floated='right'
-                    disabled={loading}>
+                    disabled={loading}
+                  >
                     Submit
                   </Button>
                   <PublishResponse
@@ -189,7 +194,8 @@ const OpportunityResponse = () => {
                     primary
                     className='btn-outline me-3'
                     floated='right'
-                    disabled={loading}>
+                    disabled={loading}
+                  >
                     Save as Draft
                   </Button>
                 </>
@@ -201,7 +207,8 @@ const OpportunityResponse = () => {
                 error
                 size='small'
                 onSubmit={handleSubmit(handleEdit)}
-                loading={loading}>
+                loading={loading}
+              >
                 {error && (
                   <Message color='red' className='error-message'>
                     {error}
@@ -230,7 +237,8 @@ const OpportunityResponse = () => {
           <>
             <Grid.Column
               width={5}
-              style={{ backgroundColor: '#EDF1F6', height: '100%' }}>
+              style={{ backgroundColor: '#EDF1F6', height: '100%' }}
+            >
               <div className='clearfix'>
                 <Header floated='left'>Opportunity Information</Header>
               </div>
