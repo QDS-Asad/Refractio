@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   deleteOpportunity,
   fetchOpportunity,
+  fetchResults,
   opportunityDetailSelector,
   resetOpportunity,
   updateOpportunity,
@@ -191,6 +192,7 @@ const OpportunityDetail = () => {
     success,
     message,
     deleted,
+    evaluation,
   } = useSelector(opportunityDetailSelector);
   const { userLogin } = useSelector(authLoginSelector);
   // hook to fetch items
@@ -207,6 +209,9 @@ const OpportunityDetail = () => {
       opportunity.qualityOfIdea.questions.forEach((question) => {
         setValue(`qualityOfIdeaQ${question.order}`, question.question);
       });
+      if (opportunity.status === 'completed') {
+        dispatch(fetchResults(id));
+      }
     }
   }, [opportunity]);
   useEffect(() => {
@@ -236,12 +241,17 @@ const OpportunityDetail = () => {
   const watchQualityOfIdeaQ5 = watch('qualityOfIdeaQ5', '');
 
   const panes = [
-    opportunity && userLogin.id === opportunity.createdById
+    opportunity &&
+    opportunity.status === 'completed' &&
+    userLogin.id === opportunity.createdById
       ? {
           menuItem: 'Results',
           render: () => (
             <Tab.Pane loading={loading} attached={false}>
-              <ResultsOpportunity />
+              <ResultsOpportunity
+                evaluation={evaluation}
+                opportunity={opportunity}
+              />
             </Tab.Pane>
           ),
         }

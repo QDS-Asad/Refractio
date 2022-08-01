@@ -96,7 +96,16 @@ const Opportunity = ({ opportunity }) => {
                   className='mt-3'
                   style={{ display: 'flex', justifyContent: 'center' }}
                 >
-                  <Button primary className='btn' content='View Results' />
+                  <Button
+                    onClick={() =>
+                      navigate({
+                        pathname: `/opportunities/${opportunity._id}`,
+                      })
+                    }
+                    primary
+                    className='btn'
+                    content='View Results'
+                  />
                 </div>
               )}
             </>
