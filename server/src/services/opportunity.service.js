@@ -16,6 +16,14 @@ exports.getOpportunitiesByUser = async (user) => {
   });
 };
 
+exports.getOpportunitiesByUserAsParticipant = async (user) => {
+  return await Opportunity.find({
+    participants: { $in: [ObjectId(user._id)] },
+    teamId: user.teamId,
+    status: user.status,
+  });
+};
+
 exports.getOpportunityById = async (id) => {
   return await Opportunity.findOne({ _id: ObjectId(id) });
 };
