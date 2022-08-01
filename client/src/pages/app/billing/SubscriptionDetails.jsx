@@ -199,7 +199,7 @@ const SubscriptionDetails = () => {
                         </p>
                       )}
                       {subscription.status === SUBSCRIPTION_STATUS.CANCELED && (
-                        <p className='pt-2'>Canceled</p>
+                        <p className='pt-2'>Cancel at {formatDate(subscription.cancelAt)}{' '}</p>
                       )}
                     </Grid.Column>
                   </Grid.Row>
@@ -210,8 +210,10 @@ const SubscriptionDetails = () => {
                   <Button
                     className='btn-link'
                     floated='left'
+                    disabled={!subscription.isExpired}
+                    title={!subscription.isExpired && "(Will be enabled after cancelation date)"}
                     onClick={() => changeCardHandler()}>
-                    Add Payment method
+                    Add Payment method 
                   </Button>
                   <ChangeCard
                     title='Add'
