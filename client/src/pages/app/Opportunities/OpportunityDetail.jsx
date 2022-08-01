@@ -17,7 +17,7 @@ import {
   Tab,
   Segment,
 } from 'semantic-ui-react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import OpportunityStatus from '../../../components/OpportunityStatus';
 import PublishOpportunity from './PublishOpportunity';
 import ManageParticipants from './ManageParticipants';
@@ -223,6 +223,9 @@ const OpportunityDetail = () => {
       });
     }
   }, [deleted]);
+  if (opportunity && userLogin.id !== opportunity.createdById) {
+    return <Navigate to='/' replace />;
+  }
   const watchComprehensionQ1 = watch('comprehensionQ1', '');
   const watchComprehensionQ2 = watch('comprehensionQ2', '');
   const watchQualityOfIdeaQ1 = watch('qualityOfIdeaQ1', '');

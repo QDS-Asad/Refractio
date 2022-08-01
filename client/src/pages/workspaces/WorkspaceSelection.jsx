@@ -18,6 +18,7 @@ import {
 } from '../../features/workspace/workspaceListSlice';
 import {
   createWorkspace,
+  removeSelf,
   selectWorkspace,
   workspaceSelectSelector,
 } from '../../features/workspace/workspaceSelectSlice';
@@ -93,7 +94,8 @@ const WorkspaceSelection = () => {
             {workspaces.activeTeamList.map((workspace) => (
               <List.Item
                 key={workspace.teamId}
-                onClick={() => handleTeamSelection(workspace.teamId)}>
+                onClick={() => handleTeamSelection(workspace.teamId)}
+              >
                 <List.Content floated='right'>
                   <Icon name='arrow right' className='my-2' />
                 </List.Content>
@@ -146,7 +148,8 @@ const WorkspaceSelection = () => {
               {workspaces.invitedTeamList.map((workspace) => (
                 <List.Item
                   key={workspace.teamId}
-                  onClick={() => handleInvitation(workspace.teamId)}>
+                  onClick={() => handleInvitation(workspace.teamId)}
+                >
                   <List.Content floated='right'>
                     <Button basic loading={joinLoading}>
                       Join
@@ -167,19 +170,24 @@ const WorkspaceSelection = () => {
       <div className='text-center'>
         <div>Not seeing your team?</div>
         <span className='primary-color cursor-pointer' onClick={logout}>
-          Try a different email
+          Try a different email/Logout
+        </span>{' '}
+        |{' '}
+        <span
+          className='primary-color cursor-pointer'
+          onClick={() => dispatch(removeSelf(userLogin.id))}
+        >
+          Remove account
         </span>
-      </div>
-      <div>
-        <Button primary onClick={logout} floated='right'>
-          Logout
-        </Button>
-        <Button
-          content='Remove'
-          className='btn-danger'
-          onClick={logout}
-          floated='left'
-        />
+        {/* <div>
+          <Button content='Logout' primary onClick={logout} floated='right' />
+          <Button
+            content='Remove account'
+            className='btn-danger'
+            onClick={() => dispatch(removeSelf(userLogin.id))}
+            floated='left'
+          />
+        </div> */}
       </div>
     </>
   );
