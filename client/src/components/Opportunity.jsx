@@ -17,17 +17,25 @@ const Opportunity = ({ opportunity }) => {
       <Card fluid>
         <Card.Content>
           <Card.Header className='my-3'>
-            <Link
-              className='secondary-color'
-              to={`/opportunities/${opportunity._id}`}
-            >
-              {opportunity.name}
-            </Link>
+            {userLogin.id === opportunity.createdById ? (
+              <Link
+                className='secondary-color'
+                to={`/opportunities/${opportunity._id}`}
+              >
+                {opportunity.name}
+              </Link>
+            ) : (
+              <span className='secondary-color'>{opportunity.name}</span>
+            )}
           </Card.Header>
           <Card.Meta className='mb-3'>
-            <Link to={`/opportunities/${opportunity._id}`}>
+            {userLogin.id === opportunity.createdById ? (
+              <Link to={`/opportunities/${opportunity._id}`}>
+                <OpportunityStatus status={opportunity.status} />
+              </Link>
+            ) : (
               <OpportunityStatus status={opportunity.status} />
-            </Link>
+            )}
           </Card.Meta>
           <Card.Description className='mb-3'>
             {opportunity.description.length > 203 ? (
