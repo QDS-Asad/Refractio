@@ -1107,17 +1107,18 @@ exports.disableUser = async (req, res, next) => {
               await OpportunityService.getOpportunitiesByUserAsParticipant({
                 _id: userInfo._id,
                 teamId: user.teamId,
+                status: OPPORTUNITY_STATUS.DRAFT
               });
             if (userOpportunites && userOpportunites.length) {
-              userOpportunites.map((opp) => {
+              await Promise.all(userOpportunites.map(async (opp) => {
                 const filteredParticipants =
                   opp.participants.filter(
                     (part) => part.toString() !== userId.toString()
                   );
-                OpportunityService.updateOpportunity(opp._id, {
+                await OpportunityService.updateOpportunity(opp._id, {
                   participants: filteredParticipants,
                 });
-              });
+              }));
             }
             const emailObj = {
               email: userInfo.email,
@@ -1151,7 +1152,6 @@ exports.disableUser = async (req, res, next) => {
           });
         });
     } else {
-      console.log(error);
       return errorResp(res, {
         msg: ERROR_MESSAGE.NOT_FOUND,
         code: HTTP_STATUS.NOT_FOUND.CODE,
@@ -1259,7 +1259,6 @@ exports.disableUserBySelf = async (req, res, next) => {
           });
         });
     } else {
-      console.log(error);
       return errorResp(res, {
         msg: ERROR_MESSAGE.NOT_FOUND,
         code: HTTP_STATUS.NOT_FOUND.CODE,
