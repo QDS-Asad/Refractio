@@ -172,22 +172,18 @@ const WorkspaceSelection = () => {
         <span className='primary-color cursor-pointer' onClick={logout}>
           Try a different email/Logout
         </span>{' '}
-        |{' '}
-        <span
-          className='primary-color cursor-pointer'
-          onClick={() => dispatch(removeSelf(userLogin.id))}
-        >
-          Remove account
-        </span>
-        {/* <div>
-          <Button content='Logout' primary onClick={logout} floated='right' />
-          <Button
-            content='Remove account'
-            className='btn-danger'
-            onClick={() => dispatch(removeSelf(userLogin.id))}
-            floated='left'
-          />
-        </div> */}
+        {workspaces.invitedTeamList.length === 0 &&
+          workspaces.activeTeamList.length === 0 && (
+            <>
+              |{' '}
+              <span
+                className='primary-color cursor-pointer'
+                onClick={() => dispatch(removeSelf())}
+              >
+                Remove account
+              </span>
+            </>
+          )}
       </div>
     </>
   );
