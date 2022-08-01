@@ -18,6 +18,7 @@ import {
 } from '../../features/workspace/workspaceListSlice';
 import {
   createWorkspace,
+  removeSelf,
   selectWorkspace,
   workspaceSelectSelector,
 } from '../../features/workspace/workspaceSelectSlice';
@@ -169,8 +170,20 @@ const WorkspaceSelection = () => {
       <div className='text-center'>
         <div>Not seeing your team?</div>
         <span className='primary-color cursor-pointer' onClick={logout}>
-          Try a different email
-        </span>
+          Try a different email/Logout
+        </span>{' '}
+        {workspaces.invitedTeamList.length === 0 &&
+          workspaces.activeTeamList.length === 0 && (
+            <>
+              |{' '}
+              <span
+                className='primary-color cursor-pointer'
+                onClick={() => dispatch(removeSelf())}
+              >
+                Remove account
+              </span>
+            </>
+          )}
       </div>
     </>
   );

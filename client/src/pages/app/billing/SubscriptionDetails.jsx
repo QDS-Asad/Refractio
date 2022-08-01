@@ -99,8 +99,7 @@ const SubscriptionDetails = () => {
                           <Button
                             className='btn-link'
                             floated='right'
-                            onClick={() => cancelSubscriptionHandler()}
-                          >
+                            onClick={() => cancelSubscriptionHandler()}>
                             Cancel Subscription
                           </Button>
                           <CancelSubscription
@@ -114,8 +113,7 @@ const SubscriptionDetails = () => {
                           <Button
                             className='btn-link'
                             floated='right'
-                            onClick={() => resumeSubscriptionHandler()}
-                          >
+                            onClick={() => resumeSubscriptionHandler()}>
                             Resume Subscription
                           </Button>
                           <ResumeSubscription
@@ -151,8 +149,7 @@ const SubscriptionDetails = () => {
                         <Button
                           className='btn-link'
                           floated='right'
-                          onClick={() => changeCardHandler()}
-                        >
+                          onClick={() => changeCardHandler()}>
                           Change
                         </Button>
                         <ChangeCard
@@ -170,11 +167,50 @@ const SubscriptionDetails = () => {
             <List divided relaxed='very'>
               <List.Item className='px-3'>
                 <List.Content>
+                  <Grid columns={3}>
+                    <Grid.Row>
+                      <Grid.Column>
+                        <p className='pt-2 fw-bold'>Plan</p>
+                      </Grid.Column>
+
+                      <Grid.Column>
+                        <p className='pt-2'>
+                          {subscription.planName}, {subscription.interval}ly
+                        </p>
+                      </Grid.Column>
+                    </Grid.Row>
+                  </Grid>
+                </List.Content>
+              </List.Item>
+              <List.Item className='px-3'>
+                <Grid columns={3}>
+                  <Grid.Row>
+                    <Grid.Column>
+                      <p className='pt-2 fw-bold'>Next Payment</p>
+                    </Grid.Column>
+                    <Grid.Column>
+                      {subscription.status === SUBSCRIPTION_STATUS.ACTIVE && (
+                        <p className='pt-2'>
+                          ${subscription.amount} -{' '}
+                          {formatDate(subscription.nextBillingAt)}{' '}
+                          {subscription.autoRenew && (
+                            <span>(Billed automatically)</span>
+                          )}
+                        </p>
+                      )}
+                      {subscription.status === SUBSCRIPTION_STATUS.CANCELED && (
+                        <p className='pt-2'>Canceled</p>
+                      )}
+                    </Grid.Column>
+                  </Grid.Row>
+                </Grid>
+              </List.Item>
+              <List.Item className='px-3'>
+                <List.Content>
                   <Button
                     className='btn-link'
                     floated='left'
-                    onClick={() => changeCardHandler()}
-                  >
+                    onClick={() => changeCardHandler()}>
                     Add Payment method
                   </Button>
                   <ChangeCard
