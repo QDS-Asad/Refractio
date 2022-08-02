@@ -5,10 +5,6 @@ const Schema = mongoose.Schema;
 
 const UserSchema = new Schema(
   {
-    // roleId: {
-    //   type: Schema.Types.ObjectId,
-    //   required: true,
-    // },
     firstName: {
       type: String,
     },
@@ -45,19 +41,6 @@ const UserSchema = new Schema(
       enum: [true, false],
       default: false,
     },
-    // status: {
-    //   type: String,
-    //   enum: [
-    //     USER_STATUS.ACTIVE,
-    //     USER_STATUS.INVITE_SENT,
-    //     USER_STATUS.SUBSCRIPTION_PENDING,
-    //     USER_STATUS.DISABLED,
-    //   ],
-    //   default: USER_STATUS.DISABLED,
-    // },
-    // teamId: {
-    //   type: Schema.Types.ObjectId,
-    // },
     isRegistered: {
       type: Boolean,
       default: false,
@@ -153,26 +136,9 @@ const UserSchema = new Schema(
       type: String,
       default: "",
     },
-    createdBy: {
-      type: String,
-    },
-    updatedBy: {
-      type: String,
-      defalut: "",
-    },
   },
   { timestamps: true }
 );
-
-UserSchema.pre("save", function (next) {
-  this.set("createdBy", "createdby");
-  next();
-});
-
-UserSchema.pre("findOneAndUpdate", function (next) {
-  this.set("updatedBy", "updatedBy");
-  next();
-});
 UserSchema.plugin(mongoosePaginate);
 module.exports = {
   User: mongoose.model("users", UserSchema),
