@@ -3,9 +3,11 @@ import { useSelector } from 'react-redux';
 import { Navigate, Outlet } from 'react-router-dom';
 import { authLoginSelector } from '../features/auth/authLoginSlice';
 import { Grid, Header } from 'semantic-ui-react';
+import { workspaceListSelector } from '../features/workspace/workspaceListSlice';
 
 const WorkspaceLayout = () => {
   const { loading, userLogin } = useSelector(authLoginSelector);
+  const { workspaces } = useSelector(workspaceListSelector);
 
   if (!loading && !userLogin) {
     return <Navigate to='/auth/login' />;
@@ -23,7 +25,9 @@ const WorkspaceLayout = () => {
           />
           <Header as='h2' className='text-center my-5'>
             Welcome back!
-            <Header.Subheader>Choose a team.</Header.Subheader>
+            {workspaces && workspaces.activeTeamList.length > 0 && (
+              <Header.Subheader>Choose a team.</Header.Subheader>
+            )}
           </Header>
           <Outlet />
         </Grid.Column>
