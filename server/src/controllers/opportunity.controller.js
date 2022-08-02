@@ -715,9 +715,9 @@ const evaluateAnswerOpportunityResponse = async (
     await OpportunityService.getOpportunityEvaluationsByOpportunityId(
       opportunityId
     );
-  const filterParticipants = opportunityInfo.participants.filter((obj) => obj.toString() !== req.body.user._id.toString());
-  console.log(req.body.status, opportunityEvaluation.length, filterParticipants.length);
-  if (req.body.status === OPPORTUNITY_STATUS.PUBLISH && opportunityEvaluation.length == (filterParticipants.length * 2)) {
+  const filterParticipants = opportunityInfo.participants;
+  console.log(req.body.status, opportunityEvaluation.length, filterParticipants.length, filterParticipants.length * (filterParticipants.length - 1));
+  if (req.body.status === OPPORTUNITY_STATUS.PUBLISH && opportunityEvaluation.length == (filterParticipants.length * (filterParticipants.length - 1))) {
     await OpportunityService.updateOpportunity(opportunityId, {
       status: OPPORTUNITY_STATUS.COMPLETED
     });

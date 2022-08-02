@@ -24,6 +24,14 @@ exports.getOpportunitiesByUserAsParticipant = async (user) => {
   });
 };
 
+exports.getOpportunitiesByUserAsOwner = async (user) => {
+  return await Opportunity.find({
+    createdById: user._id,
+    teamId: user.teamId,
+    status: user.status,
+  });
+};
+
 exports.getOpportunityById = async (id) => {
   return await Opportunity.findOne({ _id: ObjectId(id) });
 };
