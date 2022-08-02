@@ -74,8 +74,6 @@ const OpportunityResponse = () => {
     loading: responseLoading,
     error: responseError,
     response,
-    success: responseSuccess,
-    message: responseMessage,
   } = useSelector(opportunityGetResponseSelector);
   const handleChange = (e) => {
     e.persist();
@@ -117,17 +115,16 @@ const OpportunityResponse = () => {
         );
         setValue((`q${i}`, ''));
       }
-      debugger;
     }
   }, [allQuestions]);
   useEffect(() => {
-    if (success || responseSuccess) {
+    if (success) {
       setDisplayMessage(true);
       setTimeout(() => {
         setDisplayMessage(false);
       }, 4000);
     }
-  }, [success, responseSuccess]);
+  }, [success]);
   useEffect(() => {
     if (response) {
       debugger;
@@ -176,11 +173,7 @@ const OpportunityResponse = () => {
         <Grid stretched>
           <Grid.Column width={11}>
             {displayMessage && (
-              <Message
-                header={message || responseMessage}
-                success
-                className='success-message'
-              />
+              <Message header={message} success className='success-message' />
             )}
             <Header as='h3' className='primary-dark-color'>
               {opportunity.name}
