@@ -1,69 +1,5 @@
 import React, { memo, useState } from 'react';
 import { Button, Divider, Grid, Header, List } from 'semantic-ui-react';
-const participants = [
-  {
-    name: 'Alexa Richardson',
-    comp: 5,
-    qual: 4,
-    score: 22,
-  },
-  {
-    name: 'Alexa Richardson',
-    comp: 5,
-    qual: 4,
-    score: 22,
-  },
-  {
-    name: 'Alexa Richardson',
-    comp: 5,
-    qual: 4,
-    score: 22,
-  },
-  {
-    name: 'Alexa Richardson',
-    comp: 5,
-    qual: 4,
-    score: 22,
-  },
-  {
-    name: 'Alexa Richardson',
-    comp: 5,
-    qual: 4,
-    score: 22,
-  },
-];
-const responses = [
-  {
-    question:
-      'Question 1: Describe the risks from action taken to pursue Opportunity',
-    answer:
-      'Si sine causa, nollem me tamen laudandis maioribus meis corrupisti nec voluptas sit. Quid ex ea voluptate velit esse, uam ob aliquam quaerat voluptatem ut alterum. Et quidem se ipsam causam ista, quae ab illo inventore veritatis et dolore. At vero eos censes tantas res gessisse sine causa, nollem me ab illo.',
-  },
-  {
-    question:
-      'Question 2: Describe the risks from action taken to pursue Opportunity',
-    answer:
-      'Si sine causa, nollem me tamen laudandis maioribus meis corrupisti nec voluptas sit. Quid ex ea voluptate velit esse, uam ob aliquam quaerat voluptatem ut alterum. Et quidem se ipsam causam ista, quae ab illo inventore veritatis et dolore. At vero eos censes tantas res gessisse sine causa, nollem me ab illo.',
-  },
-];
-const scoring = [
-  {
-    name: 'Grigoriy Kozhukhov',
-    score: 2,
-  },
-  {
-    name: 'Sofia Manzano',
-    score: 1,
-  },
-  {
-    name: 'Uzoma Buchi',
-    score: 1,
-  },
-  {
-    name: 'Xun Guiying',
-    score: 1,
-  },
-];
 const ResultsOpportunity = memo(({ evaluation }) => {
   const [currentParticipant, setCurrentParticipant] = useState(0);
   const [currentSection, setCurrentSection] = useState(1);
@@ -93,8 +29,7 @@ const ResultsOpportunity = memo(({ evaluation }) => {
                   }}
                   onClick={() => setCurrentParticipant(index)}
                   key={index}
-                  className='participantsList'
-                >
+                  className='participantsList'>
                   {firstName + ' ' + lastName}
                   <List.Content floated='right'>
                     {totalQualityOfIdeaAverageEvaluationScore}
@@ -115,14 +50,12 @@ const ResultsOpportunity = memo(({ evaluation }) => {
           <Button.Group>
             <Button
               onClick={() => setCurrentSection(1)}
-              className={currentSection === 1 ? 'btn' : ''}
-            >
+              className={currentSection === 1 ? 'btn' : ''}>
               Evaluation of Comprehension
             </Button>
             <Button
               onClick={() => setCurrentSection(2)}
-              className={currentSection === 2 ? 'btn' : ''}
-            >
+              className={currentSection === 2 ? 'btn' : ''}>
               Evaluation of Quality of Idea-Response
             </Button>
           </Button.Group>
@@ -135,8 +68,7 @@ const ResultsOpportunity = memo(({ evaluation }) => {
                         className='mb-4'
                         style={{ fontSize: 15 }}
                         size='medium'
-                        color='grey'
-                      >
+                        color='grey'>
                         Question {order}: {question}
                         <Header.Subheader className='mt-3' color='black'>
                           {answer}
@@ -152,8 +84,7 @@ const ResultsOpportunity = memo(({ evaluation }) => {
                         className='mb-4'
                         style={{ fontSize: 15 }}
                         size='medium'
-                        color='grey'
-                      >
+                        color='grey'>
                         Question {order}: {question}{' '}
                         <Header.Subheader className='mt-3' color='black'>
                           {answer}
@@ -185,10 +116,11 @@ const ResultsOpportunity = memo(({ evaluation }) => {
                 <div className='indivisualScore'>
                   <span>Total</span>
                   <span>
-                    {
-                      evaluation[currentParticipant]
-                        .totalQualityOfIdeaAverageEvaluationScore
-                    }
+                    {currentSection === 1
+                      ? evaluation[currentParticipant]
+                          .totalComprehensionAverageEvaluationScore
+                      : evaluation[currentParticipant]
+                          .totalQualityOfIdeaAverageEvaluationScore}
                   </span>
                 </div>
               </Grid.Column>

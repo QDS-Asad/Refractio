@@ -20,8 +20,7 @@ const Opportunity = ({ opportunity }) => {
             {userLogin.id === opportunity.createdById ? (
               <Link
                 className='secondary-color'
-                to={`/opportunities/${opportunity._id}`}
-              >
+                to={`/opportunities/${opportunity._id}`}>
                 {opportunity.name}
               </Link>
             ) : (
@@ -47,8 +46,7 @@ const Opportunity = ({ opportunity }) => {
                 )}
                 <span
                   style={style}
-                  onClick={() => setShowMore((prev) => !prev)}
-                >
+                  onClick={() => setShowMore((prev) => !prev)}>
                   {showMore ? 'Show Less' : 'Show More'}
                 </span>
               </>
@@ -77,8 +75,7 @@ const Opportunity = ({ opportunity }) => {
               {opportunity.status === 'evaluating' && (
                 <div
                   className='mt-3'
-                  style={{ display: 'flex', justifyContent: 'center' }}
-                >
+                  style={{ display: 'flex', justifyContent: 'center' }}>
                   <Button
                     onClick={() =>
                       navigate({
@@ -91,11 +88,11 @@ const Opportunity = ({ opportunity }) => {
                   />
                 </div>
               )}
-              {opportunity.status === 'completed' && (
+              {opportunity.status === 'completed' &&
+              userLogin.id === opportunity.createdById ? (
                 <div
                   className='mt-3'
-                  style={{ display: 'flex', justifyContent: 'center' }}
-                >
+                  style={{ display: 'flex', justifyContent: 'center' }}>
                   <Button
                     onClick={() =>
                       navigate({
@@ -107,6 +104,17 @@ const Opportunity = ({ opportunity }) => {
                     content='View Results'
                   />
                 </div>
+              ) : (
+                <>
+                  <Image
+                    src='/images/team.svg'
+                    className='d-inline-block'
+                    verticalAlign='middle'
+                  />
+                  <span className='secondary-color'>
+                    {opportunity.participants.length}
+                  </span>
+                </>
               )}
             </>
           ) : (

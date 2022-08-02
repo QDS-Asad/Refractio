@@ -165,7 +165,7 @@ const WorkspaceSelection = () => {
           </Card.Content>
         </Card>
       )}
-      <div className='text-center'>
+      <div className='text-center fs-5'>
         <div>Not seeing your team?</div>
         <span className='primary-color cursor-pointer' onClick={logout}>
           Try a different email / logout
