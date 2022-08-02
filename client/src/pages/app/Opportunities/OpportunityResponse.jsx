@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchOpportunity,
-  getResponse,
   opportunityResponseSelector,
   resetResponse,
   respondOpportunity,
@@ -12,6 +11,11 @@ import { useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import ResponseForm from '../../../components/ResponseForm';
 import PublishResponse from './PublishResponse';
+import {
+  resetGetResponse,
+  getOpportunityResponse,
+  opportunityGetResponseSelector,
+} from '../../../features/opportunities/opportunityGetResponseSlice';
 
 const apiResponseFormat = (allQuestions, opportunity, data) => {
   let comprehensionAnswer = [];
@@ -63,14 +67,14 @@ const OpportunityResponse = () => {
   const dispatch = useDispatch();
 
   // fetch data from our store
+  const { loading, error, opportunity, success, message } = useSelector(
+    opportunityResponseSelector
+  );
   const {
-    loading,
-    error,
-    opportunity,
+    loading: responseLoading,
+    error: responseError,
     response,
-    success,
-    message,
-  } = useSelector(opportunityResponseSelector);
+  } = useSelector(opportunityGetResponseSelector);
   const handleChange = (e) => {
     e.persist();
     setValue(e.target.name, e.target.value);
@@ -81,13 +85,11 @@ const OpportunityResponse = () => {
   useEffect(() => {
     return () => {
       dispatch(resetResponse());
-      setResponsePublished(false);
-      setViewSubmit(false);
+      dispatch(resetGetResponse());
     };
   }, []);
   useEffect(() => {
     dispatch(fetchOpportunity(id));
-    dispatch(getResponse(id));
   }, [dispatch, id]);
   useEffect(() => {
     if (opportunity && opportunity.comprehension.questions) {
@@ -112,22 +114,35 @@ const OpportunityResponse = () => {
         );
         setValue((`q${i}`, ''));
       }
+      dispatch(getOpportunityResponse(id));
     }
   }, [allQuestions]);
+  useEffect(() => {
+    if (success) {
+      setDisplayMessage(true);
+      setTimeout(() => {
+        setDisplayMessage(false);
+      }, 4000);
+    }
+  }, [success]);
   useEffect(() => {
     if (response) {
       if (response.comprehension) {
         response.comprehension.answers.map((answer, idx) => {
-          setValue(`q${idx + 1}`, answer.answer);
+          if (answer.answer) {
+            setValue(`q${idx + 1}`, answer.answer);
+          }
           return answer;
         });
       }
       if (response.qualityOfIdea) {
         response.qualityOfIdea.answers.map((answer, idx) => {
-          setValue(
-            `q${response.comprehension.answers.length + idx + 1}`,
-            answer.answer
-          );
+          if (answer.answer) {
+            setValue(
+              `q${response.comprehension.answers.length + idx + 1}`,
+              answer.answer
+            );
+          }
           return answer;
         });
       }
@@ -138,15 +153,6 @@ const OpportunityResponse = () => {
       }
     }
   }, [response]);
-  useEffect(() => {
-    if (success) {
-      setDisplayMessage(true);
-      setTimeout(() => {
-        setDisplayMessage(false);
-      }, 4000);
-    }
-  }, [success]);
-
   const handleEdit = (data) => {
     setAnswer(apiResponseFormat(allQuestions, opportunity, data));
     setViewSubmit(true);
@@ -180,8 +186,7 @@ const OpportunityResponse = () => {
                     form='create-opportunity'
                     className='btn-secondary'
                     floated='right'
-                    disabled={loading}
-                  >
+                    disabled={loading || responseLoading}>
                     Submit
                   </Button>
                   <PublishResponse
@@ -194,8 +199,7 @@ const OpportunityResponse = () => {
                     primary
                     className='btn-outline me-3'
                     floated='right'
-                    disabled={loading}
-                  >
+                    disabled={loading || responseLoading}>
                     Save as Draft
                   </Button>
                 </>
@@ -207,11 +211,15 @@ const OpportunityResponse = () => {
                 error
                 size='small'
                 onSubmit={handleSubmit(handleEdit)}
-                loading={loading}
-              >
+                loading={loading || responseLoading}>
                 {error && (
                   <Message color='red' className='error-message'>
                     {error}
+                  </Message>
+                )}
+                {responseError && (
+                  <Message color='red' className='error-message'>
+                    {responseError}
                   </Message>
                 )}
                 {allQuestions.map((o, index) => (
@@ -225,7 +233,7 @@ const OpportunityResponse = () => {
                         watch={watch}
                         allQuestions={allQuestions.length}
                         setCurrentQuestion={setCurrentQuestion}
-                        loading={loading}
+                        loading={loading || responseLoading}
                         responsePublished={responsePublished}
                       />
                     )}

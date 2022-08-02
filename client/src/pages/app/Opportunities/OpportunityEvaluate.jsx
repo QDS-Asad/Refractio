@@ -186,8 +186,7 @@ const OpportunityEvaluate = () => {
                     form='submit-evaluation'
                     className='btn-secondary'
                     floated='right'
-                    disabled={loading || currentParticipant < responses.length}
-                  >
+                    disabled={loading || currentParticipant < responses.length}>
                     Submit
                   </Button>
                   <PublishEvaluation
@@ -201,8 +200,7 @@ const OpportunityEvaluate = () => {
                     type='button'
                     className='btn-outline me-3'
                     floated='right'
-                    disabled={loading}
-                  >
+                    disabled={loading}>
                     Save as Draft
                   </Button>
                 </>
@@ -214,8 +212,7 @@ const OpportunityEvaluate = () => {
                 error
                 size='small'
                 onSubmit={handleSubmit(handleSubmittion)}
-                loading={loading}
-              >
+                loading={loading}>
                 {error && (
                   <Message color='red' className='error-message'>
                     {error}
@@ -233,8 +230,8 @@ const OpportunityEvaluate = () => {
                             currentParticipant={currentParticipant}
                             setCurrentParticipant={setCurrentParticipant}
                             totalParticipants={responses.length}
-                            quality={response.comprehension}
-                            comprehension={response.qualityOfIdea}
+                            comprehension={response.comprehension}
+                            quality={response.qualityOfIdea}
                             handleChange={handleChange}
                             trigger={trigger}
                             setValue={setValue}
@@ -255,8 +252,7 @@ const OpportunityEvaluate = () => {
           <>
             <Grid.Column
               width={5}
-              style={{ backgroundColor: '#EDF1F6', height: '100%' }}
-            >
+              style={{ backgroundColor: '#EDF1F6', height: '100%' }}>
               <div className='clearfix'>
                 <Header floated='left'>Opportunity Information</Header>
               </div>
