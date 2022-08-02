@@ -94,8 +94,7 @@ const WorkspaceSelection = () => {
             {workspaces.activeTeamList.map((workspace) => (
               <List.Item
                 key={workspace.teamId}
-                onClick={() => handleTeamSelection(workspace.teamId)}
-              >
+                onClick={() => handleTeamSelection(workspace.teamId)}>
                 <List.Content floated='right'>
                   <Icon name='arrow right' className='my-2' />
                 </List.Content>
@@ -148,8 +147,7 @@ const WorkspaceSelection = () => {
               {workspaces.invitedTeamList.map((workspace) => (
                 <List.Item
                   key={workspace.teamId}
-                  onClick={() => handleInvitation(workspace.teamId)}
-                >
+                  onClick={() => handleInvitation(workspace.teamId)}>
                   <List.Content floated='right'>
                     <Button basic loading={joinLoading}>
                       Join
@@ -170,7 +168,7 @@ const WorkspaceSelection = () => {
       <div className='text-center'>
         <div>Not seeing your team?</div>
         <span className='primary-color cursor-pointer' onClick={logout}>
-          Try a different email/Logout
+          Try a different email / logout
         </span>{' '}
         {workspaces.invitedTeamList.length === 0 &&
           workspaces.activeTeamList.length === 0 && (
@@ -178,8 +176,7 @@ const WorkspaceSelection = () => {
               |{' '}
               <span
                 className='primary-color cursor-pointer'
-                onClick={() => dispatch(removeSelf())}
-              >
+                onClick={() => dispatch(removeSelf())}>
                 Remove account
               </span>
             </>

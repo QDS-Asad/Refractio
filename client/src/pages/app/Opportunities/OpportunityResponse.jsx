@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchOpportunity,
-  getResponse,
   opportunityResponseSelector,
   resetResponse,
   respondOpportunity,
@@ -12,6 +11,11 @@ import { useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import ResponseForm from '../../../components/ResponseForm';
 import PublishResponse from './PublishResponse';
+import {
+  resetGetResponse,
+  getOpportunityResponse,
+  opportunityGetResponseSelector,
+} from '../../../features/opportunities/opportunityGetResponseSlice';
 
 const apiResponseFormat = (allQuestions, opportunity, data) => {
   let comprehensionAnswer = [];
@@ -63,14 +67,14 @@ const OpportunityResponse = () => {
   const dispatch = useDispatch();
 
   // fetch data from our store
+  const { loading, error, opportunity, success, message } = useSelector(
+    opportunityResponseSelector
+  );
   const {
-    loading,
-    error,
-    opportunity,
+    loading: responseLoading,
+    error: responseError,
     response,
-    success,
-    message,
-  } = useSelector(opportunityResponseSelector);
+  } = useSelector(opportunityGetResponseSelector);
   const handleChange = (e) => {
     e.persist();
     setValue(e.target.name, e.target.value);
@@ -81,12 +85,11 @@ const OpportunityResponse = () => {
   useEffect(() => {
     return () => {
       dispatch(resetResponse());
-      setResponsePublished(false);
+      dispatch(resetGetResponse());
     };
   }, []);
   useEffect(() => {
     dispatch(fetchOpportunity(id));
-    dispatch(getResponse(id));
   }, [dispatch, id]);
   useEffect(() => {
     if (opportunity && opportunity.comprehension.questions) {
@@ -111,6 +114,7 @@ const OpportunityResponse = () => {
         );
         setValue((`q${i}`, ''));
       }
+      dispatch(getOpportunityResponse(id));
     }
   }, [allQuestions]);
   useEffect(() => {
@@ -180,8 +184,7 @@ const OpportunityResponse = () => {
                     form='create-opportunity'
                     className='btn-secondary'
                     floated='right'
-                    disabled={loading}
-                  >
+                    disabled={loading || responseLoading}>
                     Submit
                   </Button>
                   <PublishResponse
@@ -194,8 +197,7 @@ const OpportunityResponse = () => {
                     primary
                     className='btn-outline me-3'
                     floated='right'
-                    disabled={loading}
-                  >
+                    disabled={loading || responseLoading}>
                     Save as Draft
                   </Button>
                 </>
@@ -207,11 +209,15 @@ const OpportunityResponse = () => {
                 error
                 size='small'
                 onSubmit={handleSubmit(handleEdit)}
-                loading={loading}
-              >
+                loading={loading || responseLoading}>
                 {error && (
                   <Message color='red' className='error-message'>
                     {error}
+                  </Message>
+                )}
+                {responseError && (
+                  <Message color='red' className='error-message'>
+                    {responseError}
                   </Message>
                 )}
                 {allQuestions.map((o, index) => (
@@ -225,7 +231,7 @@ const OpportunityResponse = () => {
                         watch={watch}
                         allQuestions={allQuestions.length}
                         setCurrentQuestion={setCurrentQuestion}
-                        loading={loading}
+                        loading={loading || responseLoading}
                         responsePublished={responsePublished}
                       />
                     )}
@@ -237,8 +243,7 @@ const OpportunityResponse = () => {
           <>
             <Grid.Column
               width={5}
-              style={{ backgroundColor: '#EDF1F6', height: '100%' }}
-            >
+              style={{ backgroundColor: '#EDF1F6', height: '100%' }}>
               <div className='clearfix'>
                 <Header floated='left'>Opportunity Information</Header>
               </div>
