@@ -55,6 +55,39 @@ exports.getTeam = async (obj) => {
   );
 };
 
+exports.getAllUsers = async (obj) => {
+  const { page, page_size } = obj;
+  const options = {
+    page: page || DEFAULT_PAGE_NO,
+    limit: page_size || DEFAULT_PAGE_SIZE,
+    sort: {
+      createdAt: 1, //Sort by Date Added ASC
+    },
+    select: {
+      password: 0,
+      token: 0,
+      tokenExpiry: 0,
+      createdBy: 0,
+      updatedBy: 0,
+    },
+  };
+  return await User.paginate(
+    {
+      // ...(!user.isOwner && {_id: {$nin: OwnerId}}),
+      // teams: {
+      //   $elemMatch: {
+      //     teamId: ObjectId(teamId),
+      //     status: { $nin: USER_STATUS.DISABLED },
+      //   },
+      // },
+      // "teams.teamId": ObjectId(teamId),
+      // "teams.roleId": { $in: roleIds },
+      // "teams.status": { $nin: USER_STATUS.DISABLED },
+    },
+    options
+  );
+};
+
 exports.getUsersByTeamId = async (teamId) => {
   return await User.find({
     teams: {

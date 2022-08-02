@@ -643,7 +643,7 @@ exports.login = async (req, res) => {
             code: HTTP_STATUS.BAD_REQUEST.CODE,
           });
         }
-        await UserService.updateUserById(user._id, {canLogin: true});
+        await UserService.updateUserById(user._id, { canLogin: true });
         const expiry =
           (req.body.rememberMe && JWT_EXPIRY_REMEMBER_ME) || JWT_EXPIRY;
         const token = jwt.sign(
@@ -1308,7 +1308,10 @@ exports.updateUserRole = async (req, res, next) => {
         roleId: role._id,
       };
       // console.log(userInfo.teams);return;
-      await UserService.updateUserById(userId, { canLogin: false, teams: userInfo.teams });
+      await UserService.updateUserById(userId, {
+        canLogin: false,
+        teams: userInfo.teams,
+      });
       const memberIndex = team.members.findIndex(
         (obj) => obj.userId.toString() == userId
       );
@@ -2473,6 +2476,181 @@ exports.changeName = async (req, res, next) => {
       });
   } catch (error) {
     console.log(error);
+    serverError(res, error);
+  }
+};
+
+//get all user list with pagination
+exports.getAllUsers = async (req, res, next) => {
+  try {
+    const { page, page_size } = req.query;
+    const teamData = {
+      page,
+      page_size,
+    };
+    await TeamService.getAllUsers(teamData)
+      .then(async (teamRes) => {
+        let docs = [];
+        await Promise.all(
+          teamRes.docs.map(async (userObj, key) => {
+            let obj = userObj._doc;
+            docs[key] = {
+              _id: obj._id,
+              firstName: obj.firstName,
+              lastName: obj.lastName,
+              email: obj.email,
+            };
+          })
+        );
+        teamRes = {
+          ...teamRes,
+          docs,
+        };
+        return successResp(res, {
+          msg: SUCCESS_MESSAGE.DATA_FETCHED,
+          code: HTTP_STATUS.SUCCESS.CODE,
+          data: teamRes,
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        errorResp(res, {
+          msg: ERROR_MESSAGE.NOT_FOUND,
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+        });
+      });
+  } catch (error) {
+    console.log(error);
+    serverError(res, error);
+  }
+};
+
+exports.getUserById = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    await UserService.getUserById(userId)
+      .then(async (userObj) => {
+        let docs = [];
+        await Promise.all(
+          userObj.teams.map(async (team, key) => {
+            await RoleService.getRoleById(team.roleId).then(async (role) => {
+              const teamData = await TeamService.getTeamById(team.teamId);
+              let subscriptionDetails = {};
+              if(team.stripeDetails.subscription.subscriptionId){
+              const reqBody = {
+                planId: team.stripeDetails.subscription.planId,
+                prices: [team.stripeDetails.subscription.priceId],
+              };
+              const stripePlan = await PlanService.getStripePlanById(reqBody);
+              subscriptionDetails = {
+                planName: stripePlan.name,
+                interval: stripePlan.prices[0].recurring.interval,
+                amount: convertDollerToCent(stripePlan.prices[0].unit_amount),
+                nextBillingAt:
+                  (team.stripeDetails.subscription.status ==
+                    SUBSCRIPTION_STATUS.ACTIVE &&
+                    new Date(
+                      convertTimestampToDate(
+                        team.stripeDetails.subscription.endDate
+                      )
+                    )) ||
+                  null,
+                cancelAt:
+                  (team.stripeDetails.subscription.status ==
+                    SUBSCRIPTION_STATUS.CANCELED &&
+                    new Date(
+                      convertTimestampToDate(
+                        team.stripeDetails.subscription.canceledDate
+                      )
+                    )) ||
+                  null,
+                autoRenew: team.stripeDetails.subscription.autoRenew, 
+                status: team.stripeDetails.subscription.status,
+                isExpired:
+                  (team.stripeDetails.subscription.status ==
+                    SUBSCRIPTION_STATUS.CANCELED &&
+                    team.stripeDetails.subscription.canceledDate <
+                      getCurrentTimeStamp()) ||
+                  false,
+              };
+            }
+              docs[key] = {
+                role: {
+                  _id: role._id,
+                  roleId: role.roleId,
+                  name: role.name,
+                },
+                teamId: team.teamId,
+                teamName: teamData.name,
+                userStatus: team.status,
+                teamStatus: teamData.status,
+                totalMembers: teamData.members.length,
+                subscription: subscriptionDetails,
+              };
+            });
+          })
+        );
+        return successResp(res, {
+          msg: SUCCESS_MESSAGE.DATA_FETCHED,
+          code: HTTP_STATUS.SUCCESS.CODE,
+          data: docs,
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        errorResp(res, {
+          msg: ERROR_MESSAGE.NOT_FOUND,
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+        });
+      });
+  } catch (error) {
+    console.log(error);
+    serverError(res, error);
+  }
+};
+
+//get all users billing history list with pagination
+exports.getAllUsersBillingHistory = async (req, res, next) => {
+  try {
+    const { page, page_size } = req.query;
+    const filterData = {
+      page,
+      page_size
+    };
+    await BillingService.getAllUsersBillingHistory(filterData)
+      .then(async (billingRes) => {
+        let docs = [];
+        await Promise.all(
+          billingRes.docs.map(async (order, key) => {
+            const orderObj = order._doc;
+            const userData = await UserService.getUserById(orderObj.userId);
+            const teamData = await TeamService.getTeamById(orderObj.teamId);
+            docs[key] = {
+              ...orderObj,
+              firstName: userData.firstName,
+              lastName: userData.lastName,
+              email: userData.email,
+              teamName: teamData.name
+            }
+          })
+        )
+        billingRes = {
+          ...billingRes,
+          docs
+        }
+        return successResp(res, {
+          msg: SUCCESS_MESSAGE.DATA_FETCHED,
+          code: HTTP_STATUS.SUCCESS.CODE,
+          data: billingRes,
+        });
+      })
+      .catch((error) => {
+        errorResp(res, {
+          msg: ERROR_MESSAGE.NOT_FOUND,
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+        });
+      });
+  } catch (error) {
     serverError(res, error);
   }
 };

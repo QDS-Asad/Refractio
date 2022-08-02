@@ -868,15 +868,52 @@ exports.evalutationResultsByParticipants = async (req, res, next) => {
   }
 };
 
-const getOpportunitiesByStatus = async (opportunities) => {
-  const completed = opportunities.filter(
-    (obj) => obj.status == OPPORTUNITY_STATUS.COMPLETED
-  );
-  const published = opportunities.filter(
-    (obj) => obj.status == OPPORTUNITY_STATUS.PUBLISH
-  );
-  const drafted = opportunities.filter(
-    (obj) => obj.status == OPPORTUNITY_STATUS.DRAFT
-  );
-  return { completed, published, drafted };
-};
+exports.getAllOpportunities = async (req, res, next) => {
+  try {
+    const { page, page_size } = req.query;
+    const filterData = {
+      page,
+      page_size
+    };
+    await OpportunityService.getAllOpportunities(filterData)
+      .then(async (opportunityRes) => {
+        let docs = [];
+        await Promise.all(
+          opportunityRes.docs.map(async (opportunity, key) => {
+            const opportunityObj = opportunity._doc;
+            const userData = await UserService.getUserById(opportunityObj.createdById);
+            const teamData = await TeamService.getTeamById(opportunityObj.teamId);
+            docs[key] = {
+              name: opportunityObj.name,
+              description: opportunityObj.description,
+              status: opportunityObj.status,
+              // firstName: userData.firstName,
+              // lastName: userData.lastName,
+              // email: userData.email,
+              // teamName: teamData.name
+            }
+          })
+        )
+        opportunityRes = {
+          ...opportunityRes,
+          docs
+        }
+        return successResp(res, {
+          msg: SUCCESS_MESSAGE.DATA_FETCHED,
+          code: HTTP_STATUS.SUCCESS.CODE,
+          data: opportunityRes,
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        errorResp(res, {
+          msg: ERROR_MESSAGE.NOT_FOUND,
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+        });
+      });
+  } catch (error) {
+    console.log(error);
+
+    serverError(res, error);
+  }
+}
