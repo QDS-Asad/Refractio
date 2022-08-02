@@ -47,26 +47,16 @@ const OpportunityResponseSchema = new Schema(
         },
       ],
     },
-    createdBy: {
-      type: String,
-    },
-    updatedBy: {
-      type: String,
-      defalut: "",
-    },
+    // createdBy: {
+    //   type: String,
+    // },
+    // updatedBy: {
+    //   type: String,
+    //   defalut: "",
+    // },
   },
   { timestamps: true }
 );
-
-OpportunityResponseSchema.pre("save", function (next) {
-  this.set("createdBy", "createdby");
-  next();
-});
-
-OpportunityResponseSchema.pre("findOneAndUpdate", function (next) {
-  this.set("updatedBy", "updatedBy");
-  next();
-});
 OpportunityResponseSchema.plugin(mongoosePaginate);
 module.exports = {
   OpportunityResponse: mongoose.model("OpportunityResponses", OpportunityResponseSchema),

@@ -29,27 +29,9 @@ const TeamSchema = new Schema(
       ],
       default: TEAM_STATUS.ACTIVE,
     },
-    createdBy: {
-      type: String,
-    },
-    updatedBy: {
-      type: String,
-      defalut: "",
-    },
   },
   { timestamps: true }
 );
-
-TeamSchema.pre("save", function (next) {
-  this.set("createdBy", "createdby");
-  next();
-});
-
-TeamSchema.pre("findOneAndUpdate", function (next) {
-  this.set("updatedBy", "updatedBy");
-  next();
-});
-
 module.exports = {
   Team: mongoose.model("teams", TeamSchema),
 };

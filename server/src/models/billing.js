@@ -31,17 +31,6 @@ const BillingSchema = new Schema(
   },
   { timestamps: true }
 );
-
-BillingSchema.pre("save", function (next) {
-  this.set("createdBy", "createdby");
-  next();
-});
-
-BillingSchema.pre("findOneAndUpdate", function (next) {
-  this.set("updatedBy", "updatedBy");
-  next();
-});
-
 BillingSchema.plugin(mongoosePaginate);
 module.exports = {
   Billing: mongoose.model("billing", BillingSchema),

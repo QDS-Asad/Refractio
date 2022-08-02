@@ -36,26 +36,17 @@ const OpportunityEvaluationSchema = new Schema(
         type: String,
       },
     },
-    createdBy: {
-      type: String,
-    },
-    updatedBy: {
-      type: String,
-      defalut: "",
-    },
+    // createdBy: {
+    //   type: String,
+    // },
+    // updatedBy: {
+    //   type: String,
+    //   defalut: "",
+    // },
   },
   { timestamps: true }
 );
 
-OpportunityEvaluationSchema.pre("save", function (next) {
-  this.set("createdBy", "createdby");
-  next();
-});
-
-OpportunityEvaluationSchema.pre("findOneAndUpdate", function (next) {
-  this.set("updatedBy", "updatedBy");
-  next();
-});
 OpportunityEvaluationSchema.plugin(mongoosePaginate);
 module.exports = {
   OpportunityEvaluation: mongoose.model(
