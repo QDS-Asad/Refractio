@@ -31,6 +31,7 @@ const opportunityResponseSlice = createSlice({
       state.success = false;
     },
     setSuccess: (state, { payload }) => {
+      state.loading = false;
       state.error = null;
       state.success = true;
       state.message = payload;
