@@ -76,6 +76,15 @@ router.get("/", Auth, Opportunity.opportunitiesList);
 //  *   get:
 //  *     description: get all users opportunities list
 //  *     tags: [Opportunities]
+//  *     parameters:
+//  *        - in: query
+//  *          name: page
+//  *          schema:
+//  *              type: integer
+//  *        - in: query
+//  *          name: page_size
+//  *          schema:
+//  *              type: integer
 //  *     responses:
 //  *        '200':
 //  *           description: Success
@@ -131,6 +140,15 @@ router.get("/", Auth, Opportunity.opportunitiesList);
 //  *                     type: object
 //  *                 example:
 //  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
+//  * components:
+//  *  schemas:
+//  *   AllOpportunity:
+//  *    type: object
+//  *    properties:
+//  *      page:
+//  *        type: number
+//  *      page_size:
+//  *        type: number
 //  */
 // router.get("/all", Auth, Opportunity.getAllOpportunities);
 
