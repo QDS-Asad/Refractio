@@ -214,11 +214,38 @@ label {
   font-size: 1.25rem !important;
   text-align: center;
 }
-
+.participantsList {
+  font-size: 16px;
+  font-weight: 700;
+  color: #6c757d;
+}
+.participantsScore {
+  font-size: 12px;
+  font-weight: normal;
+  color: #98a6ad;
+}
+.participantsScore:first-child {
+  margin-top: 3px;
+}
 .ui.modal > .close {
   top: 1rem;
   right: 1rem;
   color: var(--dark) !important;
+}
+.Results .ui.divided.list > .item {
+  padding: 8px !important;
+  border: none !important;
+  cursor: pointer !important;
+}
+.Results.ui.list {
+  border-right: 1px solid #edeff1 !important;
+}
+.indivisualScore {
+  display: flex;
+  justify-content: space-between;
+  font-size: 15px;
+  font-weight: 700;
+  color: #6c757d;
 }
 i.icon.close:before {
   content: '\f00d';

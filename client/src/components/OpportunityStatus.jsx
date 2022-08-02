@@ -17,7 +17,9 @@ const OpportunityStatus = ({ status }) => {
       break;
   }
   return (
-    <Label className={`${bgColor} white-color text-capitalize`}>{status}</Label>
+    <Label className={`${bgColor} white-color text-capitalize`}>
+      {status.toLowerCase() === 'publish' ? 'Published' : status}
+    </Label>
   );
 };
 

@@ -42,6 +42,7 @@ module.exports = Object.freeze({
     },
     OPPORTUNITY_STATUS : {
       PUBLISH: "publish",
+      PUBLISHED: "published",
       DRAFT: "draft",
       DISABLED: "disabled",
       COMPLETED: "completed",
