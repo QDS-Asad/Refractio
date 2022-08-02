@@ -90,7 +90,6 @@ const OpportunityResponse = () => {
   }, []);
   useEffect(() => {
     dispatch(fetchOpportunity(id));
-    dispatch(getOpportunityResponse(id));
   }, [dispatch, id]);
   useEffect(() => {
     if (opportunity && opportunity.comprehension.questions) {
@@ -115,6 +114,7 @@ const OpportunityResponse = () => {
         );
         setValue((`q${i}`, ''));
       }
+      dispatch(getOpportunityResponse(id));
     }
   }, [allQuestions]);
   useEffect(() => {
