@@ -799,13 +799,12 @@ exports.evalutationResultsByParticipants = async (req, res, next) => {
 
               evaluationQualityOfIdeaScores.map((compE) => {
                 totalQualityOfIdeaEvaluationScore +=
-                  compE.evaluation * totalComprehensionEvaluationScore;
+                  compE.evaluation * totalComprehensionAverageEvaluationScore;
                 console.log(totalQualityOfIdeaEvaluationScore);
               });
               totalQualityOfIdeaAverageEvaluationScore =
                 totalQualityOfIdeaEvaluationScore /
                 evaluationQualityOfIdeaScores.length;
-
               let comprehension_answers = [];
               obj.comprehension.answers.map((comp, compKey) => {
                 let queObj = opportunityInfo.comprehension.questions.find(
@@ -837,7 +836,7 @@ exports.evalutationResultsByParticipants = async (req, res, next) => {
                 // totalComprehensionEvaluationScore,
                 totalComprehensionAverageEvaluationScore,
                 // totalQualityOfIdeaEvaluationScore,
-                totalQualityOfIdeaAverageEvaluationScore,
+                totalQualityOfIdeaAverageEvaluationScore: totalQualityOfIdeaAverageEvaluationScore.toFixed(2),
                 comprehension: {
                   qa: comprehension_answers,
                   evaluation: evaluationComprehensionScores,
@@ -864,6 +863,7 @@ exports.evalutationResultsByParticipants = async (req, res, next) => {
         });
       });
   } catch (error) {
+    console.log(error);
     serverError(res, error);
   }
 };
