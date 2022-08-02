@@ -127,7 +127,6 @@ const OpportunityResponse = () => {
   }, [success]);
   useEffect(() => {
     if (response) {
-      debugger;
       if (response.comprehension) {
         response.comprehension.answers.map((answer, idx) => {
           if (answer.answer) {
