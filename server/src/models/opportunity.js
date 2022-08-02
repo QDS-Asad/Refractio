@@ -60,26 +60,16 @@ const OpportunitySchema = new Schema(
         ]  
     },
     participants: [String],
-    createdBy: {
-      type: String,
-    },
-    updatedBy: {
-      type: String,
-      defalut: "",
-    },
+    // createdBy: {
+    //   type: String,
+    // },
+    // updatedBy: {
+    //   type: String,
+    //   defalut: "",
+    // },
   },
   { timestamps: true }
 );
-
-OpportunitySchema.pre("save", function (next) {
-  this.set("createdBy", "createdby");
-  next();
-});
-
-OpportunitySchema.pre("findOneAndUpdate", function (next) {
-  this.set("updatedBy", "updatedBy");
-  next();
-});
 OpportunitySchema.plugin(mongoosePaginate);
 module.exports = {
   Opportunity: mongoose.model("Opportunities", OpportunitySchema),

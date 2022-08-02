@@ -99,4 +99,20 @@ exports.getBillingHistory = async (obj) => {
     },
     options
   );
+};
+
+exports.getAllUsersBillingHistory = async (obj) => {
+  const { page, page_size } = obj;
+  const options = {
+    page: page || DEFAULT_PAGE_NO,
+    limit: page_size || DEFAULT_PAGE_SIZE,
+    sort: {
+      createdAt: 1, //Sort by Date Added ASC
+    },
+    select: {},
+  };
+  return await Billing.paginate(
+    {},
+    options
+  );
 }
