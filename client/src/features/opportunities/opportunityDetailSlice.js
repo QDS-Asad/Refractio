@@ -9,6 +9,7 @@ export const initialState = {
   success: false,
   message: '',
   deleted: false,
+  evaluation: [],
 };
 
 // our slice
@@ -43,9 +44,15 @@ const opportunityDetailSlice = createSlice({
       state.message = '';
       state.success = false;
       state.deleted = false;
+      state.evaluation = [];
     },
     setDelete: (state, { payload }) => {
       state.deleted = payload;
+    },
+    setEvaluation: (state, { payload }) => {
+      state.evaluation = payload;
+      state.loading = false;
+      state.error = false;
     },
   },
 });
@@ -57,6 +64,7 @@ export const {
   reset,
   setSuccess,
   setDelete,
+  setEvaluation,
 } = opportunityDetailSlice.actions;
 
 // export the selector (".items" being same as in slices/index.js's "items: something")
@@ -108,6 +116,21 @@ export const deleteOpportunity = (id) => async (dispatch) => {
     setTimeout(() => {
       dispatch(setDelete(true));
     }, 1000);
+  } catch (error) {
+    const errorMessage =
+      error.response && error.response.data
+        ? error.response.data.message
+        : error.message;
+    dispatch(setError(errorMessage));
+  }
+};
+export const fetchResults = (id) => async (dispatch) => {
+  try {
+    dispatch(setLoading());
+    let { data: response } = await refractioApi.get(
+      `/opportunities/opportunity-evaluate-results/${id}`
+    );
+    dispatch(setEvaluation(response.data));
   } catch (error) {
     const errorMessage =
       error.response && error.response.data

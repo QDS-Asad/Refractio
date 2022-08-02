@@ -148,6 +148,8 @@ const OpportunityResponse = () => {
       }
       if (response.status === 'publish') {
         setResponsePublished(true);
+      } else {
+        setResponsePublished(false);
       }
     }
   }, [response]);
@@ -243,7 +245,8 @@ const OpportunityResponse = () => {
           <>
             <Grid.Column
               width={5}
-              style={{ backgroundColor: '#EDF1F6', height: '100%' }}>
+              style={{ backgroundColor: '#EDF1F6', height: '100%' }}
+            >
               <div className='clearfix'>
                 <Header floated='left'>Opportunity Information</Header>
               </div>

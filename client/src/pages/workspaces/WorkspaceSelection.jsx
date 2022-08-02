@@ -71,44 +71,46 @@ const WorkspaceSelection = () => {
 
   return (
     <>
-      <Card fluid>
-        <Card.Content>
-          <Card.Header className='fw-light'>
-            Teams for <strong className='fw-bold'>{userLogin.email}</strong>
-          </Card.Header>
-        </Card.Content>
-        <Card.Content>
-          <Loader active={loading} inline='centered' />
-          {error && (
-            <Message color='red' className='error-message mb-3'>
-              {error}
-            </Message>
-          )}
-          <Loader active={selectLoading} inline='centered' />
-          {selectError && (
-            <Message color='red' className='error-message mb-3'>
-              {selectError}
-            </Message>
-          )}
-          <List selection animated divided relaxed='very'>
-            {workspaces.activeTeamList.map((workspace) => (
-              <List.Item
-                key={workspace.teamId}
-                onClick={() => handleTeamSelection(workspace.teamId)}>
-                <List.Content floated='right'>
-                  <Icon name='arrow right' className='my-2' />
-                </List.Content>
-                <List.Content>
-                  <List.Header>{workspace.name}</List.Header>
-                  <List.Description>
-                    {workspace.totalMembers} members
-                  </List.Description>
-                </List.Content>
-              </List.Item>
-            ))}
-          </List>
-        </Card.Content>
-      </Card>
+      {workspaces && workspaces.activeTeamList.length > 0 && (
+        <Card fluid>
+          <Card.Content>
+            <Card.Header className='fw-light'>
+              Teams for <strong className='fw-bold'>{userLogin.email}</strong>
+            </Card.Header>
+          </Card.Content>
+          <Card.Content>
+            <Loader active={loading} inline='centered' />
+            {error && (
+              <Message color='red' className='error-message mb-3'>
+                {error}
+              </Message>
+            )}
+            <Loader active={selectLoading} inline='centered' />
+            {selectError && (
+              <Message color='red' className='error-message mb-3'>
+                {selectError}
+              </Message>
+            )}
+            <List selection animated divided relaxed='very'>
+              {workspaces.activeTeamList.map((workspace) => (
+                <List.Item
+                  key={workspace.teamId}
+                  onClick={() => handleTeamSelection(workspace.teamId)}>
+                  <List.Content floated='right'>
+                    <Icon name='arrow right' className='my-2' />
+                  </List.Content>
+                  <List.Content>
+                    <List.Header>{workspace.name}</List.Header>
+                    <List.Description>
+                      {workspace.totalMembers} members
+                    </List.Description>
+                  </List.Content>
+                </List.Item>
+              ))}
+            </List>
+          </Card.Content>
+        </Card>
+      )}
 
       <Card fluid className='my-5'>
         <Card.Content>
@@ -165,23 +167,29 @@ const WorkspaceSelection = () => {
           </Card.Content>
         </Card>
       )}
-      <div className='text-center'>
-        <div>Not seeing your team?</div>
-        <span className='primary-color cursor-pointer' onClick={logout}>
-          Try a different email / logout
-        </span>{' '}
-        {workspaces.invitedTeamList.length === 0 &&
-          workspaces.activeTeamList.length === 0 && (
-            <>
-              |{' '}
-              <span
-                className='primary-color cursor-pointer'
-                onClick={() => dispatch(removeSelf())}>
-                Remove account
-              </span>
-            </>
-          )}
-      </div>
+      {!loading && (
+        <div className='text-center fs-5'>
+          <div style={{ marginBottom: '0.8rem' }}>Not seeing your team?</div>
+          <span
+            style={{ marginRight: 25 }}
+            className='primary-color cursor-pointer'
+            onClick={logout}>
+            Try a different email / Logout
+          </span>{' '}
+          {workspaces.invitedTeamList.length === 0 &&
+            workspaces.activeTeamList.length === 0 && (
+              <>
+                |{' '}
+                <span
+                  style={{ marginLeft: 25 }}
+                  className='primary-color cursor-pointer'
+                  onClick={() => dispatch(removeSelf())}>
+                  Remove account
+                </span>
+              </>
+            )}
+        </div>
+      )}
     </>
   );
 };
