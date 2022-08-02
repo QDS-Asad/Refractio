@@ -63,13 +63,15 @@ const OpportunityResponse = () => {
   const dispatch = useDispatch();
 
   // fetch data from our store
+  const { loading, error, opportunity, success, message } = useSelector(
+    opportunityResponseSelector
+  );
   const {
-    loading,
-    error,
-    opportunity,
+    loading: responseLoading,
+    error: responseError,
     response,
-    success,
-    message,
+    success: responseSuccess,
+    message: responseMessage,
   } = useSelector(opportunityResponseSelector);
   const handleChange = (e) => {
     e.persist();
@@ -86,7 +88,6 @@ const OpportunityResponse = () => {
   }, []);
   useEffect(() => {
     dispatch(fetchOpportunity(id));
-    dispatch(getResponse(id));
   }, [dispatch, id]);
   useEffect(() => {
     if (opportunity && opportunity.comprehension.questions) {
@@ -111,18 +112,19 @@ const OpportunityResponse = () => {
         );
         setValue((`q${i}`, ''));
       }
+      dispatch(getResponse(id));
     }
   }, [allQuestions]);
   useEffect(() => {
-    if (success) {
+    if (success || responseSuccess) {
       setDisplayMessage(true);
       setTimeout(() => {
         setDisplayMessage(false);
       }, 4000);
     }
-  }, [success]);
+  }, [success, responseSuccess]);
   useEffect(() => {
-    if (response) {
+    if (response ) {
       if (response.comprehension) {
         response.comprehension.answers.map((answer, idx) => {
           if (answer.answer) {
@@ -168,7 +170,11 @@ const OpportunityResponse = () => {
         <Grid stretched>
           <Grid.Column width={11}>
             {displayMessage && (
-              <Message header={message} success className='success-message' />
+              <Message
+                header={message || responseMessage}
+                success
+                className='success-message'
+              />
             )}
             <Header as='h3' className='primary-dark-color'>
               {opportunity.name}
@@ -180,8 +186,7 @@ const OpportunityResponse = () => {
                     form='create-opportunity'
                     className='btn-secondary'
                     floated='right'
-                    disabled={loading}
-                  >
+                    disabled={loading || responseLoading}>
                     Submit
                   </Button>
                   <PublishResponse
@@ -194,8 +199,7 @@ const OpportunityResponse = () => {
                     primary
                     className='btn-outline me-3'
                     floated='right'
-                    disabled={loading}
-                  >
+                    disabled={loading || responseLoading}>
                     Save as Draft
                   </Button>
                 </>
@@ -207,11 +211,15 @@ const OpportunityResponse = () => {
                 error
                 size='small'
                 onSubmit={handleSubmit(handleEdit)}
-                loading={loading}
-              >
+                loading={loading || responseLoading}>
                 {error && (
                   <Message color='red' className='error-message'>
                     {error}
+                  </Message>
+                )}
+                {responseError && (
+                  <Message color='red' className='error-message'>
+                    {responseError}
                   </Message>
                 )}
                 {allQuestions.map((o, index) => (
@@ -225,7 +233,7 @@ const OpportunityResponse = () => {
                         watch={watch}
                         allQuestions={allQuestions.length}
                         setCurrentQuestion={setCurrentQuestion}
-                        loading={loading}
+                        loading={loading || responseLoading}
                         responsePublished={responsePublished}
                       />
                     )}
@@ -237,8 +245,7 @@ const OpportunityResponse = () => {
           <>
             <Grid.Column
               width={5}
-              style={{ backgroundColor: '#EDF1F6', height: '100%' }}
-            >
+              style={{ backgroundColor: '#EDF1F6', height: '100%' }}>
               <div className='clearfix'>
                 <Header floated='left'>Opportunity Information</Header>
               </div>
