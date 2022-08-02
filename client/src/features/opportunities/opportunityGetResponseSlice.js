@@ -55,13 +55,13 @@ export const {
 
 // export the selector (".items" being same as in slices/index.js's "items: something")
 export const opportunityGetResponseSelector = (state) =>
-  state.opportunityGetResponseSlice;
+  state.opportunityGetResponse;
 
 // export the default reducer
 export default opportunityGetResponseSlice.reducer;
 
 // fetch opportunity details
-export const getResponse = (id) => async (dispatch) => {
+export const getOpportunityResponse = (id) => async (dispatch) => {
   try {
     dispatch(setLoading());
     let { data: response } = await refractioApi.get(

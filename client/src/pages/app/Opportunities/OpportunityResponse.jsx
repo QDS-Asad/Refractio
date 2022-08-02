@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchOpportunity,
-  getResponse,
   opportunityResponseSelector,
   resetResponse,
   respondOpportunity,
@@ -12,7 +11,11 @@ import { useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import ResponseForm from '../../../components/ResponseForm';
 import PublishResponse from './PublishResponse';
-import { resetGetResponse } from '../../../features/opportunities/opportunityGetResponseSlice';
+import {
+  resetGetResponse,
+  getOpportunityResponse,
+  opportunityGetResponseSelector,
+} from '../../../features/opportunities/opportunityGetResponseSlice';
 
 const apiResponseFormat = (allQuestions, opportunity, data) => {
   let comprehensionAnswer = [];
@@ -73,7 +76,7 @@ const OpportunityResponse = () => {
     response,
     success: responseSuccess,
     message: responseMessage,
-  } = useSelector(opportunityResponseSelector);
+  } = useSelector(opportunityGetResponseSelector);
   const handleChange = (e) => {
     e.persist();
     setValue(e.target.name, e.target.value);
@@ -89,6 +92,7 @@ const OpportunityResponse = () => {
   }, []);
   useEffect(() => {
     dispatch(fetchOpportunity(id));
+    dispatch(getOpportunityResponse(id));
   }, [dispatch, id]);
   useEffect(() => {
     if (opportunity && opportunity.comprehension.questions) {
@@ -113,7 +117,7 @@ const OpportunityResponse = () => {
         );
         setValue((`q${i}`, ''));
       }
-      dispatch(getResponse(id));
+      debugger;
     }
   }, [allQuestions]);
   useEffect(() => {
@@ -126,6 +130,7 @@ const OpportunityResponse = () => {
   }, [success, responseSuccess]);
   useEffect(() => {
     if (response) {
+      debugger;
       if (response.comprehension) {
         response.comprehension.answers.map((answer, idx) => {
           if (answer.answer) {

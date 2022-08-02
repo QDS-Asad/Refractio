@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import refractioApi from '../../common/refractioApi';
-import { getResponse } from './opportunityGetResponseSlice';
+import { getOpportunityResponse } from './opportunityGetResponseSlice';
 
 // initial state
 export const initialState = {
@@ -84,7 +84,7 @@ export const respondOpportunity = (id, body) => async (dispatch) => {
     } else {
       dispatch(setSuccess('Response published successfully.'));
     }
-    dispatch(getResponse(id));
+    dispatch(getOpportunityResponse(id));
   } catch (error) {
     const errorMessage =
       error.response && error.response.data
