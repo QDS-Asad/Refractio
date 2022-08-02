@@ -12,6 +12,7 @@ import { useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import ResponseForm from '../../../components/ResponseForm';
 import PublishResponse from './PublishResponse';
+import { resetGetResponse } from '../../../features/opportunities/opportunityGetResponseSlice';
 
 const apiResponseFormat = (allQuestions, opportunity, data) => {
   let comprehensionAnswer = [];
@@ -83,7 +84,7 @@ const OpportunityResponse = () => {
   useEffect(() => {
     return () => {
       dispatch(resetResponse());
-      setResponsePublished(false);
+      dispatch(resetGetResponse());
     };
   }, []);
   useEffect(() => {
@@ -124,7 +125,7 @@ const OpportunityResponse = () => {
     }
   }, [success, responseSuccess]);
   useEffect(() => {
-    if (response ) {
+    if (response) {
       if (response.comprehension) {
         response.comprehension.answers.map((answer, idx) => {
           if (answer.answer) {
