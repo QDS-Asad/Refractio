@@ -11,8 +11,6 @@ import {
   Header,
   Loader,
   Message,
-  Segment,
-  Image,
   Tab,
 } from 'semantic-ui-react';
 import AllOpportunities from './AllOpportunities';
