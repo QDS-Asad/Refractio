@@ -59,8 +59,8 @@ const DeleteAccount = ({
               </Message>
             )}
             <p>
-              You are the Administrator with billing responsibility for the
-              Team.
+              You are the Administrator with billing responsibility for the{' '}
+              <b>Team</b>.
             </p>
             <p>
               You can{' '}
