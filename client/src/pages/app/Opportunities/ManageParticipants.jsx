@@ -52,8 +52,7 @@ const ManageParticipants = ({
       onOpen={() => setViewParticipant(true)}
       open={viewParticipant}
       dimmer='blurring'
-      size='tiny'
-    >
+      size='tiny'>
       <Modal.Header>
         {opportunity.participants.length > 0
           ? 'Manage Participants'
@@ -88,32 +87,33 @@ const ManageParticipants = ({
                 <List.Item>
                   {opportunity.participants.includes(member._id) ? (
                     <List.Content floated='right'>
-                      <Button
-                        onClick={() => {
-                          if (
-                            opportunity.participants.length <= 2 &&
-                            opportunity.status !== 'draft'
-                          ) {
-                            setViewParticipant(false);
-                            onDeletingOpportunity();
-                          } else {
-                            dispatch(
-                              removeMemberOpportunity(
-                                opportunity._id,
-                                member._id
-                              )
-                            );
+                      {opportunity.status !== 'completed' && (
+                        <Button
+                          onClick={() => {
+                            if (
+                              opportunity.participants.length <= 2 &&
+                              opportunity.status !== 'draft'
+                            ) {
+                              setViewParticipant(false);
+                              onDeletingOpportunity();
+                            } else {
+                              dispatch(
+                                removeMemberOpportunity(
+                                  opportunity._id,
+                                  member._id
+                                )
+                              );
+                            }
+                          }}
+                          disabled={
+                            loading ||
+                            opportunityLoading ||
+                            opportunity.createdById !== userId
                           }
-                        }}
-                        disabled={
-                          loading ||
-                          opportunityLoading ||
-                          opportunity.createdById !== userId
-                        }
-                        className='btn-link-danger'
-                      >
-                        Remove
-                      </Button>
+                          className='btn-link-danger'>
+                          Remove
+                        </Button>
+                      )}
                     </List.Content>
                   ) : (
                     opportunity.status === 'draft' && (
@@ -129,8 +129,7 @@ const ManageParticipants = ({
                             opportunityLoading ||
                             opportunity.createdById !== userId
                           }
-                          className='btn-link'
-                        >
+                          className='btn-link'>
                           Add
                         </Button>
                       </List.Content>
