@@ -47,8 +47,8 @@ const Opportunities = () => {
           <Dimmer active inverted>
             <Loader />
           </Dimmer>
-          <Image src='/images/card-dark.png' className='d-inline-block' />
-          <Image src='/images/card-dark.png' className='d-inline-block' />
+          {/* <Image src='/images/card-dark.png' className='d-inline-block' />
+          <Image src='/images/card-dark.png' className='d-inline-block' /> */}
         </Segment>
       );
 

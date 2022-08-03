@@ -15,7 +15,10 @@ import { fetchRoles, roleListSelector } from '../../../features/roles/roleList';
 
 const ManageUsers = () => {
   const [, setInviteTeamMember] = useState(false);
-  const { loading, error, users, page, totalPages } = { users: [] };
+  const { loading, error, users, page, totalPages } = {
+    users: [],
+    totalPages: 2,
+  };
 
   const { roles } = useSelector(roleListSelector);
 
@@ -48,8 +51,7 @@ const ManageUsers = () => {
             primary
             className='btn'
             floated='right'
-            onClick={() => setInviteTeamMember(true)}
-          >
+            onClick={() => setInviteTeamMember(true)}>
             Add
           </Button>
           {/* <InviteTeamMember
@@ -112,8 +114,7 @@ const ManageUsers = () => {
                         <Button
                           className='btn-link'
                           floated='right'
-                          onClick={() => removeTeamMemberHandler(user._id)}
-                        >
+                          onClick={() => removeTeamMemberHandler(user._id)}>
                           Remove
                         </Button>
                       )}
@@ -122,15 +123,13 @@ const ManageUsers = () => {
                           <Button
                             className='btn-link'
                             floated='right'
-                            onClick={() => resendInvitationHandler(user._id)}
-                          >
+                            onClick={() => resendInvitationHandler(user._id)}>
                             Resend invitation
                           </Button>
                           <Button
                             className='btn-link'
                             floated='right'
-                            onClick={() => cancelInvitationHandler(user._id)}
-                          >
+                            onClick={() => cancelInvitationHandler(user._id)}>
                             Cancel invitation
                           </Button>
                         </>

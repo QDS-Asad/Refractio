@@ -176,6 +176,7 @@ const OpportunityEvaluate = () => {
             <Header as='h3' className='primary-dark-color'>
               {opportunity.name}
               {!(
+                responses[responses.length - 1] &&
                 responses[responses.length - 1].opportunityEvaluations &&
                 responses[responses.length - 1].opportunityEvaluations
                   .status === 'publish'

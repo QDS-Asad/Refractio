@@ -47,9 +47,10 @@ const DeleteAccount = ({
         open={deleteAccount}
         dimmer='blurring'
         size='tiny'
-        closeIcon
-      >
-        <Modal.Header color='red'>Deactivate Account</Modal.Header>
+        closeIcon>
+        <Modal.Header color='red'>
+          Options to Delete Account or Team
+        </Modal.Header>
         <Modal.Content>
           <Modal.Description>
             {error && (
@@ -58,19 +59,19 @@ const DeleteAccount = ({
               </Message>
             )}
             <p>
-              You are the primary owner of your team so you can't deactivate
-              your account.
+              You are the Administrator with billing responsibility for the
+              Team.
             </p>
             <p>
               You can{' '}
               <span onClick={transferOwnership} style={style}>
                 transfer ownership
               </span>{' '}
-              to another member or{' '}
+              to another Administrator of Team or{' '}
               <span onClick={deleteWorkSpace} style={style}>
-                delete this workspace
-              </span>
-              .{' '}
+                delete this team
+              </span>{' '}
+              completely.{' '}
             </p>
           </Modal.Description>
         </Modal.Content>
@@ -83,8 +84,7 @@ const DeleteAccount = ({
         onOpen={() => setDeleteWorkspace(true)}
         open={deleteWorkspace}
         dimmer='blurring'
-        size='tiny'
-      >
+        size='tiny'>
         <Modal.Header>Delete workspace</Modal.Header>
         <Modal.Content scrolling>
           <Modal.Description>
