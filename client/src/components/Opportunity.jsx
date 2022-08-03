@@ -68,7 +68,7 @@ const Opportunity = ({ opportunity }) => {
                     }
                     primary
                     className='btn'
-                    content='Start'
+                    content={opportunity.responded ? 'View Response' : 'Start'}
                   />
                 </div>
               )}
@@ -84,36 +84,41 @@ const Opportunity = ({ opportunity }) => {
                     }
                     primary
                     className='btn'
-                    content='Evaluate'
+                    content={
+                      opportunity.evaluated ? 'View Evaluation' : 'Evaluate'
+                    }
                   />
                 </div>
               )}
-              {opportunity.status === 'completed' &&
-              userLogin.id === opportunity.createdById ? (
-                <div
-                  className='mt-3'
-                  style={{ display: 'flex', justifyContent: 'center' }}>
-                  <Button
-                    onClick={() =>
-                      navigate({
-                        pathname: `/opportunities/${opportunity._id}`,
-                      })
-                    }
-                    primary
-                    className='btn'
-                    content='View Results'
-                  />
-                </div>
-              ) : (
+              {opportunity.status === 'completed' && (
                 <>
-                  <Image
-                    src='/images/team.svg'
-                    className='d-inline-block'
-                    verticalAlign='middle'
-                  />
-                  <span className='secondary-color'>
-                    {opportunity.participants.length}
-                  </span>
+                  {userLogin.id === opportunity.createdById ? (
+                    <div
+                      className='mt-3'
+                      style={{ display: 'flex', justifyContent: 'center' }}>
+                      <Button
+                        onClick={() =>
+                          navigate({
+                            pathname: `/opportunities/${opportunity._id}`,
+                          })
+                        }
+                        primary
+                        className='btn'
+                        content='View Results'
+                      />
+                    </div>
+                  ) : (
+                    <>
+                      <Image
+                        src='/images/team.svg'
+                        className='d-inline-block'
+                        verticalAlign='middle'
+                      />
+                      <span className='secondary-color'>
+                        {opportunity.participants.length}
+                      </span>
+                    </>
+                  )}
                 </>
               )}
             </>

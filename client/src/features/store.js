@@ -34,7 +34,7 @@ import orderListSlice from './orders/orderListSlice';
 import opportunityManageListSlice from './opportunities/opportunityManageListSlice';
 import opportunityResponseSlice from './opportunities/opportunityResponseSlice';
 import opportunityEvaluateSlice from './opportunities/opportunityEvaluateSlice';
-import editProfileSlice from './opportunities/opportunityEvaluateSlice';
+import editProfileSlice from './team/editProfileSlice';
 import deleteMemberSlice from './team/deleteMemberSlice';
 import transferOwnerSlice from './team/transferOwnerSlice';
 import teamParticipantsSlice from './team/teamParticipantsSlice';

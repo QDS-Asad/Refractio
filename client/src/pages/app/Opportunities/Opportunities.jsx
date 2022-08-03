@@ -11,8 +11,6 @@ import {
   Header,
   Loader,
   Message,
-  Segment,
-  Image,
   Tab,
 } from 'semantic-ui-react';
 import AllOpportunities from './AllOpportunities';
@@ -43,13 +41,9 @@ const Opportunities = () => {
     // loading state
     if (loading)
       return (
-        <Segment>
-          <Dimmer active inverted>
-            <Loader />
-          </Dimmer>
-          <Image src='/images/card-dark.png' className='d-inline-block' />
-          <Image src='/images/card-dark.png' className='d-inline-block' />
-        </Segment>
+        <Dimmer active inverted>
+          <Loader />
+        </Dimmer>
       );
 
     // error state
@@ -108,8 +102,7 @@ const Opportunities = () => {
               primary
               className='btn'
               onClick={() => setShowCreate(true)}
-              floated='right'
-            >
+              floated='right'>
               Create New
             </Button>
           </Grid.Column>
