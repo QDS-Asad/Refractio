@@ -6,6 +6,7 @@ export const initialState = {
   loading: false,
   error: null,
   success: false,
+  discount: 0,
 };
 
 // our slice
@@ -26,10 +27,15 @@ const subscriptionSlice = createSlice({
       state.error = payload;
       state.success = false;
     },
+    setDiscount: (state, { payload }) => {
+      state.loading = false;
+      state.discount = payload;
+    },
     reset: (state) => {
       state.loading = false;
       state.error = null;
       state.success = false;
+      state.discount = 0;
     },
   },
 });
@@ -38,6 +44,7 @@ export const {
   setLoading,
   setSubscription,
   setError,
+  setDiscount,
   reset,
 } = subscriptionSlice.actions;
 
@@ -60,6 +67,22 @@ export const userSubscription = (userId, body) => async (dispatch) => {
         ? error.response.data.message
         : error.message;
     dispatch(setError(errorMessage));
+  }
+};
+export const subscriptionDiscount = (code) => async (dispatch) => {
+  try {
+    dispatch(setLoading());
+    let { data: response } = await refractioApi.get(
+      `/users/apply-coupon/${code}`
+    );
+    dispatch(setDiscount(response.data.amount_off));
+  } catch (error) {
+    const errorMessage =
+      error.response && error.response.data
+        ? error.response.data.message
+        : error.message;
+    dispatch(setError(errorMessage));
+    dispatch(setDiscount(0));
   }
 };
 

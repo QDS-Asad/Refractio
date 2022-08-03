@@ -16,6 +16,7 @@ import {
   Message,
   Radio,
   Segment,
+  Input,
 } from 'semantic-ui-react';
 import {
   authLoginSelector,
@@ -27,6 +28,7 @@ import {
 } from '../../features/plans/planListSlice';
 import {
   resetUserSubscription,
+  subscriptionDiscount,
   subscriptionSelector,
   userSubscription,
 } from '../../features/subscriptions/subscriptionSlice';
@@ -43,6 +45,7 @@ const Subscription = () => {
     },
   });
   const [prices, setPrices] = useState([]);
+  const [discountValue, setDiscountValue] = useState('');
 
   const { userLogin } = useSelector(authLoginSelector);
 
@@ -50,9 +53,12 @@ const Subscription = () => {
 
   const { loading, error, plans } = useSelector(planListSelector);
 
-  const { loading: formLoading, error: formError, success } = useSelector(
-    subscriptionSelector
-  );
+  const {
+    loading: formLoading,
+    error: formError,
+    success,
+    discount,
+  } = useSelector(subscriptionSelector);
 
   const dispatch = useDispatch();
 
@@ -158,6 +164,7 @@ const Subscription = () => {
   useEffect(() => {
     if (success) {
       dispatch(updateUserStatus());
+      setDiscountValue('');
     }
   }, [success]);
 
@@ -267,8 +274,7 @@ const Subscription = () => {
                     id='subscription'
                     onSubmit={handleSubmit(handleCreate)}
                     loading={formLoading}
-                    error
-                  >
+                    error>
                     <Form.Field className='mb-3'>
                       <label>Team Name</label>
                       <Form.Input
@@ -358,8 +364,7 @@ const Subscription = () => {
                   computer={16}
                   largeScreen={6}
                   widescreen={6}
-                  className='mt-5'
-                >
+                  className='mt-5'>
                   <Card fluid>
                     <Card.Content>
                       <List divided relaxed='very'>
@@ -410,24 +415,31 @@ const Subscription = () => {
                           </div>
                         </List.Item>
                         <List.Item className='pt-4 pb-5'>
-                          <Form.Field className='mb-3'>
-                            <label className='mb-2'>Coupon code</label>
-                            <Form.Input
-                              name='email'
-                              fluid
-                              placeholder='Enter coupon code'
-                              tabIndex='1'
-                              action
-                            >
-                              <input />
-                              <Button type='submit' className='btn text-center'>
-                                Apply
-                              </Button>
-                            </Form.Input>
-                          </Form.Field>
+                          <label className='mb-2'>Coupon code</label>
+                          <Input
+                            name='text'
+                            fluid
+                            value={discountValue}
+                            onChange={(e) => setDiscountValue(e.target.value)}
+                            placeholder='Enter coupon code'
+                            tabIndex='1'
+                            action>
+                            <input disabled={formLoading} />
+                            <Button
+                              type='button'
+                              onClick={() =>
+                                dispatch(subscriptionDiscount(discountValue))
+                              }
+                              disabled={formLoading}
+                              className='btn text-center'>
+                              Apply
+                            </Button>
+                          </Input>
                         </List.Item>
                         <List.Item>
-                          <List.Content floated='right'>$0</List.Content>
+                          <List.Content floated='right'>
+                            ${discount}
+                          </List.Content>
                           Discount:
                         </List.Item>
                         <List.Item>
@@ -436,7 +448,7 @@ const Subscription = () => {
                             {prices &&
                             prices.find((a) => a.id === watch('priceId'))
                               ? prices.find((a) => a.id === watch('priceId'))
-                                  .amount
+                                  .amount - discount
                               : 0}
                           </List.Content>
                           Sub Total:
@@ -444,13 +456,12 @@ const Subscription = () => {
                         <List.Item>
                           <List.Content
                             floated='right'
-                            className='fw-bold fs-4'
-                          >
+                            className='fw-bold fs-4'>
                             $
                             {prices &&
                             prices.find((a) => a.id === watch('priceId'))
                               ? prices.find((a) => a.id === watch('priceId'))
-                                  .amount
+                                  .amount - discount
                               : 0}
                           </List.Content>
                           <span className='fw-bold fs-4'>Total:</span>
@@ -461,8 +472,7 @@ const Subscription = () => {
                           </p>
                           <a
                             href='mailto:help@refractio.com'
-                            className='primary-dark-color'
-                          >
+                            className='primary-dark-color'>
                             help@refractio.com
                           </a>
                         </List.Item>
