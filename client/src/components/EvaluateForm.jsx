@@ -43,8 +43,7 @@ const EvaluateForm = memo(
             fontSize: 'large',
             fontWeight: '700',
           }}
-          className='primary-dark-color pb-3 mb-3'
-        >
+          className='primary-dark-color pb-3 mb-3'>
           {response.name} -{' '}
           {currentQuestion === 1
             ? 'Evaluation of Comprehension'
@@ -78,8 +77,9 @@ const EvaluateForm = memo(
         <div className='mb-3 mt-3'>
           <label style={{ fontSize: '13px' }} className='mb-3 mt-3'>
             <Header>
-              This responses demonstrates an excellent understanding of the
-              subject matter of this opportunity.
+              {currentQuestion === 1
+                ? 'This responses demonstrates an excellent understanding of the subject matter of this opportunity.'
+                : 'This is a well structured response. We need to consider this idea over others.'}
             </Header>
           </label>
           {currentQuestion === 1 ? (

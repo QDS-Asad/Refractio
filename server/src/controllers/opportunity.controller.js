@@ -30,9 +30,29 @@ exports.opportunitiesList = async (req, res, next) => {
     const { user } = req.body;
     await OpportunityService.getOpportunitiesByUser(user).then(
       async (opportunities) => {
+        console.log(opportunities);
         let responses = [];
         await Promise.all(
-          opportunities.map((opObj, opKey) => {
+          opportunities.map(async (opObj, opKey) => {
+            let responded = false;
+            let evaluated = false;
+            const opportunityResponse = await OpportunityService.getOpportunityResponseByIdUserId(
+              opObj._id,
+              user._id
+            );
+            console.log(opportunityResponse);
+            if(opportunityResponse && opportunityResponse.status == OPPORTUNITY_STATUS.PUBLISH){
+              responded = true;
+              const opportunityEvaluation =
+              await OpportunityService.getOpportunityEvaluationByOpportunityIdUserId(
+                opObj._id,
+                user._id
+              );
+              console.log(opportunityEvaluation);
+              if(opportunityEvaluation && opportunityEvaluation.status == OPPORTUNITY_STATUS.PUBLISH){
+                evaluated = true;
+              }
+            }
             responses[opKey] = {
               _id: opObj._id,
               teamId: opObj.teamId,
@@ -45,6 +65,8 @@ exports.opportunitiesList = async (req, res, next) => {
               participants: opObj.participants,
               comprehension: opObj.comprehension,
               qualityOfIdea: opObj.qualityOfIdea,
+              responded,
+              evaluated
             };
           })
         );

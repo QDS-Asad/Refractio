@@ -144,6 +144,16 @@ exports.getOpportunityEvaluationByResponseIdUserId = async (
   });
 };
 
+exports.getOpportunityEvaluationByOpportunityIdUserId = async (
+  opportunityId,
+  userId
+) => {
+  return await OpportunityEvaluation.findOne({
+    opportunityId,
+    userId,
+  });
+};
+
 exports.getAllOpportunities = async (obj) => {
   const { page, page_size } = obj;
   const options = {
