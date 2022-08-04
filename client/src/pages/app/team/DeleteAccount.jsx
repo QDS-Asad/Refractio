@@ -95,7 +95,7 @@ const DeleteAccount = ({
         <Modal.Actions>
           <Button content='Cancel' onClick={() => setDeleteWorkspace(false)} />
           <Button
-            content='delete'
+            content='Delete'
             onClick={() => {
               setDeleteWorkspace(false);
               dispatch(deleteMember());

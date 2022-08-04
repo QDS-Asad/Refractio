@@ -85,21 +85,25 @@ const OpportunityCreate = ({ showCreate, setShowCreate, id }) => {
 
   return (
     <Modal
-      onClose={() => setShowCreate(false)}
+      onClose={() => {
+        setShowCreate(false);
+        if (!opportunity && !id) {
+          setValue('name', '');
+          setValue('description', '');
+        }
+      }}
       onOpen={() => setShowCreate(true)}
       open={showCreate}
       dimmer='blurring'
       size='tiny'
-      closeIcon
-    >
+      closeIcon>
       <Modal.Header>{id ? 'Update' : 'Create'} Opportunity</Modal.Header>
       <Modal.Content>
         <Form
           id='create-opp'
           onSubmit={handleSubmit(handleCreate)}
           loading={loading}
-          error
-        >
+          error>
           <Modal.Description>
             {error && (
               <Message color='red' className='error-message mb-3'>
