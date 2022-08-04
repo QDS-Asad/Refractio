@@ -2068,12 +2068,17 @@ exports.getSubscriptionDetails = async (req, res, next) => {
             planName: stripePlan.name,
             interval: stripePlan.prices[0].recurring.interval,
             amount: convertDollerToCent(stripePlan.prices[0].unit_amount),
+            startDate:  new Date(
+              convertTimestampToDate(
+                teamInfo.stripeDetails.subscription.startDate
+              )
+            ),
             nextBillingAt:
               (teamInfo.stripeDetails.subscription.status ==
                 SUBSCRIPTION_STATUS.ACTIVE &&
                 new Date(
                   convertTimestampToDate(
-                    teamInfo.stripeDetails.subscription.endDate
+                    teamInfo.stripeDetails.subscription.startDate
                   )
                 )) ||
               null,
