@@ -745,6 +745,7 @@ exports.selectTeam = async (req, res) => {
         email: userInfo.email,
         role: { roleId: roleInfo.roleId, name: roleInfo.name },
         isVerified: userInfo.isVerified,
+        team: teamDetail.name,
         status: teamInfo.status,
         token: token,
       };
@@ -2067,6 +2068,11 @@ exports.getSubscriptionDetails = async (req, res, next) => {
             planName: stripePlan.name,
             interval: stripePlan.prices[0].recurring.interval,
             amount: convertDollerToCent(stripePlan.prices[0].unit_amount),
+            startDate:  new Date(
+              convertTimestampToDate(
+                teamInfo.stripeDetails.subscription.startDate
+              )
+            ),
             nextBillingAt:
               (teamInfo.stripeDetails.subscription.status ==
                 SUBSCRIPTION_STATUS.ACTIVE &&
@@ -2269,7 +2275,8 @@ exports.resumeSubscription = async (req, res, next) => {
 exports.getTeamAdmins = async (req, res, next) => {
   try {
     const { user } = req.body;
-    await TeamService.getUsersByTeamIdRoleId(user)
+    const adminRole = await RoleService.getRoleByRoleId(ROLES.ADMIN);
+    await TeamService.getUsersByTeamIdRoleId(user, adminRole)
       .then((userRes) => {
         console.log(userRes);
         return successResp(res, {
@@ -2372,15 +2379,18 @@ exports.transferTeamOwnerShip = async (req, res, next) => {
         code: HTTP_STATUS.NOT_FOUND.CODE,
       });
     }
-    const cancelSubscription = await BillingService.cancelResumeSubscription(
-      userTeam.stripeDetails.subscription.subscriptionId,
-      true
-    );
+    let cancelSubscription;
+    if(userTeam.stripeDetails.subscription.subscriptionId){
+      cancelSubscription = await BillingService.cancelResumeSubscription(
+        userTeam.stripeDetails.subscription.subscriptionId,
+        true
+      );
+    }
     const stripeDetails = {
       ...userTeam.stripeDetails,
       subscription: {
         ...userTeam.stripeDetails.subscription,
-        canceledDate: cancelSubscription.cancel_at,
+        canceledDate: cancelSubscription && cancelSubscription.cancel_at || userTeam.stripeDetails.subscription.canceledDate,
         status: SUBSCRIPTION_STATUS.CANCELED,
         autoRenew: false,
       },

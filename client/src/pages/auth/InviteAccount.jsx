@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import { Button, Form, Header, Container, Message } from 'semantic-ui-react';
 import { logoutUser } from '../../features/auth/authLoginSlice';
 import {
@@ -27,6 +27,7 @@ const InviteAccount = () => {
     },
   });
   const { token, team } = useParams();
+  const Navigate = useNavigate();
 
   const { loading, error, verifyMember } = useSelector(
     authVerifyMemberSelector
@@ -53,7 +54,12 @@ const InviteAccount = () => {
 
   const handleChange = (e) => {
     e.persist();
-    setValue(e.target.name, e.target.value);
+    if (e.target.type === 'checkbox') {
+      setValue(e.target.name, e.target.checked);
+      trigger(e.target.name);
+    } else {
+      setValue(e.target.name, e.target.value);
+    }
   };
 
   const handleBlur = (e) => {
@@ -104,6 +110,9 @@ const InviteAccount = () => {
       validate: (value) =>
         value === watch('newPassword') || 'Passwords are not identical ',
     },
+    agreement: {
+      required: 'Agreement is required',
+    },
   };
 
   useEffect(() => {
@@ -112,6 +121,7 @@ const InviteAccount = () => {
     register({ name: 'lastName' }, registerOptions.lastName);
     register({ name: 'newPassword' }, registerOptions.newPassword);
     register({ name: 'confirmPassword' }, registerOptions.confirmPassword);
+    register({ name: 'agreement' }, registerOptions.agreement);
     dispatch(
       memberVerification(encodeURIComponent(token), encodeURIComponent(team))
     );
@@ -134,7 +144,11 @@ const InviteAccount = () => {
   const joinTeamHandler = () => {
     dispatch(joinNewWorkspace(verifyMember.userId, verifyMember.teamId));
   };
-
+  if (error && error === 'Not found.') {
+    setTimeout(() => {
+      Navigate('/auth/login');
+    }, 500);
+  }
   return (
     <Container>
       {registerMember ? (
@@ -147,8 +161,7 @@ const InviteAccount = () => {
             fluid
             primary
             onClick={handleBackToLogin}
-            className='mt-3 btn'
-          >
+            className='mt-3 btn'>
             Back to Login
           </Button>
         </>
@@ -162,8 +175,7 @@ const InviteAccount = () => {
             fluid
             primary
             onClick={handleBackToLogin}
-            className='mt-3 btn'
-          >
+            className='mt-3 btn'>
             Back to Login
           </Button>
         </>
@@ -199,8 +211,7 @@ const InviteAccount = () => {
                 className='btn'
                 fluid
                 onClick={joinTeamHandler}
-                loading={joinLoading}
-              >
+                loading={joinLoading}>
                 Accept Invite
               </Button>
             </>
@@ -208,8 +219,7 @@ const InviteAccount = () => {
             <Form
               onSubmit={handleSubmit(onSubmit)}
               loading={loading || registorLoading}
-              error
-            >
+              error>
               <Form.Field className='mb-3'>
                 <label>Email address</label>
                 <Form.Input
@@ -285,6 +295,24 @@ const InviteAccount = () => {
                 />
                 {errors && errors.confirmPassword && (
                   <Message error content={errors.confirmPassword.message} />
+                )}
+              </Form.Field>
+              <Form.Field className='mb-3'>
+                <Form.Checkbox
+                  name='agreement'
+                  error={!!errors.agreement}
+                  onBlur={handleChange}
+                  label={
+                    <label>
+                      I accept{' '}
+                      <Link to='/' className='primary-color ms-1'>
+                        Terms and Conditions
+                      </Link>
+                    </label>
+                  }
+                />
+                {errors && errors.agreement && (
+                  <Message error content={errors.agreement.message} />
                 )}
               </Form.Field>
               <Button type='submit' fluid primary className='mt-3 btn'>
