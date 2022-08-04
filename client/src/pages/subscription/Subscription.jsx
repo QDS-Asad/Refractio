@@ -174,7 +174,7 @@ const Subscription = () => {
       setDiscountSuccess(true);
       setTimeout(() => {
         setDiscountSuccess(false);
-      }, 2000);
+      }, 4000);
     }
   }, [discount]);
   return (

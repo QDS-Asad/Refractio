@@ -147,7 +147,7 @@ const InviteAccount = () => {
   if (error && error === 'Not found.') {
     setTimeout(() => {
       Navigate('/auth/login');
-    }, 1500);
+    }, 500);
   }
   return (
     <Container>
