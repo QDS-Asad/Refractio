@@ -46,6 +46,7 @@ const Subscription = () => {
   });
   const [prices, setPrices] = useState([]);
   const [discountValue, setDiscountValue] = useState('');
+  const [discountSuccess, setDiscountSuccess] = useState(false);
 
   const { userLogin } = useSelector(authLoginSelector);
 
@@ -58,6 +59,7 @@ const Subscription = () => {
     error: formError,
     success,
     discount,
+    errorDiscount,
   } = useSelector(subscriptionSelector);
 
   const dispatch = useDispatch();
@@ -167,7 +169,14 @@ const Subscription = () => {
       setDiscountValue('');
     }
   }, [success]);
-
+  useEffect(() => {
+    if (discount) {
+      setDiscountSuccess(true);
+      setTimeout(() => {
+        setDiscountSuccess(false);
+      }, 2000);
+    }
+  }, [discount]);
   return (
     <Container>
       {userWorkspace && userWorkspace.isRegistered && (
@@ -423,6 +432,7 @@ const Subscription = () => {
                             onChange={(e) => setDiscountValue(e.target.value)}
                             placeholder='Enter coupon code'
                             tabIndex='1'
+                            error={!!errorDiscount}
                             action>
                             <input disabled={formLoading} />
                             <Button
@@ -435,6 +445,20 @@ const Subscription = () => {
                               Apply
                             </Button>
                           </Input>
+                          {errorDiscount && (
+                            <Message
+                              color='red'
+                              className='error-message mt-3 mb-3'>
+                              {errorDiscount}
+                            </Message>
+                          )}
+                          {discountSuccess && (
+                            <Message
+                              header='Discount added successfully.'
+                              success
+                              className='mt-3 mb-3 success-message'
+                            />
+                          )}
                         </List.Item>
                         <List.Item>
                           <List.Content floated='right'>

@@ -111,7 +111,9 @@ const TeamMembers = () => {
       <Grid>
         <Grid.Column width={8}>
           <Header as='h3' className='primary-dark-color' floated='left'>
-            Team {`(${userLogin && userLogin.team})`}
+            {`${userLogin && userLogin.team}`}
+            {/* {`Team (${userLogin && userLogin.team})`} */}
+            {/* {`Team: ${userLogin && userLogin.team}`} */}
           </Header>
         </Grid.Column>
         {(userLogin.role.roleId === ROLES.ADMIN ||
@@ -200,7 +202,7 @@ const TeamMembers = () => {
                       <Table.Cell>
                         {userLogin.role.roleId === ROLES.ORGANIZER &&
                         user.role.roleId === ROLES.ADMIN ? (
-                          <Dropdown disabled={true} fluid>
+                          <Dropdown disabled fluid>
                             <Dropdown.Item selected value={user.role.roleId}>
                               {user.role.name}
                             </Dropdown.Item>

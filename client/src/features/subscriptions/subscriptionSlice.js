@@ -7,6 +7,7 @@ export const initialState = {
   error: null,
   success: false,
   discount: 0,
+  errorDiscount: null,
 };
 
 // our slice
@@ -21,21 +22,30 @@ const subscriptionSlice = createSlice({
       state.loading = false;
       state.error = null;
       state.success = payload;
+      state.errorDiscount = null;
     },
     setError: (state, { payload }) => {
       state.loading = false;
       state.error = payload;
       state.success = false;
+      state.errorDiscount = null;
+    },
+    setErrorDiscount: (state, { payload }) => {
+      state.loading = false;
+      state.errorDiscount = payload;
+      state.discount = 0;
     },
     setDiscount: (state, { payload }) => {
       state.loading = false;
       state.discount = payload;
+      state.errorDiscount = null;
     },
     reset: (state) => {
       state.loading = false;
       state.error = null;
       state.success = false;
       state.discount = 0;
+      state.errorDiscount = null;
     },
   },
 });
@@ -46,6 +56,7 @@ export const {
   setError,
   setDiscount,
   reset,
+  setErrorDiscount,
 } = subscriptionSlice.actions;
 
 export const subscriptionSelector = (state) => state.subscription;
@@ -81,8 +92,7 @@ export const subscriptionDiscount = (code) => async (dispatch) => {
       error.response && error.response.data
         ? error.response.data.message
         : error.message;
-    dispatch(setError(errorMessage));
-    dispatch(setDiscount(0));
+    dispatch(setErrorDiscount(errorMessage));
   }
 };
 
