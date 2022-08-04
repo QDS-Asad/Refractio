@@ -2078,7 +2078,7 @@ exports.getSubscriptionDetails = async (req, res, next) => {
                 SUBSCRIPTION_STATUS.ACTIVE &&
                 new Date(
                   convertTimestampToDate(
-                    teamInfo.stripeDetails.subscription.startDate
+                    teamInfo.stripeDetails.subscription.endDate
                   )
                 )) ||
               null,
