@@ -6,7 +6,7 @@ const Auth = () => {
   return (
     <Grid celled className='auth vh-100'>
       <Grid.Row>
-        <Grid.Column width={5} className='p-4'>
+        <Grid.Column mobile='16' computer='5' className='p-4'>
           <Header
             className='position-absolute'
             as='h2'
@@ -17,7 +17,7 @@ const Auth = () => {
             <Outlet />
           </div>
         </Grid.Column>
-        <Grid.Column width={11} className='primary-bg'>
+        <Grid.Column only='computer' width={11} className='primary-bg'>
           <div className='d-flex justify-content-center align-items-center h-100'>
             <div className='logo'>
               <Header

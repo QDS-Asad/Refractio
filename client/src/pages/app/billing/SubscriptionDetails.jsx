@@ -77,6 +77,22 @@ const SubscriptionDetails = () => {
                 <Grid columns={3}>
                   <Grid.Row>
                     <Grid.Column>
+                      <p className='pt-2 fw-bold'>Start Date</p>
+                    </Grid.Column>
+                    <Grid.Column>
+                      {subscription && subscription.startDate && (
+                        <p className='pt-2'>
+                          {formatDate(subscription.startDate)}{' '}
+                        </p>
+                      )}
+                    </Grid.Column>
+                  </Grid.Row>
+                </Grid>
+              </List.Item>
+              <List.Item className='px-3'>
+                <Grid columns={3}>
+                  <Grid.Row>
+                    <Grid.Column>
                       <p className='pt-2 fw-bold'>Next Payment</p>
                     </Grid.Column>
                     <Grid.Column>
@@ -99,8 +115,7 @@ const SubscriptionDetails = () => {
                           <Button
                             className='btn-link'
                             floated='right'
-                            onClick={() => cancelSubscriptionHandler()}
-                          >
+                            onClick={() => cancelSubscriptionHandler()}>
                             Cancel Subscription
                           </Button>
                           <CancelSubscription
@@ -114,8 +129,7 @@ const SubscriptionDetails = () => {
                           <Button
                             className='btn-link'
                             floated='right'
-                            onClick={() => resumeSubscriptionHandler()}
-                          >
+                            onClick={() => resumeSubscriptionHandler()}>
                             Resume Subscription
                           </Button>
                           <ResumeSubscription
@@ -151,8 +165,7 @@ const SubscriptionDetails = () => {
                         <Button
                           className='btn-link'
                           floated='right'
-                          onClick={() => changeCardHandler()}
-                        >
+                          onClick={() => changeCardHandler()}>
                           Change
                         </Button>
                         <ChangeCard
@@ -189,6 +202,22 @@ const SubscriptionDetails = () => {
                 <Grid columns={3}>
                   <Grid.Row>
                     <Grid.Column>
+                      <p className='pt-2 fw-bold'>Start Date</p>
+                    </Grid.Column>
+                    <Grid.Column>
+                      {subscription && subscription.startDate && (
+                        <p className='pt-2'>
+                          {formatDate(subscription.startDate)}{' '}
+                        </p>
+                      )}
+                    </Grid.Column>
+                  </Grid.Row>
+                </Grid>
+              </List.Item>
+              <List.Item className='px-3'>
+                <Grid columns={3}>
+                  <Grid.Row>
+                    <Grid.Column>
                       <p className='pt-2 fw-bold'>Next Payment</p>
                     </Grid.Column>
                     <Grid.Column>
@@ -216,12 +245,7 @@ const SubscriptionDetails = () => {
                     className='btn-link'
                     floated='left'
                     disabled={!subscription.isExpired}
-                    title={
-                      !subscription.isExpired &&
-                      '(Will be enabled after cancelation date)'
-                    }
-                    onClick={() => changeCardHandler()}
-                  >
+                    onClick={() => changeCardHandler()}>
                     {`Add Payment method ${!subscription.isExpired &&
                       '(Will be enabled after cancelation date)'}`}
                   </Button>

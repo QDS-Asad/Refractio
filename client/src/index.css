@@ -74,6 +74,10 @@ label {
   min-width: 10rem !important;
 }
 
+.btn:hover {
+  cursor: pointer !important;
+}
+
 .btn-secondary {
   background: var(--secondary) !important;
   color: var(--white) !important;
@@ -96,6 +100,7 @@ label {
   padding: 1rem;
   min-width: 10rem !important;
 }
+
 .btn-link-danger {
   background: none !important;
   color: var(--danger) !important;
@@ -147,9 +152,11 @@ label {
   height: 0px;
   width: 0px;
 }
+
 .ui.inverted.menu .active.item {
   background-color: transparent;
 }
+
 .ui.inverted.menu .item {
   color: rgba(255, 255, 255, 0.5);
 }
@@ -182,11 +189,13 @@ label {
   color: var(--secondary) !important;
   border-color: var(--primary-dark) !important;
 }
+
 .ui.secondary.pointing.menu .item {
   min-width: 100px;
   text-align: center;
   display: inline-block;
 }
+
 .ui.segment.tab {
   border: none;
   box-shadow: none;
@@ -196,50 +205,62 @@ label {
   position: static;
   height: auto;
 }
+
 .opportunity.ui.fluid.card {
   min-height: 273px !important;
 }
-.ui.card > .content > .meta + .description {
+
+.ui.card>.content>.meta+.description {
   min-height: 119px !important;
 }
+
 .ui.disabled.input {
   opacity: 0.75 !important;
 }
+
 .ui.form .disabled.field {
   opacity: 0.85 !important;
 }
+
 .error-message,
 .success-message {
   padding: 1rem !important;
   font-size: 1.25rem !important;
   text-align: center;
 }
+
 .participantsList {
   font-size: 16px;
   font-weight: 700;
   color: #6c757d;
 }
+
 .participantsScore {
   font-size: 12px;
   font-weight: normal;
   color: #98a6ad;
 }
+
 .participantsScore:first-child {
   margin-top: 3px;
 }
-.ui.modal > .close {
+
+.ui.modal>.close {
   top: 1rem;
   right: 1rem;
   color: var(--dark) !important;
 }
-.Results .ui.divided.list > .item {
+
+.Results .ui.divided.list>.item {
   padding: 8px !important;
   border: none !important;
   cursor: pointer !important;
 }
+
 .Results.ui.list {
   border-right: 1px solid #edeff1 !important;
 }
+
 .indivisualScore {
   display: flex;
   justify-content: space-between;
@@ -247,19 +268,24 @@ label {
   font-weight: 700;
   color: #6c757d;
 }
+
 i.icon.close:before {
   content: '\f00d';
 }
-.ui.action.input > .button {
+
+.ui.action.input>.button {
   display: block;
 }
+
 .hoverable:hover {
   cursor: pointer;
 }
+
 .ui.pagination.secondary.menu .active.item {
   background: var(--primary-dark);
   color: var(--white);
 }
+
 .ui.form .inline.fields .field {
   padding: 0px;
 }
@@ -273,6 +299,7 @@ i.icon.close:before {
   position: relative;
   height: 100vh;
 }
+
 #misc .misc {
   position: absolute;
   left: 50%;
@@ -281,6 +308,7 @@ i.icon.close:before {
   -ms-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
 }
+
 .misc {
   max-width: 920px;
   width: 100%;
@@ -289,6 +317,7 @@ i.icon.close:before {
   padding-left: 15px;
   padding-right: 15px;
 }
+
 .misc .misc-error {
   position: absolute;
   height: 100px;
@@ -299,6 +328,7 @@ i.icon.close:before {
   transform: translateX(-50%);
   z-index: -1;
 }
+
 .misc .misc-error h1 {
   font-family: maven pro, sans-serif;
   color: #ececec;
@@ -312,6 +342,7 @@ i.icon.close:before {
   -ms-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
 }
+
 .misc h2 {
   font-family: maven pro, sans-serif;
   font-size: 46px;
@@ -320,6 +351,7 @@ i.icon.close:before {
   text-transform: uppercase;
   margin: 0;
 }
+
 .misc p {
   font-family: maven pro, sans-serif;
   font-size: 16px;
@@ -328,10 +360,12 @@ i.icon.close:before {
   text-transform: uppercase;
   margin-top: 15px;
 }
+
 @media only screen and (max-width: 480px) {
   .misc .misc-error h1 {
     font-size: 162px;
   }
+
   .misc h2 {
     font-size: 26px;
   }

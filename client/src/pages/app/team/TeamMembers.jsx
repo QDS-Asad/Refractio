@@ -111,7 +111,7 @@ const TeamMembers = () => {
       <Grid>
         <Grid.Column width={8}>
           <Header as='h3' className='primary-dark-color' floated='left'>
-            Team
+            {`Team:   [${userLogin && userLogin.team}]`}
           </Header>
         </Grid.Column>
         {(userLogin.role.roleId === ROLES.ADMIN ||
@@ -121,8 +121,7 @@ const TeamMembers = () => {
               primary
               className='btn'
               floated='right'
-              onClick={() => setInviteTeamMember(true)}
-            >
+              onClick={() => setInviteTeamMember(true)}>
               Add
             </Button>
             <InviteTeamMember
@@ -201,7 +200,7 @@ const TeamMembers = () => {
                       <Table.Cell>
                         {userLogin.role.roleId === ROLES.ORGANIZER &&
                         user.role.roleId === ROLES.ADMIN ? (
-                          <Dropdown disabled={true} fluid>
+                          <Dropdown disabled fluid>
                             <Dropdown.Item selected value={user.role.roleId}>
                               {user.role.name}
                             </Dropdown.Item>
@@ -236,8 +235,7 @@ const TeamMembers = () => {
                             <Button
                               className='btn-link'
                               floated='right'
-                              onClick={() => removeTeamMemberHandler(user._id)}
-                            >
+                              onClick={() => removeTeamMemberHandler(user._id)}>
                               Remove
                             </Button>
                           )}
@@ -249,8 +247,7 @@ const TeamMembers = () => {
                                 floated='right'
                                 onClick={() =>
                                   resendInvitationHandler(user._id)
-                                }
-                              >
+                                }>
                                 Resend invitation
                               </Button>
                               <Button
@@ -258,8 +255,7 @@ const TeamMembers = () => {
                                 floated='right'
                                 onClick={() =>
                                   cancelInvitationHandler(user._id)
-                                }
-                              >
+                                }>
                                 Cancel invitation
                               </Button>
                             </>
@@ -270,8 +266,7 @@ const TeamMembers = () => {
                             <Button
                               className='btn-link-danger'
                               floated='right'
-                              onClick={() => deleteAccountHandler(user._id)}
-                            >
+                              onClick={() => deleteAccountHandler(user._id)}>
                               Delete Account
                             </Button>
                           )}
