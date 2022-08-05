@@ -126,13 +126,15 @@ const TeamMembers = () => {
               onClick={() => setInviteTeamMember(true)}>
               Add
             </Button>
-            <Button
-              primary
-              className='btn'
-              floated='right'
-              onClick={() => setChangeTeamName(true)}>
-              Change Team Name
-            </Button>
+            {userLogin.isTeamOwner && (
+              <Button
+                primary
+                className='btn'
+                floated='right'
+                onClick={() => setChangeTeamName(true)}>
+                Change Team Name
+              </Button>
+            )}
             <InviteTeamMember
               inviteTeamMember={inviteTeamMember}
               setInviteTeamMember={setInviteTeamMember}
