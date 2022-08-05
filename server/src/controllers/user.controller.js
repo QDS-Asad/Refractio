@@ -2490,6 +2490,30 @@ exports.changeName = async (req, res, next) => {
   }
 };
 
+exports.changeTeamName = async (req, res, next) => {
+  try {
+    8;
+    const { user, name } = req.body;
+    await TeamService.updateTeamMembers(user.teamId, { name })
+      .then((teamRes) => {
+        return successResp(res, {
+          msg: SUCCESS_MESSAGE.UPDATED,
+          code: HTTP_STATUS.SUCCESS.CODE,
+          data: { name },
+        });
+      })
+      .catch((error) => {
+        errorResp(res, {
+          msg: ERROR_MESSAGE.NOT_FOUND,
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+        });
+      });
+  } catch (error) {
+    console.log(error);
+    serverError(res, error);
+  }
+};
+
 //get all user list with pagination
 exports.getAllUsers = async (req, res, next) => {
   try {
