@@ -165,8 +165,10 @@ label {
   background: none;
 }
 
-.sidebar-pusher {
-  width: calc(100vw - 260px);
+@media only screen and (min-width: 800px) {
+  .sidebar-pusher {
+    width: calc(100vw - 260px);
+  }
 }
 
 .opportunities-tabs {
@@ -220,6 +222,10 @@ label {
 
 .ui.form .disabled.field {
   opacity: 0.85 !important;
+}
+
+.pushable>.pusher {
+  min-width: fit-content !important;
 }
 
 .error-message,

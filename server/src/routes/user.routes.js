@@ -4,6 +4,7 @@ const User = require("../controllers/user.controller");
 const { validateAcceptInvite } = require("../middlewares/acceptInvite");
 const Auth = require("../middlewares/auth");
 const { validateChangeName } = require("../middlewares/changeName");
+const { validateChangeTeamName } = require("../middlewares/changeTeamName");
 const { validateInvite } = require("../middlewares/inviteUser");
 const { validateLogin } = require("../middlewares/login");
 const { validateChangePaymentMethod } = require("../middlewares/paymentMethod");
@@ -800,157 +801,157 @@ router.delete("/delete/:userId", Auth, User.disableUser);
  */
 router.delete("/remove-my-account", Auth, User.disableMyAccount);
 
-// /**
-//  * @swagger
-//  *   /api/users/list:
-//  *   get:
-//  *     description: get all users
-//  *     tags: [User]
-//  *     parameters:
-//  *        - in: query
-//  *          name: page
-//  *          schema:
-//  *              type: integer
-//  *        - in: query
-//  *          name: page_size
-//  *          schema:
-//  *              type: integer
-//  *     responses:
-//  *        '200':
-//  *           description: Success
-//  *           content:
-//  *             application/json:
-//  *               schema:
-//  *                 type: object
-//  *                 properties:
-//  *                   success:
-//  *                     type: string
-//  *                   code:
-//  *                     type: integer
-//  *                   message:
-//  *                     type: string
-//  *                   data:
-//  *                     type: object
-//  *                 example:
-//  *                   success: true
-//  *                   code: 200
-//  *                   message: Operation successfull.
-//  *        '404':
-//  *           description: Operation Failed
-//  *           content:
-//  *             application/json:
-//  *               schema:
-//  *                 type: object
-//  *                 properties:
-//  *                   success:
-//  *                     type: string
-//  *                   code:
-//  *                     type: integer
-//  *                   message:
-//  *                     type: string
-//  *                   data:
-//  *                     type: object
-//  *                 example:
-//  *                    {"success": false,"code": 404,"message": "Operation Failed."}
-//  *
-//  *        '422':
-//  *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
-//  *           content:
-//  *             application/json:
-//  *               schema:
-//  *                 type: object
-//  *                 properties:
-//  *                   success:
-//  *                     type: string
-//  *                   code:
-//  *                     type: integer
-//  *                   message:
-//  *                     type: string
-//  *                   data:
-//  *                     type: object
-//  *                 example:
-//  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
-//  *
-//  * components:
-//  *  schemas:
-//  *   Team:
-//  *    type: object
-//  *    properties:
-//  *      page:
-//  *        type: number
-//  *      page_size:
-//  *        type: number
-//  */
-// router.get("/list", Auth, User.getAllUsers);
+/**
+ * @swagger
+ *   /api/users/list:
+ *   get:
+ *     description: get all users
+ *     tags: [User]
+ *     parameters:
+ *        - in: query
+ *          name: page
+ *          schema:
+ *              type: integer
+ *        - in: query
+ *          name: page_size
+ *          schema:
+ *              type: integer
+ *     responses:
+ *        '200':
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                   success: true
+ *                   code: 200
+ *                   message: Operation successfull.
+ *        '404':
+ *           description: Operation Failed
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 404,"message": "Operation Failed."}
+ *
+ *        '422':
+ *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
+ *
+ * components:
+ *  schemas:
+ *   Team:
+ *    type: object
+ *    properties:
+ *      page:
+ *        type: number
+ *      page_size:
+ *        type: number
+ */
+router.get("/list", Auth, User.getAllUsers);
 
-// /**
-//  * @swagger
-//  *   /api/users/user-details/{userId}:
-//  *   get:
-//  *     description: user details
-//  *     tags: [User]
-//  *     parameters:
-//  *       - in: path
-//  *         name: userId
-//  *     schema:
-//  *        type: integer
-//  *     responses:
-//  *        '200':
-//  *           description: Success
-//  *           content:
-//  *             application/json:
-//  *               schema:
-//  *                 type: object
-//  *                 properties:
-//  *                   success:
-//  *                     type: string
-//  *                   code:
-//  *                     type: integer
-//  *                   message:
-//  *                     type: string
-//  *                   data:
-//  *                     type: object
-//  *                 example:
-//  *                   success: true
-//  *                   code: 200
-//  *                   message: Operation successfull.
-//  *        '404':
-//  *           description: Operation Failed
-//  *           content:
-//  *             application/json:
-//  *               schema:
-//  *                 type: object
-//  *                 properties:
-//  *                   success:
-//  *                     type: string
-//  *                   code:
-//  *                     type: integer
-//  *                   message:
-//  *                     type: string
-//  *                   data:
-//  *                     type: object
-//  *                 example:
-//  *                    {"success": false,"code": 404,"message": "Operation Failed."}
-//  *
-//  *        '422':
-//  *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
-//  *           content:
-//  *             application/json:
-//  *               schema:
-//  *                 type: object
-//  *                 properties:
-//  *                   success:
-//  *                     type: string
-//  *                   code:
-//  *                     type: integer
-//  *                   message:
-//  *                     type: string
-//  *                   data:
-//  *                     type: object
-//  *                 example:
-//  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
-//  */
-// router.get("/user-details/:userId", Auth, User.getUserById);
+/**
+ * @swagger
+ *   /api/users/user-details/{userId}:
+ *   get:
+ *     description: user details
+ *     tags: [User]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *     schema:
+ *        type: integer
+ *     responses:
+ *        '200':
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                   success: true
+ *                   code: 200
+ *                   message: Operation successfull.
+ *        '404':
+ *           description: Operation Failed
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 404,"message": "Operation Failed."}
+ *
+ *        '422':
+ *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
+ */
+router.get("/user-details/:userId", Auth, User.getUserById);
 
 
 //Team specific user routes
@@ -1376,6 +1377,85 @@ router.put("/join-team/:userId/:teamId", User.joinTeam);
  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
  */
 router.put("/resend-invite-account/:userId", Auth, User.resendInvite);
+
+/**
+ * @swagger
+ *   /api/users/change-team-name:
+ *   put:
+ *     description: update user role
+ *     tags: [User]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/changeTeamName'
+ *     responses:
+ *        '200':
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                   success: true
+ *                   code: 200
+ *                   message: Operation successfull.
+ *        '404':
+ *           description: Operation Failed
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 404,"message": "Operation Failed."}
+ *
+ *        '422':
+ *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
+ * components:
+ *  schemas:
+ *   changeName:
+ *    type: object
+ *    required:
+ *      - name
+ *    properties:
+ *      name:
+ *        type: string
+ */
+router.put("/change-team-name", Auth, validateChangeTeamName, User.changeTeamName);
 
 /**
  * @swagger
@@ -2675,88 +2755,88 @@ router.put("/resume-subscription", Auth, User.resumeSubscription);
  */
 router.get("/billing-history", Auth, User.getBillingHistory);
 
-// /**
-//  * @swagger
-//  *   /api/users/orders:
-//  *   get:
-//  *     description: get billing history
-//  *     tags: [User]
-//  *     parameters:
-//  *        - in: query
-//  *          name: page
-//  *          schema:
-//  *              type: integer
-//  *        - in: query
-//  *          name: page_size
-//  *          schema:
-//  *              type: integer
-//  *     responses:
-//  *        '200':
-//  *           description: Success
-//  *           content:
-//  *             application/json:
-//  *               schema:
-//  *                 type: object
-//  *                 properties:
-//  *                   success:
-//  *                     type: string
-//  *                   code:
-//  *                     type: integer
-//  *                   message:
-//  *                     type: string
-//  *                   data:
-//  *                     type: object
-//  *                 example:
-//  *                   success: true
-//  *                   code: 200
-//  *                   message: Operation successfull.
-//  *        '404':
-//  *           description: Operation Failed
-//  *           content:
-//  *             application/json:
-//  *               schema:
-//  *                 type: object
-//  *                 properties:
-//  *                   success:
-//  *                     type: string
-//  *                   code:
-//  *                     type: integer
-//  *                   message:
-//  *                     type: string
-//  *                   data:
-//  *                     type: object
-//  *                 example:
-//  *                    {"success": false,"code": 404,"message": "Operation Failed."}
-//  *
-//  *        '422':
-//  *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
-//  *           content:
-//  *             application/json:
-//  *               schema:
-//  *                 type: object
-//  *                 properties:
-//  *                   success:
-//  *                     type: string
-//  *                   code:
-//  *                     type: integer
-//  *                   message:
-//  *                     type: string
-//  *                   data:
-//  *                     type: object
-//  *                 example:
-//  *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
-//  *
-//  * components:
-//  *  schemas:
-//  *   BillingHistory:
-//  *    type: object
-//  *    properties:
-//  *      page:
-//  *        type: number
-//  *      page_size:
-//  *        type: number
-//  */
-// router.get("/orders", Auth, User.getAllUsersBillingHistory);
+/**
+ * @swagger
+ *   /api/users/orders:
+ *   get:
+ *     description: get billing history
+ *     tags: [User]
+ *     parameters:
+ *        - in: query
+ *          name: page
+ *          schema:
+ *              type: integer
+ *        - in: query
+ *          name: page_size
+ *          schema:
+ *              type: integer
+ *     responses:
+ *        '200':
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                   success: true
+ *                   code: 200
+ *                   message: Operation successfull.
+ *        '404':
+ *           description: Operation Failed
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 404,"message": "Operation Failed."}
+ *
+ *        '422':
+ *           description: Unprocessable entity - This occurs in cases where data might not be valid (E.g Data provided is not valid.)
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: string
+ *                   code:
+ *                     type: integer
+ *                   message:
+ *                     type: string
+ *                   data:
+ *                     type: object
+ *                 example:
+ *                    {"success": false,"code": 422,"message": "Data provided is not valid."}
+ *
+ * components:
+ *  schemas:
+ *   BillingHistory:
+ *    type: object
+ *    properties:
+ *      page:
+ *        type: number
+ *      page_size:
+ *        type: number
+ */
+router.get("/orders", Auth, User.getAllUsersBillingHistory);
 
 router.post("/subscription-recurring-payment", User.subscriptionRecurringPayment);
 
