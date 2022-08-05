@@ -39,6 +39,7 @@ import deleteMemberSlice from './team/deleteMemberSlice';
 import transferOwnerSlice from './team/transferOwnerSlice';
 import teamParticipantsSlice from './team/teamParticipantsSlice';
 import opportunityGetResponseSlice from './opportunities/opportunityGetResponseSlice';
+import changeTeamNameSlice from './team/changeTeamNameSlice';
 
 const store = configureStore({
   reducer: {
@@ -81,6 +82,7 @@ const store = configureStore({
     transferOwner: transferOwnerSlice,
     teamParticipants: teamParticipantsSlice,
     opportunityGetResponse: opportunityGetResponseSlice,
+    changeTeamName: changeTeamNameSlice,
   },
 });
 
