@@ -25,6 +25,7 @@ import ResendInvitation from './ResendInvitation';
 import { ROLES, USER_STATUS } from '../../../common/constants';
 import { authLoginSelector } from '../../../features/auth/authLoginSlice';
 import OwnershipTransfer from './OwnershipTransfer';
+import ChangeTeamName from './ChangeTeamName';
 
 const TeamMembers = () => {
   const [inviteTeamMember, setInviteTeamMember] = useState(false);
@@ -36,6 +37,7 @@ const TeamMembers = () => {
   const [changeMemberRole, setChangeMemberRole] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
   const [selectedRole, setSelectedRole] = useState(0);
+  const [changeTeamName, setChangeTeamName] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -111,7 +113,7 @@ const TeamMembers = () => {
       <Grid>
         <Grid.Column width={8}>
           <Header as='h3' className='primary-dark-color' floated='left'>
-            {`Team:   [${userLogin && userLogin.team}]`}
+            Team: {`[${userLogin && userLogin.team}]`}
           </Header>
         </Grid.Column>
         {(userLogin.role.roleId === ROLES.ADMIN ||
@@ -123,6 +125,13 @@ const TeamMembers = () => {
               floated='right'
               onClick={() => setInviteTeamMember(true)}>
               Add
+            </Button>
+            <Button
+              primary
+              className='btn'
+              floated='right'
+              onClick={() => setChangeTeamName(true)}>
+              Change Team Name
             </Button>
             <InviteTeamMember
               inviteTeamMember={inviteTeamMember}
@@ -159,6 +168,13 @@ const TeamMembers = () => {
               member={selectedMember}
               roleId={selectedRole}
             />
+            {userLogin.team && (
+              <ChangeTeamName
+                changeTeamName={changeTeamName}
+                setChangeTeamName={setChangeTeamName}
+                currentName={userLogin.team}
+              />
+            )}
           </Grid.Column>
         )}
       </Grid>
