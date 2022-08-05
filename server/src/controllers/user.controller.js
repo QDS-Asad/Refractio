@@ -746,6 +746,7 @@ exports.selectTeam = async (req, res) => {
         role: { roleId: roleInfo.roleId, name: roleInfo.name },
         isVerified: userInfo.isVerified,
         team: teamDetail.name,
+        isTeamOwner: teamDetail.createdById.toString() === userInfo._id.toString(),
         status: teamInfo.status,
         token: token,
       };
@@ -2494,6 +2495,13 @@ exports.changeTeamName = async (req, res, next) => {
   try {
     8;
     const { user, name } = req.body;
+    const teamInfo = await TeamService.getTeamById(user.teamId);
+    if(teamInfo.createdById.toString() !== user._id.toString()){
+      return errorResp(res, {
+        msg: ERROR_MESSAGE.NOT_ALLOWED,
+        code: HTTP_STATUS.BAD_REQUEST.CODE,
+      });
+    }
     await TeamService.updateTeamMembers(user.teamId, { name })
       .then((teamRes) => {
         return successResp(res, {
