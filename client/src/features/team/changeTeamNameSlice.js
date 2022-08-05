@@ -48,16 +48,14 @@ export const changeTeamNameSelector = (state) => state.changeTeamName;
 export default changeTeamNameSlice.reducer;
 
 // fetch all opportunities
-export const changeTeamname = (body) => async (dispatch) => {
+export const changeTeamname = (name) => async (dispatch) => {
   try {
     dispatch(setLoading());
-    // await refractioApi.post('/users/invite-account', {
-    //   teamName: body.teamName,
-    // });
-    setTimeout(() => {
-      dispatch(updateUserTeam(body.teamName));
-      dispatch(setSuccess(true));
-    }, 2000);
+    await refractioApi.put('/users/change-team-name', {
+      name,
+    });
+    dispatch(updateUserTeam(name));
+    dispatch(setSuccess(true));
   } catch (error) {
     const errorMessage =
       error.response && error.response.data

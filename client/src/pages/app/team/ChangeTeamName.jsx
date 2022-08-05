@@ -24,7 +24,7 @@ const ChangeTeamName = ({ changeTeamName, setChangeTeamName, currentName }) => {
 
   const handleCreate = (data) => {
     // dispatch team invite;
-    dispatch(changeTeamname(data));
+    dispatch(changeTeamname(data.teamName));
   };
 
   const handleChange = (e) => {
@@ -56,6 +56,13 @@ const ChangeTeamName = ({ changeTeamName, setChangeTeamName, currentName }) => {
       dispatch(resetchangeTeamName());
     }
   }, [success]);
+  useEffect(() => {
+    if (changeTeamName) {
+      if (currentName) {
+        setValue('teamName', currentName);
+      }
+    }
+  }, [changeTeamName]);
 
   const closeModel = () => {
     setChangeTeamName(false);
@@ -73,7 +80,7 @@ const ChangeTeamName = ({ changeTeamName, setChangeTeamName, currentName }) => {
       <Modal.Header>Change Team Name</Modal.Header>
       <Modal.Content>
         <Form
-          id='invite-team-member'
+          id='change-team-name'
           onSubmit={handleSubmit(handleCreate)}
           loading={loading}
           error>
@@ -94,7 +101,6 @@ const ChangeTeamName = ({ changeTeamName, setChangeTeamName, currentName }) => {
                 onChange={handleChange}
                 value={watchTeamName}
               />
-
               {errors && errors.teamName && (
                 <Message error content={errors.teamName.message} />
               )}
@@ -105,7 +111,7 @@ const ChangeTeamName = ({ changeTeamName, setChangeTeamName, currentName }) => {
       <Modal.Actions>
         <Button
           type='submit'
-          form='invite-team-member'
+          form='change-team-name'
           content='Change'
           className='btn'
           loading={loading}

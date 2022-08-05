@@ -113,7 +113,7 @@ const TeamMembers = () => {
       <Grid>
         <Grid.Column width={8}>
           <Header as='h3' className='primary-dark-color' floated='left'>
-            {`Team:   [${userLogin && userLogin.team}]`}
+            Team: {`[${userLogin && userLogin.team}]`}
           </Header>
         </Grid.Column>
         {(userLogin.role.roleId === ROLES.ADMIN ||
