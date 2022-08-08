@@ -1,8 +1,12 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { Grid, Header } from 'semantic-ui-react';
+import { useMediaQuery } from 'react-responsive';
 
 const Auth = () => {
+  const isMobile = useMediaQuery({
+    query: '(max-height: 600px)',
+  });
   return (
     <Grid celled className='auth vh-100'>
       <Grid.Row>
@@ -13,7 +17,9 @@ const Auth = () => {
             image='/logo-dark.svg'
             content='Refractio'
           />
-          <div className='d-flex justify-content-center align-items-center h-100 pt-5'>
+          <div
+            className={`d-flex justify-content-center align-items-center h-100 pt-5 ${isMobile &&
+              'mt-5'}`}>
             <Outlet />
           </div>
         </Grid.Column>
