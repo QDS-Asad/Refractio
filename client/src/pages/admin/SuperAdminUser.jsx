@@ -43,8 +43,10 @@ export const SuperAdminUser = ({ user, removeTeamMemberHandler }) => {
           }}
           style={{ cursor: 'pointer' }}
         >
-          <Icon name={activeIndex ? 'caret right' : 'dropdown'} />
-          {user.firstName + ' ' + user.lastName}
+          <Icon name={activeIndex ? 'dropdown' : 'caret right'} />
+          {user.firstName
+            ? user.firstName + ' ' + user.lastName
+            : 'Pending Invitation'}
         </Table.Cell>
         <Table.Cell>{user.email}</Table.Cell>
         {/* <Table.Cell className='clearfix'>
