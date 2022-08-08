@@ -73,6 +73,7 @@ exports.getAllUsers = async (obj) => {
   };
   return await User.paginate(
     {
+      isSuperAdmin: false,
       // ...(!user.isOwner && {_id: {$nin: OwnerId}}),
       // teams: {
       //   $elemMatch: {

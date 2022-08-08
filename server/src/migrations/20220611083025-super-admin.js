@@ -6,13 +6,13 @@ module.exports = {
   async up(db, client) {
     try {
       const role = await RoleService.getRoleByRoleId(ROLES.SUPER_ADMIN);
-      const password = "Qwe123@@@";
+      // const password = "Qwe123@@@";
         const adminData = {
           roleId: role._id,
           firstName: "Refractio",
           lastName: "Super Admin",
           email: "refractio@yopmail.com",
-          password: crypto_encrypt(password),
+          password: "U2FsdGVkX18w43LTE0oeWzg0uGc3myufavgsmmZWamke1Q2u3A4l",//crypto_encrypt(password),
           status: USER_STATUS.ACTIVE,
           isVerified: true,
           canLogin: true,
