@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Button,
-  Dropdown,
   Grid,
   Header,
   Message,
@@ -10,32 +9,26 @@ import {
   Segment,
   Table,
 } from 'semantic-ui-react';
-import { USER_STATUS } from '../../../common/constants';
-import { fetchRoles, roleListSelector } from '../../../features/roles/roleList';
+import {
+  fetchTeamList,
+  getUsersSelector,
+} from '../../../features/team/getUsersSlice';
 
 const ManageUsers = () => {
   const [, setInviteTeamMember] = useState(false);
-  const { loading, error, users, page, totalPages } = {
-    users: [],
-    totalPages: 2,
-  };
-
-  const { roles } = useSelector(roleListSelector);
+  const { loading, error, members, page, limit, totalPages } = useSelector(
+    getUsersSelector
+  );
 
   const dispatch = useDispatch();
-
   useEffect(() => {
-    dispatch(fetchRoles());
-  }, []);
-
-  const handleRoleChange = (newRoleId, userId) => {};
+    dispatch(fetchTeamList(page, limit));
+  }, [dispatch]);
 
   const removeTeamMemberHandler = () => {};
-  const resendInvitationHandler = () => {};
-  const cancelInvitationHandler = () => {};
 
   const onPageChange = (e, { activePage }) => {
-    //dispatch(fetchTeamList(activePage, limit));
+    dispatch(fetchTeamList(activePage, limit));
   };
 
   return (
@@ -72,78 +65,26 @@ const ManageUsers = () => {
               <Table.Header>
                 <Table.Row>
                   <Table.HeaderCell>Name</Table.HeaderCell>
-                  <Table.HeaderCell>Role</Table.HeaderCell>
-                  <Table.HeaderCell>Status</Table.HeaderCell>
-                  <Table.HeaderCell>Plan</Table.HeaderCell>
                   <Table.HeaderCell>Email</Table.HeaderCell>
                   <Table.HeaderCell></Table.HeaderCell>
                 </Table.Row>
               </Table.Header>
 
               <Table.Body>
-                {users.map((user) => (
+                {members.map((user) => (
                   <Table.Row key={user._id}>
                     <Table.Cell>
-                      {user.status === 'invite_sent'
-                        ? 'Pending Invitation'
-                        : user.fullName}
+                      {user.firstName + ' ' + user.lastName}
                     </Table.Cell>
-                    <Table.Cell>
-                      <Dropdown
-                        onChange={(e, { value }) =>
-                          handleRoleChange(value, user._id)
-                        }
-                        fluid
-                        selection
-                        defaultValue={user.role.roleId}
-                        options={roles.map((role) => {
-                          return {
-                            key: role.roleId,
-                            text: role.name,
-                            value: role.roleId,
-                          };
-                        })}
-                      />
-                    </Table.Cell>
-                    <Table.Cell>{user.status}</Table.Cell>
-                    <Table.Cell>{user.plan}</Table.Cell>
                     <Table.Cell>{user.email}</Table.Cell>
 
                     <Table.Cell className='clearfix'>
-                      {user.status === USER_STATUS.ACTIVE && (
-                        <Button
-                          className='btn-link'
-                          floated='right'
-                          onClick={() => removeTeamMemberHandler(user._id)}>
-                          Remove
-                        </Button>
-                      )}
-                      {user.status === USER_STATUS.INVITE_SENT && (
-                        <>
-                          <Button
-                            className='btn-link'
-                            floated='right'
-                            onClick={() => resendInvitationHandler(user._id)}>
-                            Resend invitation
-                          </Button>
-                          <Button
-                            className='btn-link'
-                            floated='right'
-                            onClick={() => cancelInvitationHandler(user._id)}>
-                            Cancel invitation
-                          </Button>
-                        </>
-                      )}
-                      {/* {userLogin.id === user._id &&
-                        user.role.roleId === ROLES.ADMIN && (
-                          <Button
-                            className='btn-link-danger'
-                            floated='right'
-                            onClick={() => deleteAccountHandler(user._id)}
-                          >
-                            Delete Account
-                          </Button>
-                        )} */}
+                      <Button
+                        className='btn-link'
+                        floated='right'
+                        onClick={() => removeTeamMemberHandler(user._id)}>
+                        Remove
+                      </Button>
                     </Table.Cell>
                   </Table.Row>
                 ))}
