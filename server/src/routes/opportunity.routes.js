@@ -70,7 +70,7 @@ const { validateUpdateOpportunity } = require("../middlewares/updateOpportunity"
  */
 router.get("/", Auth, Opportunity.opportunitiesList);
 
-// /**
+/**
 //  * @swagger
 //  *   /api/opportunities/all:
 //  *   get:
@@ -150,7 +150,7 @@ router.get("/", Auth, Opportunity.opportunitiesList);
 //  *      page_size:
 //  *        type: number
 //  */
-// router.get("/all", Auth, Opportunity.getAllOpportunities);
+router.get("/all", Auth, Opportunity.getAllOpportunities);
 
 /**
  * @swagger

@@ -267,7 +267,7 @@ exports.removeOpportunityMember = async (req, res, next) => {
     const { user } = req.body;
     await OpportunityService.getOpportunityById(opportunityId)
       .then(async (opportunityInfo) => {
-        if (opportunityInfo.createdById !== user._id) {
+        if (opportunityInfo.createdById.toString() !== user._id.toString()) {
           return errorResp(res, {
             msg: ERROR_MESSAGE.NOT_ALLOWED,
             code: HTTP_STATUS.BAD_REQUEST.CODE,
@@ -905,15 +905,19 @@ exports.getAllOpportunities = async (req, res, next) => {
             const opportunityObj = opportunity._doc;
             const userData = await UserService.getUserById(opportunityObj.createdById);
             const teamData = await TeamService.getTeamById(opportunityObj.teamId);
-            docs[key] = {
-              name: opportunityObj.name,
-              description: opportunityObj.description,
-              status: opportunityObj.status,
-              // firstName: userData.firstName,
-              // lastName: userData.lastName,
-              // email: userData.email,
-              // teamName: teamData.name
-            }
+            // if(teamData){
+              docs[key] = {
+                name: opportunityObj.name,
+                description: opportunityObj.description,
+                totalParticipants: opportunityObj.participants.length,
+                status: opportunityObj.status,
+                // firstName: userData.firstName,
+                // lastName: userData.lastName,
+                // email: userData.email,
+                // teamName: teamData.name
+              }
+            // }
+            
           })
         )
         opportunityRes = {

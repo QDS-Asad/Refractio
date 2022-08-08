@@ -2538,8 +2538,8 @@ exports.getAllUsers = async (req, res, next) => {
             let obj = userObj._doc;
             docs[key] = {
               _id: obj._id,
-              firstName: obj.firstName,
-              lastName: obj.lastName,
+              firstName: obj.firstName || "",
+              lastName: obj.lastName || "",
               email: obj.email,
             };
           })
