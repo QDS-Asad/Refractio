@@ -13,6 +13,7 @@ import {
   fetchTeamList,
   getUsersSelector,
 } from '../../../features/team/getUsersSlice';
+import { SuperAdminUser } from '../SuperAdminUser';
 
 const ManageUsers = () => {
   const [, setInviteTeamMember] = useState(false);
@@ -40,13 +41,13 @@ const ManageUsers = () => {
           </Header>
         </Grid.Column>
         <Grid.Column computer={4} tablet={6} mobile={16}>
-          <Button
+          {/* <Button
             primary
             className='btn'
             floated='right'
             onClick={() => setInviteTeamMember(true)}>
             Add
-          </Button>
+          </Button> */}
           {/* <InviteTeamMember
           inviteTeamMember={inviteTeamMember}
           setInviteTeamMember={setInviteTeamMember}
@@ -72,21 +73,10 @@ const ManageUsers = () => {
 
               <Table.Body>
                 {members.map((user) => (
-                  <Table.Row key={user._id}>
-                    <Table.Cell>
-                      {user.firstName + ' ' + user.lastName}
-                    </Table.Cell>
-                    <Table.Cell>{user.email}</Table.Cell>
-
-                    <Table.Cell className='clearfix'>
-                      <Button
-                        className='btn-link'
-                        floated='right'
-                        onClick={() => removeTeamMemberHandler(user._id)}>
-                        Remove
-                      </Button>
-                    </Table.Cell>
-                  </Table.Row>
+                  <SuperAdminUser
+                    user={user}
+                    removeTeamMemberHandler={removeTeamMemberHandler}
+                  />
                 ))}
               </Table.Body>
 
