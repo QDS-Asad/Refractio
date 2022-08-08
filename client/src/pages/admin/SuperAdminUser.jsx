@@ -1,11 +1,12 @@
 import * as React from 'react';
 import { Button, Table, Icon, Loader, Message } from 'semantic-ui-react';
 import refractioApi from '../../common/refractioApi';
+import { formatDate } from '../../utils/dateHelper';
 
 export const SuperAdminUser = ({ user, removeTeamMemberHandler }) => {
   const [activeIndex, setActiveIndex] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
-  const [userDetails, setUser] = React.useState(null);
+  const [userDetails, setUser] = React.useState([]);
   const [error, setError] = React.useState(null);
 
   React.useEffect(() => {
@@ -20,7 +21,7 @@ export const SuperAdminUser = ({ user, removeTeamMemberHandler }) => {
       let { data: response } = await refractioApi.get(
         `/users/user-details/${id}`
       );
-      setUser(response.data[0]);
+      setUser(response.data);
       setLoading(false);
       setError(null);
     } catch (error) {
@@ -39,29 +40,82 @@ export const SuperAdminUser = ({ user, removeTeamMemberHandler }) => {
         <Table.Cell
           onClick={() => {
             setActiveIndex((prev) => !prev);
-          }}>
-          <Icon name='dropdown' />
+          }}
+          style={{ cursor: 'pointer' }}
+        >
+          <Icon name={activeIndex ? 'caret right' : 'dropdown'} />
           {user.firstName + ' ' + user.lastName}
         </Table.Cell>
         <Table.Cell>{user.email}</Table.Cell>
-
-        <Table.Cell className='clearfix'>
+        {/* <Table.Cell className='clearfix'>
           <Button
             className='btn-link'
             floated='right'
-            onClick={() => removeTeamMemberHandler(user._id)}>
+            onClick={() => removeTeamMemberHandler(user._id)}
+          >
             Remove
           </Button>
-        </Table.Cell>
+        </Table.Cell> */}
       </Table.Row>
       <Table.Row>
-        <Loader active={loading} inline='centered' />
-        {error && (
-          <Message color='red' className='error-message mb-3'>
-            {error}
-          </Message>
+        {activeIndex && (
+          <div>
+            <Table basic='very'>
+              <Table.Header fullWidth>
+                <Table.Row>
+                  <Table.HeaderCell>Team Name</Table.HeaderCell>
+                  <Table.HeaderCell>Role</Table.HeaderCell>
+                  <Table.HeaderCell>User Status</Table.HeaderCell>
+                  <Table.HeaderCell>Team Status</Table.HeaderCell>
+                  <Table.HeaderCell>Subscription Status</Table.HeaderCell>
+                  <Table.HeaderCell>Next Billing At</Table.HeaderCell>
+                  <Table.HeaderCell>Total Members</Table.HeaderCell>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                {loading && (
+                  <Table.Row>
+                    <Table.Cell>
+                      <Loader active={loading} inline='centered' />
+                    </Table.Cell>
+                    {error && (
+                      <Table.Cell>
+                        <Message color='red' className='error-message mb-3'>
+                          {error}
+                        </Message>
+                      </Table.Cell>
+                    )}
+                  </Table.Row>
+                )}
+                {!loading &&
+                  userDetails.length > 0 &&
+                  userDetails.map((detail) => (
+                    <Table.Row key={detail.teamId}>
+                      <Table.Cell>{detail.teamName}</Table.Cell>
+                      <Table.Cell>{detail.role.name}</Table.Cell>
+                      <Table.Cell>{detail.teamStatus}</Table.Cell>
+                      <Table.Cell>
+                        {detail.userStatus === 'disabled'
+                          ? 'deleted'
+                          : detail.userStatus}
+                      </Table.Cell>
+                      <Table.Cell>
+                        {detail.subscription.status || 'N/A'}
+                      </Table.Cell>
+                      <Table.Cell>
+                        {detail.subscription.nextBillingAt
+                          ? formatDate(detail.subscription.nextBillingAt)
+                          : 'N/A'}
+                      </Table.Cell>
+                      <Table.Cell>
+                        {detail.totalMembers + ' member/s'}
+                      </Table.Cell>
+                    </Table.Row>
+                  ))}
+              </Table.Body>
+            </Table>
+          </div>
         )}
-        {activeIndex && <Table.Cell>{user.email}</Table.Cell>}
       </Table.Row>
     </>
   );

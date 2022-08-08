@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  Button,
   Grid,
   Header,
   Message,
@@ -16,7 +15,6 @@ import {
 import { SuperAdminUser } from '../SuperAdminUser';
 
 const ManageUsers = () => {
-  const [, setInviteTeamMember] = useState(false);
   const { loading, error, members, page, limit, totalPages } = useSelector(
     getUsersSelector
   );
@@ -39,19 +37,6 @@ const ManageUsers = () => {
           <Header as='h3' className='primary-dark-color' floated='left'>
             User management
           </Header>
-        </Grid.Column>
-        <Grid.Column computer={4} tablet={6} mobile={16}>
-          {/* <Button
-            primary
-            className='btn'
-            floated='right'
-            onClick={() => setInviteTeamMember(true)}>
-            Add
-          </Button> */}
-          {/* <InviteTeamMember
-          inviteTeamMember={inviteTeamMember}
-          setInviteTeamMember={setInviteTeamMember}
-        /> */}
         </Grid.Column>
       </Grid>
       <Grid>
