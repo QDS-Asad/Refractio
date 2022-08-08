@@ -93,12 +93,12 @@ export const SuperAdminUser = ({ user, removeTeamMemberHandler }) => {
                     <Table.Row key={detail.teamId}>
                       <Table.Cell>{detail.teamName}</Table.Cell>
                       <Table.Cell>{detail.role.name}</Table.Cell>
-                      <Table.Cell>{detail.teamStatus}</Table.Cell>
                       <Table.Cell>
                         {detail.userStatus === 'disabled'
                           ? 'deleted'
                           : detail.userStatus}
                       </Table.Cell>
+                      <Table.Cell>{detail.teamStatus}</Table.Cell>
                       <Table.Cell>
                         {detail.subscription.status || 'N/A'}
                       </Table.Cell>
