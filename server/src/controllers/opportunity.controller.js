@@ -30,7 +30,6 @@ exports.opportunitiesList = async (req, res, next) => {
     const { user } = req.body;
     await OpportunityService.getOpportunitiesByUser(user).then(
       async (opportunities) => {
-        console.log(opportunities);
         let responses = [];
         await Promise.all(
           opportunities.map(async (opObj, opKey) => {
@@ -40,7 +39,6 @@ exports.opportunitiesList = async (req, res, next) => {
               opObj._id,
               user._id
             );
-            console.log(opportunityResponse);
             if(opportunityResponse && opportunityResponse.status == OPPORTUNITY_STATUS.PUBLISH){
               responded = true;
               const opportunityEvaluation =
@@ -48,7 +46,6 @@ exports.opportunitiesList = async (req, res, next) => {
                 opObj._id,
                 user._id
               );
-              console.log(opportunityEvaluation);
               if(opportunityEvaluation && opportunityEvaluation.status == OPPORTUNITY_STATUS.PUBLISH){
                 evaluated = true;
               }
@@ -178,7 +175,6 @@ exports.updateOpportunity = async (req, res, next) => {
             subject: OPPORTUNITY_EMAIL_SUBJECT,
             html: OPPORTUNITY_EMAIL_TEMPLATE({ link }),
           };
-          console.log(emailObj);
           await UserService.tokenVerificationEmail(emailObj)
             .then((emailRes) => {
               return successResp(res, {
@@ -187,8 +183,6 @@ exports.updateOpportunity = async (req, res, next) => {
               });
             })
             .catch((error) => {
-              console.log(error);
-
               return errorResp(res, {
                 msg: ERROR_MESSAGE.NOT_FOUND,
                 code: HTTP_STATUS.BAD_REQUEST.CODE,
@@ -202,7 +196,6 @@ exports.updateOpportunity = async (req, res, next) => {
         }
       })
       .catch((error) => {
-        console.log(error);
         return errorResp(res, {
           msg: ERROR_MESSAGE.NOT_FOUND,
           code: HTTP_STATUS.BAD_REQUEST.CODE,
@@ -306,7 +299,6 @@ exports.removeOpportunityMember = async (req, res, next) => {
             });
           })
           .catch((error) => {
-            console.log(error);
             return errorResp(res, {
               msg: ERROR_MESSAGE.NOT_FOUND,
               code: HTTP_STATUS.BAD_REQUEST.CODE,
@@ -314,7 +306,6 @@ exports.removeOpportunityMember = async (req, res, next) => {
           });
       })
       .catch((error) => {
-        console.log(error);
         return errorResp(res, {
           msg: ERROR_MESSAGE.NOT_FOUND,
           code: HTTP_STATUS.BAD_REQUEST.CODE,
@@ -389,7 +380,6 @@ exports.getOpportunityResponseById = async (req, res, next) => {
       user._id
     )
       .then((opportunityInfo) => {
-        console.log(opportunityInfo);
         return successResp(res, {
           msg: SUCCESS_MESSAGE.DATA_FETCHED,
           code: HTTP_STATUS.SUCCESS.CODE,
@@ -424,7 +414,6 @@ exports.getOpportunityResponsesById = async (req, res, next) => {
       opportunityId
     )
       .then(async (opportunityResponses) => {
-        console.log(opportunityResponses);
         opportunityResponses = opportunityResponses.filter((obj) => obj.userId !== user._id);
         let responses = [];
         await Promise.all(
@@ -452,7 +441,6 @@ exports.getOpportunityResponsesById = async (req, res, next) => {
               let queObj = opportunityInfo.comprehension.questions.find(
                 (que) => que._id.toString() === comp.questionId
               );
-              console.log(queObj);
               if (queObj) {
                 comprehension_answers[compKey] = {
                   question: queObj.question,
@@ -496,7 +484,6 @@ exports.getOpportunityResponsesById = async (req, res, next) => {
         });
       })
       .catch((error) => {
-        console.log(error);
         errorResp(res, {
           msg: ERROR_MESSAGE.NOT_FOUND,
           code: HTTP_STATUS.NOT_FOUND.CODE,
@@ -533,7 +520,6 @@ exports.answerOpportunity = async (req, res, next) => {
       });
     }
     const participantAllowed = await isParticipantAllowed(opportunityId, user);
-    console.log(participantAllowed);
     if (!participantAllowed) {
       return errorResp(res, {
         msg: ERROR_MESSAGE.NOT_ALLOWED,
@@ -563,7 +549,6 @@ exports.answerOpportunity = async (req, res, next) => {
           answerOpportunityResponse(req, res, opportunityRes);
         })
         .catch((error) => {
-          console.log(error);
           return errorResp(res, {
             msg: ERROR_MESSAGE.NOT_FOUND,
             code: HTTP_STATUS.BAD_REQUEST.CODE,
@@ -575,7 +560,6 @@ exports.answerOpportunity = async (req, res, next) => {
           answerOpportunityResponse(req, res, opportunityRes);
         })
         .catch((error) => {
-          console.log(error);
           return errorResp(res, {
             msg: ERROR_MESSAGE.NOT_FOUND,
             code: HTTP_STATUS.BAD_REQUEST.CODE,
@@ -583,7 +567,6 @@ exports.answerOpportunity = async (req, res, next) => {
         });
     }
   } catch (error) {
-    console.log(error);
     serverError(res, error);
   }
 };
@@ -599,12 +582,10 @@ const answerOpportunityResponse = async (req, res, opportunityRes) => {
         opportunityId
       );
     const filterParticipants = opportunityInfo.participants;
-    console.log('length', opportunityResponses.length, filterParticipants.length);
     if (req.body.status === OPPORTUNITY_STATUS.PUBLISH && opportunityResponses.length == filterParticipants.length) {
       const opportunityURes = await OpportunityService.updateOpportunity(opportunityId, {
         status: OPPORTUNITY_STATUS.EVALUATING,
       });
-      console.log('opportunityURes --',opportunityURes);
       const participantsEmails = await UserService.getParticipants(
         opportunityRes.participants
       );
@@ -637,7 +618,6 @@ const answerOpportunityResponse = async (req, res, opportunityRes) => {
       });
     }
   } catch (error) {
-    console.log(error);
     serverError(res, error);
   }
 };
@@ -651,10 +631,8 @@ exports.evaluateAnswerOpportunity = async (req, res, next) => {
       await OpportunityService.getOpportunityResponseById(
         opportunityResponseId
       );
-    console.log(opportunityresponse);
     const opportunityId = opportunityresponse.opportunityId;
     const participantAllowed = await isParticipantAllowed(opportunityId, user);
-    console.log(participantAllowed);
     if (!participantAllowed) {
       return errorResp(res, {
         msg: ERROR_MESSAGE.NOT_ALLOWED,
@@ -675,7 +653,6 @@ exports.evaluateAnswerOpportunity = async (req, res, next) => {
         opportunityResponseId,
         user._id
       );
-    // console.log('opportunityEvaluateInfo aa', opportunityEvaluateInfo);return
     if (opportunityEvaluateInfo) {
       await OpportunityService.updateEvaluateOpportunity(
         opportunityEvaluateInfo._id,
@@ -690,7 +667,6 @@ exports.evaluateAnswerOpportunity = async (req, res, next) => {
           );
         })
         .catch((error) => {
-          console.log(error);
           return errorResp(res, {
             msg: ERROR_MESSAGE.NOT_FOUND,
             code: HTTP_STATUS.BAD_REQUEST.CODE,
@@ -707,7 +683,6 @@ exports.evaluateAnswerOpportunity = async (req, res, next) => {
           );
         })
         .catch((error) => {
-          console.log(error);
           return errorResp(res, {
             msg: ERROR_MESSAGE.NOT_FOUND,
             code: HTTP_STATUS.BAD_REQUEST.CODE,
@@ -738,7 +713,6 @@ const evaluateAnswerOpportunityResponse = async (
       opportunityId
     );
   const filterParticipants = opportunityInfo.participants;
-  console.log(req.body.status, opportunityEvaluation.length, filterParticipants.length, filterParticipants.length * (filterParticipants.length - 1));
   if (req.body.status === OPPORTUNITY_STATUS.PUBLISH && opportunityEvaluation.length == (filterParticipants.length * (filterParticipants.length - 1))) {
     await OpportunityService.updateOpportunity(opportunityId, {
       status: OPPORTUNITY_STATUS.COMPLETED
@@ -779,7 +753,6 @@ exports.evalutationResultsByParticipants = async (req, res, next) => {
         let participantResults = [];
         await Promise.all(
           results.map(async (obj, key) => {
-            console.log(obj);
             const userInfo = await UserService.getUserById(obj.userId);
             const evaluationResults =
               await OpportunityService.getOpportunityEvaluationByResponseId(
@@ -792,7 +765,6 @@ exports.evalutationResultsByParticipants = async (req, res, next) => {
               let totalQualityOfIdeaEvaluationScore = 0;
               let totalComprehensionAverageEvaluationScore = 0;
               let totalQualityOfIdeaAverageEvaluationScore = 0;
-              // console.log(evaluationResults);return
               await Promise.all(
                 evaluationResults.map(async (el, elKey) => {
                   const elUserInfo = await UserService.getUserById(el.userId);
@@ -802,9 +774,6 @@ exports.evalutationResultsByParticipants = async (req, res, next) => {
                     lastName: elUserInfo.lastName,
                     evaluation: Number(el.comprehension.score),
                   };
-
-                  console.log(evaluationComprehensionScores);
-
                   evaluationQualityOfIdeaScores[elKey] = {
                     firstName: elUserInfo.firstName,
                     lastName: elUserInfo.lastName,
@@ -822,7 +791,6 @@ exports.evalutationResultsByParticipants = async (req, res, next) => {
               evaluationQualityOfIdeaScores.map((compE) => {
                 totalQualityOfIdeaEvaluationScore +=
                   compE.evaluation * totalComprehensionAverageEvaluationScore;
-                console.log(totalQualityOfIdeaEvaluationScore);
               });
               totalQualityOfIdeaAverageEvaluationScore =
                 totalQualityOfIdeaEvaluationScore /
@@ -878,14 +846,12 @@ exports.evalutationResultsByParticipants = async (req, res, next) => {
         });
       })
       .catch((error) => {
-        console.log(error);
         return errorResp(res, {
           msg: ERROR_MESSAGE.NOT_FOUND,
           code: HTTP_STATUS.BAD_REQUEST.CODE,
         });
       });
   } catch (error) {
-    console.log(error);
     serverError(res, error);
   }
 };
@@ -931,15 +897,12 @@ exports.getAllOpportunities = async (req, res, next) => {
         });
       })
       .catch((error) => {
-        console.log(error);
         errorResp(res, {
           msg: ERROR_MESSAGE.NOT_FOUND,
           code: HTTP_STATUS.NOT_FOUND.CODE,
         });
       });
   } catch (error) {
-    console.log(error);
-
     serverError(res, error);
   }
 }

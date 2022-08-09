@@ -102,7 +102,6 @@ exports.getPlanByPlanId = async (req, res, next) => {
     const { planId } = req.params;
     await PlanService.getPlanByPlanId(planId)
       .then(async (planRes) => {
-        console.log(planRes);
         const planData = {
           planId: planRes.planId,
           prices: planRes.prices,
@@ -116,16 +115,13 @@ exports.getPlanByPlanId = async (req, res, next) => {
             });
           })
           .catch((error) => {
-            console.log(error);
             serverError(res, error);
           });
       })
       .catch((error) => {
-        console.log(error);
         serverError(res, error);
       });
   } catch (error) {
-    console.log(error);
     serverError(res, error);
   }
 };
