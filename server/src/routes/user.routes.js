@@ -2183,10 +2183,10 @@ router.delete("/delete-team", Auth, User.deleteTeam);
 
 /**
  * @swagger
- *   /api/users/team-users/{teamId}:
+ *   /api/users/delete-team/{teamId}:
  *   get:
  *     description: user details
- *     tags: [User]
+ *     tags: [Team]
  *     parameters:
  *       - in: path
  *         name: teamId
