@@ -13,35 +13,27 @@ import {
 import {
   fetchOrderList,
   orderListSelector,
-  sortList,
 } from '../../../features/orders/orderListSlice';
 import { formatDate } from '../../../utils/dateHelper';
 
 const ManageOrders = () => {
-  const {
-    loading,
-    error,
-    orders,
-    page,
-    totalPages,
-    column,
-    limit,
-    direction,
-  } = useSelector(orderListSelector);
+  const { loading, error, orders, page, totalPages, limit } = useSelector(
+    orderListSelector
+  );
   const dispatch = useDispatch();
 
   const onPageChange = (e, { activePage }) => {
     dispatch(fetchOrderList(activePage, limit));
   };
 
-  const onSortChange = (columnName) => {
-    let sortDirection = 'ascending';
-    if (columnName === column) {
-      sortDirection = direction === 'ascending' ? 'descending' : 'ascending';
-    }
-    // dispatch sort event
-    dispatch(sortList(columnName, sortDirection));
-  };
+  // const onSortChange = (columnName) => {
+  //   let sortDirection = 'ascending';
+  //   if (columnName === column) {
+  //     sortDirection = direction === 'ascending' ? 'descending' : 'ascending';
+  //   }
+  //   // dispatch sort event
+  //   dispatch(sortList(columnName, sortDirection));
+  // };
   useEffect(() => {
     dispatch(fetchOrderList(page, limit));
   }, [dispatch]);
@@ -69,38 +61,45 @@ const ManageOrders = () => {
               <Table.Header>
                 <Table.Row>
                   <Table.HeaderCell
-                    sorted={column === 'orderId' ? direction : null}
-                    onClick={() => onSortChange('orderId')}>
+                  // sorted={column === 'orderId' ? direction : null}
+                  // onClick={() => onSortChange('orderId')}
+                  >
                     #Order
                   </Table.HeaderCell>
                   <Table.HeaderCell
-                    sorted={column === 'date' ? direction : null}
-                    onClick={() => onSortChange('date')}>
+                  // sorted={column === 'date' ? direction : null}
+                  // onClick={() => onSortChange('date')}
+                  >
                     Date
                   </Table.HeaderCell>
                   <Table.HeaderCell
-                    sorted={column === 'user' ? direction : null}
-                    onClick={() => onSortChange('user')}>
+                  // sorted={column === 'user' ? direction : null}
+                  // onClick={() => onSortChange('user')}
+                  >
                     Client Name
                   </Table.HeaderCell>
                   <Table.HeaderCell
-                    sorted={column === 'plan' ? direction : null}
-                    onClick={() => onSortChange('plan')}>
+                  // sorted={column === 'plan' ? direction : null}
+                  // onClick={() => onSortChange('plan')}
+                  >
                     Plan
                   </Table.HeaderCell>
                   <Table.HeaderCell
-                    sorted={column === 'subscription' ? direction : null}
-                    onClick={() => onSortChange('subscription')}>
+                  // sorted={column === 'subscription' ? direction : null}
+                  // onClick={() => onSortChange('subscription')}
+                  >
                     Subscription
                   </Table.HeaderCell>
                   <Table.HeaderCell
-                    sorted={column === 'status' ? direction : null}
-                    onClick={() => onSortChange('status')}>
+                  // sorted={column === 'status' ? direction : null}
+                  // onClick={() => onSortChange('status')}
+                  >
                     Status
                   </Table.HeaderCell>
                   <Table.HeaderCell
-                    sorted={column === 'amount' ? direction : null}
-                    onClick={() => onSortChange('amount')}>
+                  // sorted={column === 'amount' ? direction : null}
+                  // onClick={() => onSortChange('amount')}
+                  >
                     Total
                   </Table.HeaderCell>
                 </Table.Row>

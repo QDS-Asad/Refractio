@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Button,
@@ -11,8 +11,8 @@ import {
   Table,
 } from 'semantic-ui-react';
 import {
+  fetchOpportunityList,
   opportunityManageListSelector,
-  sortList,
 } from '../../../features/opportunities/opportunityManageListSlice';
 
 const ManageOpportunities = () => {
@@ -22,8 +22,7 @@ const ManageOpportunities = () => {
     opportunities,
     page,
     totalPages,
-    column,
-    direction,
+    limit,
   } = useSelector(opportunityManageListSelector);
   const dispatch = useDispatch();
 
@@ -31,15 +30,17 @@ const ManageOpportunities = () => {
     //dispatch(fetchTeamList(activePage, limit));
   };
 
-  const onSortChange = (columnName) => {
-    let sortDirection = 'ascending';
-    if (columnName === column) {
-      sortDirection = direction === 'ascending' ? 'descending' : 'ascending';
-    }
-    // dispatch sort event
-    dispatch(sortList(columnName, sortDirection));
-  };
-
+  // const onSortChange = (columnName) => {
+  //   let sortDirection = 'ascending';
+  //   if (columnName === column) {
+  //     sortDirection = direction === 'ascending' ? 'descending' : 'ascending';
+  //   }
+  //   // dispatch sort event
+  //   dispatch(sortList(columnName, sortDirection));
+  // };
+  useEffect(() => {
+    dispatch(fetchOpportunityList(page, limit));
+  }, [dispatch]);
   return (
     <>
       <Grid>
@@ -64,22 +65,22 @@ const ManageOpportunities = () => {
               <Table.Header>
                 <Table.Row>
                   <Table.HeaderCell
-                    sorted={column === 'name' ? direction : null}
-                    onClick={() => onSortChange('name')}
+                  // sorted={column === 'name' ? direction : null}
+                  // onClick={() => onSortChange('name')}
                   >
                     Name
                   </Table.HeaderCell>
                   <Table.HeaderCell
-                    sorted={column === 'status' ? direction : null}
-                    onClick={() => onSortChange('status')}
+                  // sorted={column === 'status' ? direction : null}
+                  // onClick={() => onSortChange('status')}
                   >
                     Status
                   </Table.HeaderCell>
                   <Table.HeaderCell
-                    sorted={column === 'type' ? direction : null}
-                    onClick={() => onSortChange('type')}
+                  // sorted={column === 'type' ? direction : null}
+                  // onClick={() => onSortChange('type')}
                   >
-                    Type
+                    Participants
                   </Table.HeaderCell>
                   <Table.HeaderCell></Table.HeaderCell>
                 </Table.Row>
@@ -88,11 +89,15 @@ const ManageOpportunities = () => {
               <Table.Body>
                 {opportunities.map((opportunity) => (
                   <Table.Row key={opportunity._id}>
-                    <Table.Cell>{opportunity.title}</Table.Cell>
-                    <Table.Cell>{opportunity.status}</Table.Cell>
-                    <Table.Cell>{opportunity.plan}</Table.Cell>
+                    <Table.Cell>{opportunity.name}</Table.Cell>
                     <Table.Cell>
-                      <Button className='btn-link' floated='right'>
+                      {opportunity.status === 'disabled'
+                        ? 'deleted'
+                        : opportunity.status}
+                    </Table.Cell>
+                    <Table.Cell>{opportunity.totalParticipants}</Table.Cell>
+                    <Table.Cell textAlign='center'>
+                      <Button className='btn-link' floated='center'>
                         Remove
                       </Button>
                     </Table.Cell>
