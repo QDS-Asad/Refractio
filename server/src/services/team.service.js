@@ -61,8 +61,10 @@ exports.getAllUsers = async (obj) => {
     page: page || DEFAULT_PAGE_NO,
     limit: page_size || DEFAULT_PAGE_SIZE,
     sort: {
-      createdAt: 1, //Sort by Date Added ASC
+      firstName: 1, //Sort by FirstName Added ASC
+      lastName: 1, //Sort by LastName Added ASC
     },
+    collation: { "locale": "en", strength: 3 },
     select: {
       password: 0,
       token: 0,
@@ -95,8 +97,9 @@ exports.getAllTeams = async (obj) => {
     page: page || DEFAULT_PAGE_NO,
     limit: page_size || DEFAULT_PAGE_SIZE,
     sort: {
-      createdAt: 1, //Sort by Date Added ASC
+      name: 1, //Sort by Name Added ASC
     },
+    collation: { "locale": "en", strength: 3 },
     select: {
       createdBy: 0,
       updatedBy: 0,
