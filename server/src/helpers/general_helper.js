@@ -15,7 +15,7 @@ const getCurrentTimeStamp = () => {
 };
 
 const timeDifference = (date1,date2) => {
-  let difference = date2.getTime() - date1.getTime();
+  let difference = date1.getTime() - date2.getTime();
 
   let daysDifference = Math.floor(difference/1000/60/60/24);
   difference -= daysDifference*1000*60*60*24

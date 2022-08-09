@@ -2656,7 +2656,7 @@ exports.getUserById = async (req, res, next) => {
                   inactiveFor: (team.stripeDetails.subscription.status ==
                     SUBSCRIPTION_STATUS.CANCELED &&
                     team.stripeDetails.subscription.canceledDate <
-                      getCurrentTimeStamp()) && timeDifference(new Date(convertTimestampToDate(team.stripeDetails.subscription.canceledDate)), new Date()) 
+                      getCurrentTimeStamp()) && timeDifference(new Date(), new Date(convertTimestampToDate(team.stripeDetails.subscription.canceledDate))) 
               };
             }
               docs[key] = {
@@ -2752,7 +2752,7 @@ exports.getAllTeams = async (req, res, next) => {
                 inactiveFor: (filterTeam.stripeDetails.subscription.status ==
                   SUBSCRIPTION_STATUS.CANCELED &&
                   filterTeam.stripeDetails.subscription.canceledDate <
-                    getCurrentTimeStamp()) && timeDifference(new Date(convertTimestampToDate(filterTeam.stripeDetails.subscription.canceledDate)), new Date()) 
+                    getCurrentTimeStamp()) && timeDifference(new Date(), new Date(convertTimestampToDate(filterTeam.stripeDetails.subscription.canceledDate))) 
               };
             }
             docs[key] = {
