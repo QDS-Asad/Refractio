@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   Grid,
   Header,
-  Input,
   Message,
   Pagination,
   Segment,

@@ -1,10 +1,8 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  Button,
   Grid,
   Header,
-  Input,
   Message,
   Pagination,
   Segment,
