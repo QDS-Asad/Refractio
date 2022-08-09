@@ -299,8 +299,7 @@ const OpportunityDetail = () => {
                         floated='right'
                         type='button'
                         onClick={() => setEditOpportunity(true)}
-                        disabled={loading}
-                      >
+                        disabled={loading}>
                         Edit
                       </Button>
                       <OpportunityCreate
@@ -351,8 +350,7 @@ const OpportunityDetail = () => {
 
                 <span
                   className='ms-2 fw-bold primary-color hoverable'
-                  onClick={() => !loading && setViewParticipant(true)}
-                >
+                  onClick={() => !loading && setViewParticipant(true)}>
                   {opportunity.participants.length > 0
                     ? 'View Participants'
                     : 'Add Participants'}
@@ -375,11 +373,10 @@ const OpportunityDetail = () => {
                 <>
                   <Button
                     primary
-                    className='btn-secondary'
+                    className='btn-secondary my-1'
                     floated='right'
                     type='submit'
-                    form='create-opportunity'
-                  >
+                    form='create-opportunity'>
                     Publish
                   </Button>
                   <PublishOpportunity
@@ -390,10 +387,9 @@ const OpportunityDetail = () => {
                   <Button
                     onClick={handleDraft}
                     primary
-                    className='btn-outline me-3'
+                    className='btn-outline me-3 my-1'
                     floated='right'
-                    disabled={loading}
-                  >
+                    disabled={loading}>
                     Save as Draft
                   </Button>
                 </>
@@ -410,10 +406,9 @@ const OpportunityDetail = () => {
                 <Button
                   onClick={() => setViewDelete(true)}
                   negative
-                  className='me-3'
+                  className='me-3 my-1'
                   floated='right'
-                  disabled={loading}
-                >
+                  disabled={loading}>
                   Delete
                 </Button>
               </>
@@ -442,8 +437,7 @@ const OpportunityDetail = () => {
             id='create-opportunity'
             error
             size='small'
-            onSubmit={handleSubmit(handleSubmittion)}
-          >
+            onSubmit={handleSubmit(handleSubmittion)}>
             {error && (
               <Message color='red' className='error-message'>
                 {error}

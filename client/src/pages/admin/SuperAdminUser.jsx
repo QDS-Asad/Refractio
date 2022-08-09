@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { Button, Table, Icon, Loader, Message } from 'semantic-ui-react';
+import { Table, Icon, Loader, Message } from 'semantic-ui-react';
 import refractioApi from '../../common/refractioApi';
 import { formatDate } from '../../utils/dateHelper';
 
-export const SuperAdminUser = ({ user, removeTeamMemberHandler }) => {
+export const SuperAdminUser = ({ user }) => {
   const [activeIndex, setActiveIndex] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [userDetails, setUser] = React.useState([]);
@@ -41,23 +41,13 @@ export const SuperAdminUser = ({ user, removeTeamMemberHandler }) => {
           onClick={() => {
             setActiveIndex((prev) => !prev);
           }}
-          style={{ cursor: 'pointer' }}
-        >
+          style={{ cursor: 'pointer' }}>
           <Icon name={activeIndex ? 'dropdown' : 'caret right'} />
           {user.firstName
             ? user.firstName + ' ' + user.lastName
             : 'Pending Invitation'}
         </Table.Cell>
         <Table.Cell>{user.email}</Table.Cell>
-        {/* <Table.Cell className='clearfix'>
-          <Button
-            className='btn-link'
-            floated='right'
-            onClick={() => removeTeamMemberHandler(user._id)}
-          >
-            Remove
-          </Button>
-        </Table.Cell> */}
       </Table.Row>
       <Table.Row>
         {activeIndex && (
@@ -71,6 +61,7 @@ export const SuperAdminUser = ({ user, removeTeamMemberHandler }) => {
                   <Table.HeaderCell>Team Status</Table.HeaderCell>
                   <Table.HeaderCell>Subscription Status</Table.HeaderCell>
                   <Table.HeaderCell>Next Billing At</Table.HeaderCell>
+                  <Table.HeaderCell>Total Opportunities</Table.HeaderCell>
                   <Table.HeaderCell>Total Members</Table.HeaderCell>
                 </Table.Row>
               </Table.Header>
@@ -107,6 +98,12 @@ export const SuperAdminUser = ({ user, removeTeamMemberHandler }) => {
                       <Table.Cell>
                         {detail.subscription.nextBillingAt
                           ? formatDate(detail.subscription.nextBillingAt)
+                          : 'N/A'}
+                      </Table.Cell>
+                      <Table.Cell>
+                        {detail.totalOpportunities ||
+                        detail.totalOpportunities === 0
+                          ? detail.totalOpportunities + ' opportunity/s'
                           : 'N/A'}
                       </Table.Cell>
                       <Table.Cell>

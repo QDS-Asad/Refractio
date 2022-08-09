@@ -11,6 +11,7 @@ import {
 import {
   fetchTeamList,
   getUsersSelector,
+  resetGetUsers,
 } from '../../../features/team/getUsersSlice';
 import { SuperAdminUser } from '../SuperAdminUser';
 
@@ -23,8 +24,11 @@ const ManageUsers = () => {
   useEffect(() => {
     dispatch(fetchTeamList(page, limit));
   }, [dispatch]);
-
-  const removeTeamMemberHandler = () => {};
+  useEffect(() => {
+    return () => {
+      dispatch(resetGetUsers());
+    };
+  }, []);
 
   const onPageChange = (e, { activePage }) => {
     dispatch(fetchTeamList(activePage, limit));
@@ -58,10 +62,7 @@ const ManageUsers = () => {
 
               <Table.Body>
                 {members.map((user) => (
-                  <SuperAdminUser
-                    user={user}
-                    removeTeamMemberHandler={removeTeamMemberHandler}
-                  />
+                  <SuperAdminUser user={user} />
                 ))}
               </Table.Body>
 
