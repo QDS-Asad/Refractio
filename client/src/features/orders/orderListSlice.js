@@ -35,6 +35,17 @@ const orderListSlice = createSlice({
       state.loading = false;
       state.error = payload;
     },
+    setPageNumber: (state, { payload }) => {
+      state.page = payload;
+    },
+    reset: (state) => {
+      state.loading = false;
+      state.error = false;
+      state.orders = [];
+      state.totalPages = 1;
+      state.page = 1;
+      state.limit = 10;
+    },
   },
 });
 // export the actions
@@ -43,6 +54,8 @@ export const {
   setOrderList,
   setSort,
   setError,
+  setPageNumber,
+  reset,
 } = orderListSlice.actions;
 
 // export the selector (".items" being same as in slices/index.js's "items: something")
@@ -59,6 +72,7 @@ export const fetchOrderList = (pageNumber, pageSize) => async (dispatch) => {
       `/users/orders?page=${pageNumber}&page_size=${pageSize}`
     );
     dispatch(setOrderList(data.data));
+    dispatch(setPageNumber(pageNumber));
   } catch (error) {
     const errorMessage =
       error.response && error.response.data
@@ -70,4 +84,7 @@ export const fetchOrderList = (pageNumber, pageSize) => async (dispatch) => {
 
 export const sortList = (column, direction) => async (dispatch) => {
   dispatch(setSort({ column, direction }));
+};
+export const resetAdminOrders = () => async (dispatch) => {
+  dispatch(reset());
 };
