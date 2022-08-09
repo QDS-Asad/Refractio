@@ -89,6 +89,25 @@ exports.getAllUsers = async (obj) => {
   );
 };
 
+exports.getAllTeams = async (obj) => {
+  const { page, page_size } = obj;
+  const options = {
+    page: page || DEFAULT_PAGE_NO,
+    limit: page_size || DEFAULT_PAGE_SIZE,
+    sort: {
+      createdAt: 1, //Sort by Date Added ASC
+    },
+    select: {
+      createdBy: 0,
+      updatedBy: 0,
+    },
+  };
+  return await Team.paginate(
+    {},
+    options
+  );
+};
+
 exports.getUsersByTeamId = async (teamId) => {
   return await User.find({
     teams: {
@@ -110,6 +129,17 @@ exports.getTeamMembers = async (user) => {
       },
     },
   }).select({ _id: 1, firstName: 1, lastName: 1, email: 1 });
+};
+
+exports.getTeamAllMembers = async (teamId) => {
+  return await User.find({
+    // _id: { $nin: user._id },
+    teams: {
+      $elemMatch: {
+        teamId: ObjectId(teamId)
+      },
+    },
+  });
 };
 
 exports.getUsersByTeamIdRoleId = async (user, adminRole) => {
