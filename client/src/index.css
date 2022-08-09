@@ -6,8 +6,8 @@
 
 :root {
   --primary-dark: #083b66;
-  --primary: #454fc8;
-  --secondary: #6c757d;
+  --primary: #083b66;
+  --secondary: #7a8085;
   --white: #ffffff;
   --dark: #3b3b3b;
   --success: #74d14c;
@@ -225,7 +225,7 @@ label {
 }
 
 .pushable>.pusher {
-  min-width: fit-content !important;
+  min-width: min-content !important;
 }
 
 .error-message,

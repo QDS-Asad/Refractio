@@ -4,9 +4,17 @@ import { Dropdown, Header, Icon, Menu } from 'semantic-ui-react';
 import MediaQuery from 'react-responsive';
 import { authLoginSelector } from '../features/auth/authLoginSlice';
 import EditProfile from './EditProfile';
+import { useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 const NavBar = ({ showLogo = false, setVisible }) => {
+  const { pathname } = useLocation();
   const [editProfile, setEditProfile] = useState(false);
   const { userLogin } = useSelector(authLoginSelector);
+  useEffect(() => {
+    if (setVisible) {
+      setVisible(false);
+    }
+  }, [pathname]);
   return (
     <>
       <Menu>
