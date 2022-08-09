@@ -2577,6 +2577,7 @@ exports.getUserById = async (req, res, next) => {
           userObj.teams.map(async (team, key) => {
             await RoleService.getRoleById(team.roleId).then(async (role) => {
               const teamData = await TeamService.getTeamById(team.teamId);
+              const opportunityData = await OpportunityService.getAllOpportunitiesByUserAsOwner({_id: userObj._id, teamId: team.teamId});
               let subscriptionDetails = {};
               if(team.stripeDetails.subscription.subscriptionId){
               const reqBody = {
@@ -2627,6 +2628,7 @@ exports.getUserById = async (req, res, next) => {
                 userStatus: team.status,
                 teamStatus: teamData.status,
                 totalMembers: teamData.members.length,
+                totalOpportunities: opportunityData.length,
                 subscription: subscriptionDetails,
               };
             });
@@ -2636,6 +2638,51 @@ exports.getUserById = async (req, res, next) => {
           msg: SUCCESS_MESSAGE.DATA_FETCHED,
           code: HTTP_STATUS.SUCCESS.CODE,
           data: docs,
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        errorResp(res, {
+          msg: ERROR_MESSAGE.NOT_FOUND,
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+        });
+      });
+  } catch (error) {
+    console.log(error);
+    serverError(res, error);
+  }
+};
+
+//get all user list with pagination
+exports.getAllUsers = async (req, res, next) => {
+  try {
+    const { page, page_size } = req.query;
+    const teamData = {
+      page,
+      page_size,
+    };
+    await TeamService.getAllUsers(teamData)
+      .then(async (teamRes) => {
+        let docs = [];
+        await Promise.all(
+          teamRes.docs.map(async (userObj, key) => {
+            let obj = userObj._doc;
+            docs[key] = {
+              _id: obj._id,
+              firstName: obj.firstName,
+              lastName: obj.lastName,
+              email: obj.email,
+            };
+          })
+        );
+        teamRes = {
+          ...teamRes,
+          docs,
+        };
+        return successResp(res, {
+          msg: SUCCESS_MESSAGE.DATA_FETCHED,
+          code: HTTP_STATUS.SUCCESS.CODE,
+          data: teamRes,
         });
       })
       .catch((error) => {

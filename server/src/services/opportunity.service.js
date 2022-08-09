@@ -32,6 +32,14 @@ exports.getOpportunitiesByUserAsOwner = async (user) => {
   });
 };
 
+exports.getAllOpportunitiesByUserAsOwner = async (user) => {
+  return await Opportunity.find({
+    createdById: user._id,
+    teamId: user.teamId,
+    // status: {$nin: [OPPORTUNITY_STATUS.DISABLED]},
+  });
+};
+
 exports.getOpportunityById = async (id) => {
   return await Opportunity.findOne({ _id: ObjectId(id) });
 };
