@@ -5,14 +5,7 @@ import refractioApi from '../../common/refractioApi';
 export const initialState = {
   loading: false,
   error: null,
-  opportunities: [
-    {
-      _id: '1',
-      title: 'Opportunity Title',
-      status: 'completed',
-      plan: 'Team',
-    },
-  ],
+  opportunities: [],
   page: 1,
   limit: 10,
   totalPages: 1,
@@ -66,7 +59,7 @@ export const fetchOpportunityList = (pageNumber, pageSize) => async (
   try {
     dispatch(setLoading());
     let { data } = await refractioApi.get(
-      `/users/billing-history?page=${pageNumber}&page_size=${pageSize}`
+      `/opportunities/all?page=${pageNumber}&page_size=${pageSize}`
     );
     dispatch(setOpportunityList(data.data));
   } catch (error) {

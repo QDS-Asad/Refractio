@@ -80,6 +80,7 @@ const SideBar = () => {
       {userLogin.role.roleId === ROLES.SUPER_ADMIN && (
         <Menu.Item as={NavLink} to='/admin/content'>
           <Image src='/images/manage-content.svg' verticalAlign='middle' />
+          <span className='ps-2'>Content management (Landing)</span>
         </Menu.Item>
       )}
 

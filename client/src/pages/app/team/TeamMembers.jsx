@@ -121,7 +121,7 @@ const TeamMembers = () => {
           <Grid.Column width={8}>
             <Button
               primary
-              className='btn'
+              className='btn my-1'
               floated='right'
               onClick={() => setInviteTeamMember(true)}>
               Add
@@ -129,7 +129,7 @@ const TeamMembers = () => {
             {userLogin.isTeamOwner && (
               <Button
                 primary
-                className='btn'
+                className='btn my-1'
                 floated='right'
                 onClick={() => setChangeTeamName(true)}>
                 Change Team Name

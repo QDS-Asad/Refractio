@@ -5,18 +5,7 @@ import refractioApi from '../../common/refractioApi';
 export const initialState = {
   loading: false,
   error: null,
-  orders: [
-    {
-      _id: '1',
-      orderId: '#736362525',
-      date: '02/02/2021',
-      user: 'Eric Butler',
-      plan: 'Team',
-      subscription: true,
-      status: 'completed',
-      amount: 7,
-    },
-  ],
+  orders: [],
   page: 1,
   limit: 10,
   totalPages: 1,
@@ -46,6 +35,17 @@ const orderListSlice = createSlice({
       state.loading = false;
       state.error = payload;
     },
+    setPageNumber: (state, { payload }) => {
+      state.page = payload;
+    },
+    reset: (state) => {
+      state.loading = false;
+      state.error = false;
+      state.orders = [];
+      state.totalPages = 1;
+      state.page = 1;
+      state.limit = 10;
+    },
   },
 });
 // export the actions
@@ -54,6 +54,8 @@ export const {
   setOrderList,
   setSort,
   setError,
+  setPageNumber,
+  reset,
 } = orderListSlice.actions;
 
 // export the selector (".items" being same as in slices/index.js's "items: something")
@@ -67,9 +69,10 @@ export const fetchOrderList = (pageNumber, pageSize) => async (dispatch) => {
   try {
     dispatch(setLoading());
     let { data } = await refractioApi.get(
-      `/users/billing-history?page=${pageNumber}&page_size=${pageSize}`
+      `/users/orders?page=${pageNumber}&page_size=${pageSize}`
     );
     dispatch(setOrderList(data.data));
+    dispatch(setPageNumber(pageNumber));
   } catch (error) {
     const errorMessage =
       error.response && error.response.data
@@ -81,4 +84,7 @@ export const fetchOrderList = (pageNumber, pageSize) => async (dispatch) => {
 
 export const sortList = (column, direction) => async (dispatch) => {
   dispatch(setSort({ column, direction }));
+};
+export const resetAdminOrders = () => async (dispatch) => {
+  dispatch(reset());
 };

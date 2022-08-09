@@ -61,8 +61,10 @@ exports.getAllUsers = async (obj) => {
     page: page || DEFAULT_PAGE_NO,
     limit: page_size || DEFAULT_PAGE_SIZE,
     sort: {
-      createdAt: 1, //Sort by Date Added ASC
+      firstName: 1, //Sort by FirstName Added ASC
+      lastName: 1, //Sort by LastName Added ASC
     },
+    collation: { "locale": "en", strength: 3 },
     select: {
       password: 0,
       token: 0,
@@ -89,6 +91,26 @@ exports.getAllUsers = async (obj) => {
   );
 };
 
+exports.getAllTeams = async (obj) => {
+  const { page, page_size } = obj;
+  const options = {
+    page: page || DEFAULT_PAGE_NO,
+    limit: page_size || DEFAULT_PAGE_SIZE,
+    sort: {
+      name: 1, //Sort by Name Added ASC
+    },
+    collation: { "locale": "en", strength: 3 },
+    select: {
+      createdBy: 0,
+      updatedBy: 0,
+    },
+  };
+  return await Team.paginate(
+    {},
+    options
+  );
+};
+
 exports.getUsersByTeamId = async (teamId) => {
   return await User.find({
     teams: {
@@ -110,6 +132,17 @@ exports.getTeamMembers = async (user) => {
       },
     },
   }).select({ _id: 1, firstName: 1, lastName: 1, email: 1 });
+};
+
+exports.getTeamAllMembers = async (teamId) => {
+  return await User.find({
+    // _id: { $nin: user._id },
+    teams: {
+      $elemMatch: {
+        teamId: ObjectId(teamId)
+      },
+    },
+  });
 };
 
 exports.getUsersByTeamIdRoleId = async (user, adminRole) => {
