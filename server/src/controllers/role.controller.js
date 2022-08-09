@@ -4,9 +4,7 @@ const {
   serverError,
 } = require('../helpers/error_helper');
 const {
-  SUCCESS_MESSAGE,
   HTTP_STATUS,
-  ERROR_MESSAGE,
   ROLES,
 } = require('../lib/constants');
 const RoleService = require('../services/role.service');

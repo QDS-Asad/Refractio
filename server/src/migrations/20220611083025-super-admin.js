@@ -20,7 +20,6 @@ module.exports = {
         };
         await UserService.register(adminData);
     } catch (error) {
-      console.log(error);
     }
   },
 
