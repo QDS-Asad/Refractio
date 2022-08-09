@@ -3,7 +3,6 @@ const { CRYPTO_KEY } = require('../lib/constants');
 
 const crypto_encrypt = function (originalText) {
   const ciphertext = CryptoJS.AES.encrypt(originalText, CRYPTO_KEY).toString();
-  console.log(ciphertext, encodeUrl(ciphertext));
   return encodeUrl(ciphertext);
 }
 
