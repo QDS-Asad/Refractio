@@ -101,7 +101,8 @@ export const SuperAdminUser = ({ user }) => {
                           : 'N/A'}
                       </Table.Cell>
                       <Table.Cell>
-                        {detail.totalOpportunities
+                        {detail.totalOpportunities ||
+                        detail.totalOpportunities === 0
                           ? detail.totalOpportunities + ' opportunity/s'
                           : 'N/A'}
                       </Table.Cell>
