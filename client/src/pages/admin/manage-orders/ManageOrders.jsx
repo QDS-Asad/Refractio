@@ -1,4 +1,5 @@
 import React from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Grid,
@@ -10,9 +11,11 @@ import {
   Table,
 } from 'semantic-ui-react';
 import {
+  fetchOrderList,
   orderListSelector,
   sortList,
 } from '../../../features/orders/orderListSlice';
+import { formatDate } from '../../../utils/dateHelper';
 
 const ManageOrders = () => {
   const {
@@ -22,12 +25,13 @@ const ManageOrders = () => {
     page,
     totalPages,
     column,
+    limit,
     direction,
   } = useSelector(orderListSelector);
   const dispatch = useDispatch();
 
   const onPageChange = (e, { activePage }) => {
-    //dispatch(fetchTeamList(activePage, limit));
+    dispatch(fetchOrderList(activePage, limit));
   };
 
   const onSortChange = (columnName) => {
@@ -38,7 +42,9 @@ const ManageOrders = () => {
     // dispatch sort event
     dispatch(sortList(columnName, sortDirection));
   };
-
+  useEffect(() => {
+    dispatch(fetchOrderList(page, limit));
+  }, [dispatch]);
   return (
     <>
       <Grid>
@@ -64,44 +70,37 @@ const ManageOrders = () => {
                 <Table.Row>
                   <Table.HeaderCell
                     sorted={column === 'orderId' ? direction : null}
-                    onClick={() => onSortChange('orderId')}
-                  >
+                    onClick={() => onSortChange('orderId')}>
                     #Order
                   </Table.HeaderCell>
                   <Table.HeaderCell
                     sorted={column === 'date' ? direction : null}
-                    onClick={() => onSortChange('date')}
-                  >
+                    onClick={() => onSortChange('date')}>
                     Date
                   </Table.HeaderCell>
                   <Table.HeaderCell
                     sorted={column === 'user' ? direction : null}
-                    onClick={() => onSortChange('user')}
-                  >
+                    onClick={() => onSortChange('user')}>
                     Client Name
                   </Table.HeaderCell>
                   <Table.HeaderCell
                     sorted={column === 'plan' ? direction : null}
-                    onClick={() => onSortChange('plan')}
-                  >
+                    onClick={() => onSortChange('plan')}>
                     Plan
                   </Table.HeaderCell>
                   <Table.HeaderCell
                     sorted={column === 'subscription' ? direction : null}
-                    onClick={() => onSortChange('subscription')}
-                  >
+                    onClick={() => onSortChange('subscription')}>
                     Subscription
                   </Table.HeaderCell>
                   <Table.HeaderCell
                     sorted={column === 'status' ? direction : null}
-                    onClick={() => onSortChange('status')}
-                  >
+                    onClick={() => onSortChange('status')}>
                     Status
                   </Table.HeaderCell>
                   <Table.HeaderCell
                     sorted={column === 'amount' ? direction : null}
-                    onClick={() => onSortChange('amount')}
-                  >
+                    onClick={() => onSortChange('amount')}>
                     Total
                   </Table.HeaderCell>
                 </Table.Row>
@@ -110,9 +109,15 @@ const ManageOrders = () => {
               <Table.Body>
                 {orders.map((order) => (
                   <Table.Row key={order._id}>
-                    <Table.Cell>{order.orderId}</Table.Cell>
-                    <Table.Cell>{order.date}</Table.Cell>
-                    <Table.Cell>{order.user}</Table.Cell>
+                    <Table.Cell>{order._id}</Table.Cell>
+                    <Table.Cell>
+                      {order.createdAt ? formatDate(order.createdAt) : 'N/A'}
+                    </Table.Cell>
+                    <Table.Cell>
+                      {order.firstName
+                        ? order.firstName + ' ' + order.lastName
+                        : 'N/A'}
+                    </Table.Cell>
                     <Table.Cell>{order.plan}</Table.Cell>
                     <Table.Cell>
                       Autocomplete: {order.subscription ? 'On' : 'Off'}

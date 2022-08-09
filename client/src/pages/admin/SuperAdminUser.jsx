@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Table, Icon, Loader, Message } from 'semantic-ui-react';
+import { Table, Icon, Loader, Message } from 'semantic-ui-react';
 import refractioApi from '../../common/refractioApi';
 import { formatDate } from '../../utils/dateHelper';
 
@@ -41,8 +41,7 @@ export const SuperAdminUser = ({ user, removeTeamMemberHandler }) => {
           onClick={() => {
             setActiveIndex((prev) => !prev);
           }}
-          style={{ cursor: 'pointer' }}
-        >
+          style={{ cursor: 'pointer' }}>
           <Icon name={activeIndex ? 'dropdown' : 'caret right'} />
           {user.firstName
             ? user.firstName + ' ' + user.lastName
