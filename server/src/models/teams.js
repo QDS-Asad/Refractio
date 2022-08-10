@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { TEAM_STATUS } = require("../lib/constants");
+const mongoosePaginate = require('mongoose-paginate-v2');
 const Schema = mongoose.Schema;
 
 const TeamSchema = new Schema(
@@ -32,6 +33,7 @@ const TeamSchema = new Schema(
   },
   { timestamps: true }
 );
+TeamSchema.plugin(mongoosePaginate);
 module.exports = {
   Team: mongoose.model("teams", TeamSchema),
 };

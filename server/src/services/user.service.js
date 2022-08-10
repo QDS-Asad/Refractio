@@ -54,6 +54,14 @@ exports.getParticipants = async (participants) => {
    return await User.find({_id : {$in: participants}}).select({email: 1});
 }
 
+exports.getTeamParticipants = async (participants) => {
+   return await User.find({_id : {$in: participants}});
+}
+
+exports.getTeamOwnerDetails = async (id) => {
+   return await User.findOne({_id : ObjectId(id)});
+}
+
 exports.tokenVerificationEmail = async ({ email, subject, html }) => {
    return await sendEmail({ email, subject, html })
 }

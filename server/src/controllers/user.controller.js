@@ -8,7 +8,7 @@ const {
   convertDollerToCent,
   convertTimestampToDate,
   getCurrentTimeStamp,
-  convertCentToDoller,
+  timeDifference,
 } = require("../helpers/general_helper");
 const jwt = require("jsonwebtoken");
 const {
@@ -40,7 +40,6 @@ const {
   VERIFY_REGISTER_EMAIL_SUBJECT,
   INVTE_USER_EMAIL_SUBJECT,
   TOTAL_TEAM_ADMIN,
-  TOTAL_TEAM_ORGANIZER,
   PAYMENT_STATUS,
   SUBSCRIPTION_STATUS,
   TEAM_STATUS,
@@ -125,15 +124,6 @@ exports.inviteUser = async (req, res, next) => {
                   code: HTTP_STATUS.BAD_REQUEST,
                 });
               }
-              // if (
-              //   roleId == ROLES.ORGANIZER &&
-              //   teamInfo.totalOrganizer.length === TOTAL_TEAM_ORGANIZER
-              // ) {
-              //   return errorResp(res, {
-              //     msg: ERROR_MESSAGE.TEAM_ORGANIZER_LIMIT_EXCEED,
-              //     code: HTTP_STATUS.BAD_REQUEST,
-              //   });
-              // }
               const userTeamIndex = userRes.teams.findIndex(
                 (obj) => obj.teamId.toString() == user.teamId
               );
@@ -154,9 +144,6 @@ exports.inviteUser = async (req, res, next) => {
                     ];
                     await TeamService.updateTeamMembers(team._id, { members })
                       .then(async (teamRes) => {
-                        // await UserService.updateUserById(result._id, {
-                        //   teamId: team._id,
-                        // });
                         tokenVerificationEmail(
                           req,
                           res,
@@ -203,15 +190,6 @@ exports.inviteUser = async (req, res, next) => {
                 code: HTTP_STATUS.BAD_REQUEST,
               });
             }
-            // if (
-            //   roleId == ROLES.ORGANIZER &&
-            //   teamInfo.totalOrganizer.length === TOTAL_TEAM_ORGANIZER
-            // ) {
-            //   return errorResp(res, {
-            //     msg: ERROR_MESSAGE.TEAM_ORGANIZER_LIMIT_EXCEED,
-            //     code: HTTP_STATUS.BAD_REQUEST,
-            //   });
-            // }
             await UserService.updateUserById(userRes._id, {
               ...req.body,
               teams: [
@@ -230,9 +208,6 @@ exports.inviteUser = async (req, res, next) => {
                 ];
                 await TeamService.updateTeamMembers(team._id, { members })
                   .then(async (teamRes) => {
-                    // await UserService.updateUserById(result._id, {
-                    //   teamId: team._id,
-                    // });
                     tokenVerificationEmail(
                       req,
                       res,
@@ -268,15 +243,6 @@ exports.inviteUser = async (req, res, next) => {
               code: HTTP_STATUS.BAD_REQUEST,
             });
           }
-          // if (
-          //   roleId == ROLES.ORGANIZER &&
-          //   teamInfo.totalOrganizer.length === TOTAL_TEAM_ORGANIZER
-          // ) {
-          //   return errorResp(res, {
-          //     msg: ERROR_MESSAGE.TEAM_ORGANIZER_LIMIT_EXCEED,
-          //     code: HTTP_STATUS.BAD_REQUEST,
-          //   });
-          // }
           await UserService.register({
             ...req.body,
             teams: [
@@ -291,9 +257,6 @@ exports.inviteUser = async (req, res, next) => {
               const members = [...team.members, { userId: result._id, roleId }];
               await TeamService.updateTeamMembers(team._id, { members })
                 .then(async (teamRes) => {
-                  // await UserService.updateUserById(result._id, {
-                  //   teamId: team._id,
-                  // });
                   tokenVerificationEmail(
                     req,
                     res,
@@ -312,11 +275,9 @@ exports.inviteUser = async (req, res, next) => {
         }
       })
       .catch((error) => {
-        console.log(error);
         serverError(res, error);
       });
   } catch (error) {
-    console.log(error);
     serverError(res, error);
   }
 };
@@ -406,7 +367,6 @@ exports.resendToken = async (req, res) => {
 
 // email templates
 const getEmailTemplate = (obj) => {
-  console.log(obj);
   let link;
   switch (obj.type) {
     case EMAIL_TYPES.VERIFY_REGISTER:
@@ -488,7 +448,6 @@ exports.verifyEmailInvite = async (req, res) => {
   try {
     const { token, teamId } = req.params;
     const teamInfo = await TeamService.getTeamById(teamId);
-    console.log(teamInfo);
     await UserService.getUserByToken(token)
       .then(async (user) => {
         const { tokenExpiry } = user;
@@ -540,7 +499,6 @@ exports.inviteRegister = async (req, res) => {
         const userTeamIndex = user.teams.findIndex(
           (obj) => obj.teamId.toString() == teamId
         );
-        console.log(userTeamIndex);
         if (userTeamIndex >= 0) {
           user.teams[userTeamIndex] = {
             teamId: user.teams[userTeamIndex].teamId,
@@ -590,7 +548,6 @@ exports.joinTeam = async (req, res) => {
         const userTeamIndex = user.teams.findIndex(
           (obj) => obj.teamId.toString() == teamId
         );
-        console.log(userTeamIndex);
         if (userTeamIndex >= 0) {
           user.teams[userTeamIndex] = {
             teamId: user.teams[userTeamIndex].teamId,
@@ -736,7 +693,6 @@ exports.selectTeam = async (req, res) => {
       }
     );
     let userData = {};
-    console.log(user);
     if (userInfo.isVerified) {
       userData = {
         id: userInfo._id,
@@ -830,7 +786,6 @@ exports.getTeam = async (req, res, next) => {
   try {
     const { page, page_size } = req.query;
     const { user } = req.body;
-    console.log(user);
     const teamDetail = await TeamService.getTeamById(user.teamId);
     const role = await RoleService.getRoleById(user.roleId);
     const teamData = {
@@ -841,11 +796,8 @@ exports.getTeam = async (req, res, next) => {
       teamId: user.teamId,
       OwnerId: teamDetail.createdById,
     };
-    // const filterData = await getTeamByRole(teamData);
-    // console.log(filterData);
     await TeamService.getTeam(teamData)
       .then(async (teamRes) => {
-        console.log(teamRes);
         let docs = [];
         await Promise.all(
           teamRes.docs.map(async (userObj, key) => {
@@ -876,7 +828,6 @@ exports.getTeam = async (req, res, next) => {
             // }
           })
         );
-        // !user.isOwner && (docs = docs.filter((obj) => !obj.isOwner))
 
         teamRes = {
           ...teamRes,
@@ -889,14 +840,12 @@ exports.getTeam = async (req, res, next) => {
         });
       })
       .catch((error) => {
-        console.log(error);
         errorResp(res, {
           msg: ERROR_MESSAGE.NOT_FOUND,
           code: HTTP_STATUS.NOT_FOUND.CODE,
         });
       });
   } catch (error) {
-    console.log(error);
     serverError(res, error);
   }
 };
@@ -938,14 +887,12 @@ exports.getUserTeams = async (req, res, next) => {
         });
       })
       .catch((error) => {
-        console.log(error);
         errorResp(res, {
           code: HTTP_STATUS.NOT_FOUND.CODE,
           msg: ERROR_MESSAGE.NOT_FOUND,
         });
       });
   } catch (error) {
-    console.log(error);
     serverError(res, error);
   }
 };
@@ -986,7 +933,6 @@ exports.resendInvite = async (req, res) => {
             userRes,
             user.teamId
           );
-          console.log(userTeam);
           if (userTeam.status == USER_STATUS.ACTIVE) {
             return errorResp(res, {
               msg: ERROR_MESSAGE.ALLREADY_REGISTERED,
@@ -1026,11 +972,7 @@ exports.cancelUserInvite = async (req, res, next) => {
         status: USER_STATUS.DISABLED,
       };
       const userData = {
-        teams: userInfo.teams,
-        // canLogin: false,
-        // isVerified: false,
-        // token: "",
-        // tokenExpiry: null,
+        teams: userInfo.teams
       };
       await UserService.updateUserById(userId, userData)
         .then(async (userRes) => {
@@ -1055,21 +997,18 @@ exports.cancelUserInvite = async (req, res, next) => {
             });
         })
         .catch((error) => {
-          console.log(error);
           errorResp(res, {
             msg: ERROR_MESSAGE.NOT_FOUND,
             code: HTTP_STATUS.NOT_FOUND.CODE,
           });
         });
     } else {
-      console.log(error);
       return errorResp(res, {
         msg: ERROR_MESSAGE.NOT_FOUND,
         code: HTTP_STATUS.NOT_FOUND.CODE,
       });
     }
   } catch (error) {
-    console.log(error);
     serverError(res, error);
   }
 };
@@ -1083,7 +1022,6 @@ exports.disableUser = async (req, res, next) => {
     const userTeamIndex = userInfo.teams.findIndex(
       (obj) => obj.teamId.toString() == user.teamId
     );
-    console.log(userTeamIndex);
     if (userTeamIndex >= 0) {
       userInfo.teams[userTeamIndex] = {
         teamId: userInfo.teams[userTeamIndex].teamId,
@@ -1092,10 +1030,7 @@ exports.disableUser = async (req, res, next) => {
       };
       const userData = {
         teams: userInfo.teams,
-        canLogin: false,
-        // isVerified: false,
-        // token: "",
-        // tokenExpiry: null,
+        canLogin: false
       };
       await UserService.updateUserById(userId, userData)
         .then(async (userRes) => {
@@ -1140,7 +1075,6 @@ exports.disableUser = async (req, res, next) => {
                 });
               })
               .catch((error) => {
-                console.log(error);
                 errorResp(res, {
                   msg: ERROR_MESSAGE.NOT_FOUND,
                   code: HTTP_STATUS.NOT_FOUND.CODE,
@@ -1149,7 +1083,6 @@ exports.disableUser = async (req, res, next) => {
           });
         })
         .catch((error) => {
-          console.log(error);
           errorResp(res, {
             msg: ERROR_MESSAGE.NOT_FOUND,
             code: HTTP_STATUS.NOT_FOUND.CODE,
@@ -1191,7 +1124,6 @@ exports.disableMyAccount = async (req, res, next) => {
             });
           })
           .catch((error) => {
-            console.log(error);
             errorResp(res, {
               msg: ERROR_MESSAGE.NOT_FOUND,
               code: HTTP_STATUS.NOT_FOUND.CODE,
@@ -1199,7 +1131,6 @@ exports.disableMyAccount = async (req, res, next) => {
           });
       })
       .catch((error) => {
-        console.log(error);
         errorResp(res, {
           msg: ERROR_MESSAGE.NOT_FOUND,
           code: HTTP_STATUS.NOT_FOUND.CODE,
@@ -1255,7 +1186,6 @@ exports.disableUserBySelf = async (req, res, next) => {
             });
           })
           .catch((error) => {
-            console.log(error);
             errorResp(res, {
               msg: ERROR_MESSAGE.NOT_FOUND,
               code: HTTP_STATUS.NOT_FOUND.CODE,
@@ -1291,15 +1221,6 @@ exports.updateUserRole = async (req, res, next) => {
         code: HTTP_STATUS.BAD_REQUEST,
       });
     }
-    // if (
-    //   roleId == ROLES.ORGANIZER &&
-    //   teamInfo.totalOrganizer.length === TOTAL_TEAM_ORGANIZER
-    // ) {
-    //   return errorResp(res, {
-    //     msg: ERROR_MESSAGE.TEAM_ORGANIZER_LIMIT_EXCEED,
-    //     code: HTTP_STATUS.BAD_REQUEST,
-    //   });
-    // }
     const userTeamIndex = userInfo.teams.findIndex(
       (obj) => obj.teamId.toString() == user.teamId
     );
@@ -1309,7 +1230,6 @@ exports.updateUserRole = async (req, res, next) => {
         status: userInfo.teams[userTeamIndex].status,
         roleId: role._id,
       };
-      // console.log(userInfo.teams);return;
       await UserService.updateUserById(userId, {
         canLogin: false,
         teams: userInfo.teams,
@@ -1332,7 +1252,6 @@ exports.updateUserRole = async (req, res, next) => {
               teamId: user.teamId,
               status: OPPORTUNITY_STATUS.DRAFT,
             });
-          console.log(userOpportunites);
           if (userOpportunites && userOpportunites.length) {
             await Promise.all(
               userOpportunites.map(async (opp) => {
@@ -1360,7 +1279,6 @@ exports.updateUserRole = async (req, res, next) => {
       });
     }
   } catch (error) {
-    console.log(error);
     serverError(res, error);
   }
 };
@@ -1393,7 +1311,6 @@ exports.applyCoupon = async (req, res, next) => {
         });
       });
   } catch (error) {
-    console.log(error);
     serverError(res, error);
   }
 };
@@ -1413,9 +1330,7 @@ exports.subscribe = async (req, res, next) => {
           expYear: paymentMethodRes.card.exp_year,
           last4Digits: paymentMethodRes.card.last4,
         };
-        console.log(userInfo, "customer id - ", userInfo.customerId);
         if (userInfo.customerId) {
-          console.log("in update customer");
           BillingService.updateStripeCustomer({
             request: req.body,
             paymentMethod: paymentMethodRes,
@@ -1435,8 +1350,6 @@ exports.subscribe = async (req, res, next) => {
               });
             });
         } else {
-          console.log("in create customer");
-
           BillingService.createStripeCustomer({
             request: req.body,
             paymentMethod: paymentMethodRes,
@@ -1484,9 +1397,7 @@ exports.changePaymentMethod = async (req, res, next) => {
           expYear: paymentMethodRes.card.exp_year,
           last4Digits: paymentMethodRes.card.last4,
         };
-        console.log(userInfo, "customer id - ", userInfo.customerId);
         if (userInfo.customerId) {
-          console.log("in update customer");
           BillingService.updateStripeCustomer({
             request: req.body,
             paymentMethod: paymentMethodRes,
@@ -1545,9 +1456,7 @@ exports.addPaymentMethod = async (req, res, next) => {
           expYear: paymentMethodRes.card.exp_year,
           last4Digits: paymentMethodRes.card.last4,
         };
-        console.log(userInfo, "customer id - ", userInfo.customerId);
         if (!userInfo.customerId) {
-          console.log("in update customer");
           BillingService.createStripeCustomer({
             request: req.body,
             paymentMethod: paymentMethodRes,
@@ -1567,7 +1476,6 @@ exports.addPaymentMethod = async (req, res, next) => {
                 customerId: stripeCustomerRes.id,
               })
                 .then(async (subscriptionRes) => {
-                  console.log(subscriptionRes);
                   const subscription = {
                     subscriptionId: subscriptionRes.id,
                     planId: teamInfo.stripeDetails.subscription.planId,
@@ -1590,7 +1498,6 @@ exports.addPaymentMethod = async (req, res, next) => {
                       paymentMethod,
                       subscription,
                     };
-                    console.log(subscription, stripeDetails, "---");
                     userInfo.teams[userTeamIndex] = {
                       teamId: userInfo.teams[userTeamIndex].teamId,
                       status: userInfo.teams[userTeamIndex].status,
@@ -1644,7 +1551,6 @@ exports.addPaymentMethod = async (req, res, next) => {
                 customerId: stripeCustomerRes.id,
               })
                 .then(async (subscriptionRes) => {
-                  console.log(subscriptionRes);
                   const subscription = {
                     subscriptionId: subscriptionRes.id,
                     planId: teamInfo.stripeDetails.subscription.planId,
@@ -1667,7 +1573,6 @@ exports.addPaymentMethod = async (req, res, next) => {
                       paymentMethod,
                       subscription,
                     };
-                    console.log(subscription, stripeDetails, "---");
                     userInfo.teams[userTeamIndex] = {
                       teamId: userInfo.teams[userTeamIndex].teamId,
                       status: userInfo.teams[userTeamIndex].status,
@@ -1724,7 +1629,6 @@ exports.renewSubscription = async (req, res, next) => {
       userInfo,
       user.teamId
     );
-    console.log(teamInfo);
     if (
       teamInfo.stripeDetails.subscription.status == SUBSCRIPTION_STATUS.ACTIVE
     ) {
@@ -1742,7 +1646,6 @@ exports.renewSubscription = async (req, res, next) => {
       customerId: userInfo.customerId,
     })
       .then(async (subscriptionRes) => {
-        console.log(subscriptionRes);
         const subscription = {
           subscriptionId: subscriptionRes.id,
           planId: teamInfo.stripeDetails.subscription.planId,
@@ -1763,7 +1666,6 @@ exports.renewSubscription = async (req, res, next) => {
             ...teamInfo.stripeDetails,
             subscription,
           };
-          console.log(subscription, stripeDetails, "---");
           userInfo.teams[userTeamIndex] = {
             teamId: userInfo.teams[userTeamIndex].teamId,
             status: userInfo.teams[userTeamIndex].status,
@@ -1794,7 +1696,6 @@ exports.renewSubscription = async (req, res, next) => {
 };
 
 const createSubscription = async (res, userInfo, obj) => {
-  console.log("in create subscription");
   try {
     const userId = userInfo._id;
     await BillingService.createSubscription(obj)
@@ -1857,8 +1758,6 @@ const createSubscription = async (res, userInfo, obj) => {
 };
 
 const updateSubscription = async (res, userInfo, obj) => {
-  console.log("in update subscription");
-
   try {
     const userId = userInfo._id;
     await BillingService.updateSubscription(obj)
@@ -1883,7 +1782,6 @@ const updateSubscription = async (res, userInfo, obj) => {
             paymentMethod: obj.paymentMethod,
             subscription,
           };
-          console.log(stripeDetails, "--");
           userInfo.teams[userTeamIndex] = {
             teamId: userInfo.teams[userTeamIndex].teamId,
             status: userInfo.teams[userTeamIndex].status,
@@ -1917,9 +1815,7 @@ exports.subscriptionRecurringPayment = async (req, res, next) => {
   try {
     const { type, data } = req.body;
     const status = getPaymentStatus(type);
-    console.log(status, type);
     if (status) {
-      console.log("data - ", data);
       // if (type == "invoice.payment_succeeded") {
       const userInfo = await UserService.getUserByEmail(
         data.object.customer_email
@@ -1980,7 +1876,6 @@ exports.subscriptionRecurringPayment = async (req, res, next) => {
     }
     // }
   } catch (error) {
-    console.log(error);
     serverError(res, error);
   }
 };
@@ -2024,7 +1919,6 @@ exports.getBillingHistory = async (req, res, next) => {
       userId: user._id,
       teamId: user.teamId,
     };
-    console.log(filterData);
     await BillingService.getBillingHistory(filterData)
       .then(async (billingRes) => {
         return successResp(res, {
@@ -2054,7 +1948,6 @@ exports.getSubscriptionDetails = async (req, res, next) => {
           userRes,
           user.teamId
         );
-        console.log(teamInfo);
         if (
           teamInfo.stripeDetails &&
           teamInfo.stripeDetails.subscription &&
@@ -2134,12 +2027,10 @@ exports.cancelSubscription = async (req, res, next) => {
     const { user } = req.body;
     await UserService.getUserById(user._id)
       .then(async (userRes) => {
-        console.log(userRes, user.teamId);
         const teamInfo = await TeamService.getUserSelectedTeamByTeamId(
           userRes,
           user.teamId
         );
-        console.log(teamInfo);
         if (
           teamInfo.stripeDetails &&
           teamInfo.stripeDetails.subscription &&
@@ -2190,14 +2081,12 @@ exports.cancelSubscription = async (req, res, next) => {
         }
       })
       .catch((error) => {
-        console.log(error);
         errorResp(res, {
           msg: ERROR_MESSAGE.NOT_FOUND,
           code: HTTP_STATUS.NOT_FOUND.CODE,
         });
       });
   } catch (error) {
-    console.log(error);
     serverError(res, error);
   }
 };
@@ -2268,7 +2157,6 @@ exports.resumeSubscription = async (req, res, next) => {
         });
       });
   } catch (error) {
-    console.log(error);
     serverError(res, error);
   }
 };
@@ -2279,7 +2167,6 @@ exports.getTeamAdmins = async (req, res, next) => {
     const adminRole = await RoleService.getRoleByRoleId(ROLES.ADMIN);
     await TeamService.getUsersByTeamIdRoleId(user, adminRole)
       .then((userRes) => {
-        console.log(userRes);
         return successResp(res, {
           msg: SUCCESS_MESSAGE.DATA_FETCHED,
           code: HTTP_STATUS.SUCCESS.CODE,
@@ -2293,7 +2180,6 @@ exports.getTeamAdmins = async (req, res, next) => {
         });
       });
   } catch (error) {
-    console.log(error);
     serverError(res, error);
   }
 };
@@ -2303,7 +2189,6 @@ exports.getTeamMembers = async (req, res, next) => {
     const { user } = req.body;
     await TeamService.getTeamMembers(user)
       .then((userRes) => {
-        console.log(userRes);
         return successResp(res, {
           msg: SUCCESS_MESSAGE.DATA_FETCHED,
           code: HTTP_STATUS.SUCCESS.CODE,
@@ -2317,7 +2202,6 @@ exports.getTeamMembers = async (req, res, next) => {
         });
       });
   } catch (error) {
-    console.log(error);
     serverError(res, error);
   }
 };
@@ -2335,7 +2219,6 @@ exports.deleteTeam = async (req, res, next) => {
         const userTeamIndex = userInfo.teams.findIndex(
           (obj) => obj.teamId.toString() == user.teamId
         );
-        console.log(userTeamIndex);
         if (userTeamIndex >= 0) {
           userInfo.teams[userTeamIndex] = {
             teamId: userInfo.teams[userTeamIndex].teamId,
@@ -2350,6 +2233,77 @@ exports.deleteTeam = async (req, res, next) => {
       })
     );
     const teamRes = await TeamService.updateTeamMembers(user.teamId, {
+      members: [],
+      status: TEAM_STATUS.DISABLED,
+    });
+    return successResp(res, {
+      msg: SUCCESS_MESSAGE.DELETED,
+      code: HTTP_STATUS.SUCCESS.CODE,
+    });
+  } catch (error) {
+    serverError(res, error);
+  }
+};
+
+exports.deleteTeamById = async (req, res, next) => {
+  try {
+    const { teamId } = req.params;
+    const teamUsers = await usersByTeam(teamId);
+    Promise.all(
+      teamUsers.map(async (userInfo) => {
+        const userTeamIndex = userInfo.teams.findIndex(
+          (obj) => obj.teamId.toString() == teamId
+        );
+        if (userTeamIndex >= 0) {
+          userInfo.teams[userTeamIndex] = {
+            teamId: userInfo.teams[userTeamIndex].teamId,
+            roleId: userInfo.teams[userTeamIndex].roleId,
+            status: USER_STATUS.DISABLED,
+          };
+          const userData = {
+            teams: userInfo.teams,
+          };
+          await UserService.updateUserById(userInfo._id, userData);
+        }
+      })
+    );
+    const teamRes = await TeamService.updateTeamMembers(teamId, {
+      members: [],
+      status: TEAM_STATUS.DISABLED,
+    });
+    return successResp(res, {
+      msg: SUCCESS_MESSAGE.DELETED,
+      code: HTTP_STATUS.SUCCESS.CODE,
+    });
+  } catch (error) {
+    serverError(res, error);
+  }
+};
+
+exports.deleteTeamById = async (req, res, next) => {
+  try {
+    const { teamId } = req.params;
+    const teamUsers = await usersByTeam(teamId);
+    Promise.all(
+      teamUsers.map(async (userInfo) => {
+        const userTeamIndex = userInfo.teams.findIndex(
+          (obj) => obj.teamId.toString() == teamId
+        );
+        console.log(userTeamIndex);
+        if (userTeamIndex >= 0) {
+          userInfo.teams[userTeamIndex] = {
+            teamId: userInfo.teams[userTeamIndex].teamId,
+            roleId: userInfo.teams[userTeamIndex].roleId,
+            status: USER_STATUS.DISABLED,
+          };
+          const userData = {
+            teams: userInfo.teams,
+          };
+          await UserService.updateUserById(userInfo._id, userData);
+        }
+      })
+    );
+    const teamRes = await TeamService.updateTeamMembers(teamId, {
       members: [],
       status: TEAM_STATUS.DISABLED,
     });
@@ -2413,7 +2367,6 @@ exports.transferTeamOwnerShip = async (req, res, next) => {
       const newUserData = {
         teams: newUserInfo.teams,
       };
-      // console.log(newUserData);return
       await UserService.updateUserById(userId, newUserData);
     }
     const team = await TeamService.updateTeamMembers(user.teamId, {
@@ -2433,7 +2386,6 @@ exports.transferTeamOwnerShip = async (req, res, next) => {
       const userData = {
         teams: userInfo.teams,
       };
-      // console.log(userData);return
       await UserService.updateUserById(user._id, userData)
         .then(async (userRes) => {
           const team = await TeamService.getTeamById(user.teamId);
@@ -2462,7 +2414,6 @@ exports.transferTeamOwnerShip = async (req, res, next) => {
       });
     }
   } catch (error) {
-    console.log(error);
     serverError(res, error);
   }
 };
@@ -2486,7 +2437,6 @@ exports.changeName = async (req, res, next) => {
         });
       });
   } catch (error) {
-    console.log(error);
     serverError(res, error);
   }
 };
@@ -2517,7 +2467,6 @@ exports.changeTeamName = async (req, res, next) => {
         });
       });
   } catch (error) {
-    console.log(error);
     serverError(res, error);
   }
 };
@@ -2555,14 +2504,12 @@ exports.getAllUsers = async (req, res, next) => {
         });
       })
       .catch((error) => {
-        console.log(error);
         errorResp(res, {
           msg: ERROR_MESSAGE.NOT_FOUND,
           code: HTTP_STATUS.NOT_FOUND.CODE,
         });
       });
   } catch (error) {
-    console.log(error);
     serverError(res, error);
   }
 };
@@ -2615,6 +2562,10 @@ exports.getUserById = async (req, res, next) => {
                     team.stripeDetails.subscription.canceledDate <
                       getCurrentTimeStamp()) ||
                   false,
+                  inactiveFor: (team.stripeDetails.subscription.status ==
+                    SUBSCRIPTION_STATUS.CANCELED &&
+                    team.stripeDetails.subscription.canceledDate <
+                      getCurrentTimeStamp()) && timeDifference(new Date(), new Date(convertTimestampToDate(team.stripeDetails.subscription.canceledDate))) 
               };
             }
               docs[key] = {
@@ -2641,6 +2592,230 @@ exports.getUserById = async (req, res, next) => {
         });
       })
       .catch((error) => {
+        errorResp(res, {
+          msg: ERROR_MESSAGE.NOT_FOUND,
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+        });
+      });
+  } catch (error) {
+    serverError(res, error);
+  }
+};
+
+//get all teams list with pagination
+exports.getAllTeams = async (req, res, next) => {
+  try {
+    const { page, page_size } = req.query;
+    const teamData = {
+      page,
+      page_size,
+    };
+    await TeamService.getAllTeams(teamData)
+      .then(async (teamRes) => {
+        let docs = [];
+        await Promise.all(
+          teamRes.docs.map(async (teamObj, key) => {
+            let obj = teamObj._doc;
+            const ownerData = await UserService.getTeamOwnerDetails(obj.createdById);
+            const filterTeam = ownerData.teams.find((memberObj) => memberObj.teamId.toString() === obj._id.toString());
+            let subscriptionDetails = {};
+              if(filterTeam.stripeDetails.subscription.subscriptionId){
+              const reqBody = {
+                planId: filterTeam.stripeDetails.subscription.planId,
+                prices: [filterTeam.stripeDetails.subscription.priceId],
+              };
+              const stripePlan = await PlanService.getStripePlanById(reqBody);
+              subscriptionDetails = {
+                planName: stripePlan.name,
+                interval: stripePlan.prices[0].recurring.interval,
+                amount: convertDollerToCent(stripePlan.prices[0].unit_amount),
+                nextBillingAt:
+                  (filterTeam.stripeDetails.subscription.status ==
+                    SUBSCRIPTION_STATUS.ACTIVE &&
+                    new Date(
+                      convertTimestampToDate(
+                        filterTeam.stripeDetails.subscription.endDate
+                      )
+                    )) ||
+                  null,
+                cancelAt:
+                  (filterTeam.stripeDetails.subscription.status ==
+                    SUBSCRIPTION_STATUS.CANCELED &&
+                    new Date(
+                      convertTimestampToDate(
+                        filterTeam.stripeDetails.subscription.canceledDate
+                      )
+                    )) ||
+                  null,
+                autoRenew: filterTeam.stripeDetails.subscription.autoRenew, 
+                status: filterTeam.stripeDetails.subscription.status,
+                isExpired:
+                  (filterTeam.stripeDetails.subscription.status ==
+                    SUBSCRIPTION_STATUS.CANCELED &&
+                    filterTeam.stripeDetails.subscription.canceledDate <
+                      getCurrentTimeStamp()) ||
+                  false,
+                inactiveFor: (filterTeam.stripeDetails.subscription.status ==
+                  SUBSCRIPTION_STATUS.CANCELED &&
+                  filterTeam.stripeDetails.subscription.canceledDate <
+                    getCurrentTimeStamp()) && timeDifference(new Date(), new Date(convertTimestampToDate(filterTeam.stripeDetails.subscription.canceledDate))) 
+              };
+            }
+            docs[key] = {
+              _id: obj._id,
+              teamName: obj.name,
+              teamStatus: obj.status,
+              totalMembers: obj.members.length,
+              subscription: subscriptionDetails,
+            };
+          })
+        );
+        teamRes = {
+          ...teamRes,
+          docs,
+        };
+        return successResp(res, {
+          msg: SUCCESS_MESSAGE.DATA_FETCHED,
+          code: HTTP_STATUS.SUCCESS.CODE,
+          data: teamRes,
+        });
+      })
+      .catch((error) => {
+        errorResp(res, {
+          msg: ERROR_MESSAGE.NOT_FOUND,
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+        });
+      });
+  } catch (error) {
+    serverError(res, error);
+  }
+};
+
+//get all user of teams list with pagination
+exports.getUsersByTeamId = async (req, res, next) => {
+  try {
+    const { teamId } = req.params;
+    await TeamService.getTeamAllMembers(teamId)
+      .then(async (teamRes) => {
+        let docs = [];
+        await Promise.all(
+          teamRes.map(async (userObj, key) => {
+            let obj = userObj;
+            const filterTeam = obj.teams.find((memberObj) => memberObj.teamId.toString() === teamId.toString());
+            const role = await RoleService.getRoleById(filterTeam.roleId)
+            docs[key] = {
+              _id: obj._id,
+              role: {
+                _id: role._id,
+                roleId: role.roleId,
+                name: role.name,
+              },
+              firstName: obj.firstName,
+              lastName: obj.lastName,
+              email: obj.email,
+              status: filterTeam.status
+
+            };
+          })
+        );
+        teamRes = docs;
+        return successResp(res, {
+          msg: SUCCESS_MESSAGE.DATA_FETCHED,
+          code: HTTP_STATUS.SUCCESS.CODE,
+          data: teamRes,
+        });
+      })
+      .catch((error) => {
+        errorResp(res, {
+          msg: ERROR_MESSAGE.NOT_FOUND,
+          code: HTTP_STATUS.NOT_FOUND.CODE,
+        });
+      });
+  } catch (error) {
+    serverError(res, error);
+  }
+};
+
+//get all teams list with pagination
+exports.getAllTeams = async (req, res, next) => {
+  try {
+    const { page, page_size } = req.query;
+    const teamData = {
+      page,
+      page_size,
+    };
+    await TeamService.getAllTeams(teamData)
+      .then(async (teamRes) => {
+        let docs = [];
+        await Promise.all(
+          teamRes.docs.map(async (teamObj, key) => {
+            let obj = teamObj._doc;
+            const ownerData = await UserService.getTeamOwnerDetails(obj.createdById);
+            console.log(ownerData);
+            const filterTeam = ownerData.teams.find((memberObj) => memberObj.teamId.toString() === obj._id.toString());
+            let subscriptionDetails = {};
+              if(filterTeam.stripeDetails.subscription.subscriptionId){
+              const reqBody = {
+                planId: filterTeam.stripeDetails.subscription.planId,
+                prices: [filterTeam.stripeDetails.subscription.priceId],
+              };
+              const stripePlan = await PlanService.getStripePlanById(reqBody);
+              subscriptionDetails = {
+                planName: stripePlan.name,
+                interval: stripePlan.prices[0].recurring.interval,
+                amount: convertDollerToCent(stripePlan.prices[0].unit_amount),
+                nextBillingAt:
+                  (filterTeam.stripeDetails.subscription.status ==
+                    SUBSCRIPTION_STATUS.ACTIVE &&
+                    new Date(
+                      convertTimestampToDate(
+                        filterTeam.stripeDetails.subscription.endDate
+                      )
+                    )) ||
+                  null,
+                cancelAt:
+                  (filterTeam.stripeDetails.subscription.status ==
+                    SUBSCRIPTION_STATUS.CANCELED &&
+                    new Date(
+                      convertTimestampToDate(
+                        filterTeam.stripeDetails.subscription.canceledDate
+                      )
+                    )) ||
+                  null,
+                autoRenew: filterTeam.stripeDetails.subscription.autoRenew, 
+                status: filterTeam.stripeDetails.subscription.status,
+                isExpired:
+                  (filterTeam.stripeDetails.subscription.status ==
+                    SUBSCRIPTION_STATUS.CANCELED &&
+                    filterTeam.stripeDetails.subscription.canceledDate <
+                      getCurrentTimeStamp()) ||
+                  false,
+                inactiveFor: (filterTeam.stripeDetails.subscription.status ==
+                  SUBSCRIPTION_STATUS.CANCELED &&
+                  filterTeam.stripeDetails.subscription.canceledDate <
+                    getCurrentTimeStamp()) && timeDifference(new Date(), new Date(convertTimestampToDate(filterTeam.stripeDetails.subscription.canceledDate))) 
+              };
+            }
+            docs[key] = {
+              _id: obj._id,
+              teamName: obj.name,
+              teamStatus: obj.status,
+              totalMembers: obj.members.length,
+              subscription: subscriptionDetails,
+            };
+          })
+        );
+        teamRes = {
+          ...teamRes,
+          docs,
+        };
+        return successResp(res, {
+          msg: SUCCESS_MESSAGE.DATA_FETCHED,
+          code: HTTP_STATUS.SUCCESS.CODE,
+          data: teamRes,
+        });
+      })
+      .catch((error) => {
         console.log(error);
         errorResp(res, {
           msg: ERROR_MESSAGE.NOT_FOUND,
@@ -2653,32 +2828,35 @@ exports.getUserById = async (req, res, next) => {
   }
 };
 
-//get all user list with pagination
-exports.getAllUsers = async (req, res, next) => {
+//get all user of teams list with pagination
+exports.getUsersByTeamId = async (req, res, next) => {
   try {
-    const { page, page_size } = req.query;
-    const teamData = {
-      page,
-      page_size,
-    };
-    await TeamService.getAllUsers(teamData)
+    const { teamId } = req.params;
+    await TeamService.getTeamAllMembers(teamId)
       .then(async (teamRes) => {
+        console.log(teamRes);
         let docs = [];
         await Promise.all(
-          teamRes.docs.map(async (userObj, key) => {
-            let obj = userObj._doc;
+          teamRes.map(async (userObj, key) => {
+            let obj = userObj;
+            const filterTeam = obj.teams.find((memberObj) => memberObj.teamId.toString() === teamId.toString());
+            const role = await RoleService.getRoleById(filterTeam.roleId)
             docs[key] = {
               _id: obj._id,
+              role: {
+                _id: role._id,
+                roleId: role.roleId,
+                name: role.name,
+              },
               firstName: obj.firstName,
               lastName: obj.lastName,
               email: obj.email,
+              status: filterTeam.status
+
             };
           })
         );
-        teamRes = {
-          ...teamRes,
-          docs,
-        };
+        teamRes = docs;
         return successResp(res, {
           msg: SUCCESS_MESSAGE.DATA_FETCHED,
           code: HTTP_STATUS.SUCCESS.CODE,

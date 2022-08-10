@@ -168,8 +168,9 @@ exports.getAllOpportunities = async (obj) => {
     page: page || DEFAULT_PAGE_NO,
     limit: page_size || DEFAULT_PAGE_SIZE,
     sort: {
-      createdAt: 1, //Sort by Date Added ASC
+      name: 1, //Sort by Name Added ASC
     },
+    collation: { "locale": "en", strength: 3 },
     select: {},
   };
   return await Opportunity.paginate(
