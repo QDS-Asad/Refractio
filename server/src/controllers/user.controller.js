@@ -2213,6 +2213,7 @@ const usersByTeam = async (teamId) => {
 exports.deleteTeam = async (req, res, next) => {
   try {
     const { user } = req.body;
+    const teamInfo = await TeamService.getTeamById(user.teamId);
     const teamUsers = await usersByTeam(user.teamId);
     Promise.all(
       teamUsers.map(async (userInfo) => {
@@ -2220,6 +2221,14 @@ exports.deleteTeam = async (req, res, next) => {
           (obj) => obj.teamId.toString() == user.teamId
         );
         if (userTeamIndex >= 0) {
+          if(teamInfo.createdById.toString() === userInfo._id.toString()){
+            if(userInfo.teams[userTeamIndex].stripeDetails.subscription.subscriptionId){
+              cancelSubscription = await BillingService.cancelResumeSubscription(
+                userInfo.teams[userTeamIndex].stripeDetails.subscription.subscriptionId,
+                true
+              );
+            }
+          }
           userInfo.teams[userTeamIndex] = {
             teamId: userInfo.teams[userTeamIndex].teamId,
             roleId: userInfo.teams[userTeamIndex].roleId,
@@ -2248,6 +2257,7 @@ exports.deleteTeam = async (req, res, next) => {
 exports.deleteTeamById = async (req, res, next) => {
   try {
     const { teamId } = req.params;
+    const teamInfo = await TeamService.getTeamById(teamId);
     const teamUsers = await usersByTeam(teamId);
     Promise.all(
       teamUsers.map(async (userInfo) => {
@@ -2255,6 +2265,14 @@ exports.deleteTeamById = async (req, res, next) => {
           (obj) => obj.teamId.toString() == teamId
         );
         if (userTeamIndex >= 0) {
+          if(teamInfo.createdById.toString() === userInfo._id.toString()){
+            if(userInfo.teams[userTeamIndex].stripeDetails.subscription.subscriptionId){
+              cancelSubscription = await BillingService.cancelResumeSubscription(
+                userInfo.teams[userTeamIndex].stripeDetails.subscription.subscriptionId,
+                true
+              );
+            }
+          }
           userInfo.teams[userTeamIndex] = {
             teamId: userInfo.teams[userTeamIndex].teamId,
             roleId: userInfo.teams[userTeamIndex].roleId,
@@ -2276,43 +2294,6 @@ exports.deleteTeamById = async (req, res, next) => {
       code: HTTP_STATUS.SUCCESS.CODE,
     });
   } catch (error) {
-    serverError(res, error);
-  }
-};
-
-exports.deleteTeamById = async (req, res, next) => {
-  try {
-    const { teamId } = req.params;
-    const teamUsers = await usersByTeam(teamId);
-    Promise.all(
-      teamUsers.map(async (userInfo) => {
-        const userTeamIndex = userInfo.teams.findIndex(
-          (obj) => obj.teamId.toString() == teamId
-        );
-        console.log(userTeamIndex);
-        if (userTeamIndex >= 0) {
-          userInfo.teams[userTeamIndex] = {
-            teamId: userInfo.teams[userTeamIndex].teamId,
-            roleId: userInfo.teams[userTeamIndex].roleId,
-            status: USER_STATUS.DISABLED,
-          };
-          const userData = {
-            teams: userInfo.teams,
-          };
-          await UserService.updateUserById(userInfo._id, userData);
-        }
-      })
-    );
-    const teamRes = await TeamService.updateTeamMembers(teamId, {
-      members: [],
-      status: TEAM_STATUS.DISABLED,
-    });
-    return successResp(res, {
-      msg: SUCCESS_MESSAGE.DELETED,
-      code: HTTP_STATUS.SUCCESS.CODE,
-    });
-  } catch (error) {
-    console.log(error);
     serverError(res, error);
   }
 };
