@@ -2505,6 +2505,7 @@ exports.getUserById = async (req, res, next) => {
           userObj.teams.map(async (team, key) => {
             await RoleService.getRoleById(team.roleId).then(async (role) => {
               const teamData = await TeamService.getTeamById(team.teamId);
+              const teamMembers = await TeamService.getTeamAllMembers(team.teamId);
               const opportunityData = await OpportunityService.getAllOpportunitiesByUserAsOwner({_id: userObj._id, teamId: team.teamId});
               let subscriptionDetails = {};
               if(team.stripeDetails.subscription.subscriptionId){
@@ -2559,7 +2560,7 @@ exports.getUserById = async (req, res, next) => {
                 teamName: teamData.name,
                 userStatus: team.status,
                 teamStatus: teamData.status,
-                totalMembers: teamData.members.length,
+                totalMembers: teamMembers.length,
                 totalOpportunities: opportunityData.length,
                 subscription: subscriptionDetails,
               };
@@ -2597,6 +2598,8 @@ exports.getAllTeams = async (req, res, next) => {
         await Promise.all(
           teamRes.docs.map(async (teamObj, key) => {
             let obj = teamObj._doc;
+            const teamMembers = await TeamService.getTeamAllMembers(obj._id);
+            console.log('teamMembers--', teamMembers);
             const ownerData = await UserService.getTeamOwnerDetails(obj.createdById);
             const filterTeam = ownerData.teams.find((memberObj) => memberObj.teamId.toString() === obj._id.toString());
             let subscriptionDetails = {};
@@ -2646,7 +2649,7 @@ exports.getAllTeams = async (req, res, next) => {
               _id: obj._id,
               teamName: obj.name,
               teamStatus: obj.status,
-              totalMembers: obj.members.length,
+              totalMembers: teamMembers.length,
               subscription: subscriptionDetails,
             };
           })
@@ -2713,98 +2716,6 @@ exports.getUsersByTeamId = async (req, res, next) => {
         });
       });
   } catch (error) {
-    serverError(res, error);
-  }
-};
-
-//get all teams list with pagination
-exports.getAllTeams = async (req, res, next) => {
-  try {
-    const { page, page_size } = req.query;
-    const teamData = {
-      page,
-      page_size,
-    };
-    await TeamService.getAllTeams(teamData)
-      .then(async (teamRes) => {
-        let docs = [];
-        await Promise.all(
-          teamRes.docs.map(async (teamObj, key) => {
-            let obj = teamObj._doc;
-            const ownerData = await UserService.getTeamOwnerDetails(obj.createdById);
-            console.log(ownerData);
-            const filterTeam = ownerData.teams.find((memberObj) => memberObj.teamId.toString() === obj._id.toString());
-            let subscriptionDetails = {};
-              if(filterTeam.stripeDetails.subscription.subscriptionId){
-              const reqBody = {
-                planId: filterTeam.stripeDetails.subscription.planId,
-                prices: [filterTeam.stripeDetails.subscription.priceId],
-              };
-              const stripePlan = await PlanService.getStripePlanById(reqBody);
-              subscriptionDetails = {
-                planName: stripePlan.name,
-                interval: stripePlan.prices[0].recurring.interval,
-                amount: convertDollerToCent(stripePlan.prices[0].unit_amount),
-                nextBillingAt:
-                  (filterTeam.stripeDetails.subscription.status ==
-                    SUBSCRIPTION_STATUS.ACTIVE &&
-                    new Date(
-                      convertTimestampToDate(
-                        filterTeam.stripeDetails.subscription.endDate
-                      )
-                    )) ||
-                  null,
-                cancelAt:
-                  (filterTeam.stripeDetails.subscription.status ==
-                    SUBSCRIPTION_STATUS.CANCELED &&
-                    new Date(
-                      convertTimestampToDate(
-                        filterTeam.stripeDetails.subscription.canceledDate
-                      )
-                    )) ||
-                  null,
-                autoRenew: filterTeam.stripeDetails.subscription.autoRenew, 
-                status: filterTeam.stripeDetails.subscription.status,
-                isExpired:
-                  (filterTeam.stripeDetails.subscription.status ==
-                    SUBSCRIPTION_STATUS.CANCELED &&
-                    filterTeam.stripeDetails.subscription.canceledDate <
-                      getCurrentTimeStamp()) ||
-                  false,
-                inactiveFor: (filterTeam.stripeDetails.subscription.status ==
-                  SUBSCRIPTION_STATUS.CANCELED &&
-                  filterTeam.stripeDetails.subscription.canceledDate <
-                    getCurrentTimeStamp()) && timeDifference(new Date(), new Date(convertTimestampToDate(filterTeam.stripeDetails.subscription.canceledDate))) 
-              };
-            }
-            docs[key] = {
-              _id: obj._id,
-              teamName: obj.name,
-              teamStatus: obj.status,
-              totalMembers: obj.members.length,
-              subscription: subscriptionDetails,
-            };
-          })
-        );
-        teamRes = {
-          ...teamRes,
-          docs,
-        };
-        return successResp(res, {
-          msg: SUCCESS_MESSAGE.DATA_FETCHED,
-          code: HTTP_STATUS.SUCCESS.CODE,
-          data: teamRes,
-        });
-      })
-      .catch((error) => {
-        console.log(error);
-        errorResp(res, {
-          msg: ERROR_MESSAGE.NOT_FOUND,
-          code: HTTP_STATUS.NOT_FOUND.CODE,
-        });
-      });
-  } catch (error) {
-    console.log(error);
     serverError(res, error);
   }
 };
