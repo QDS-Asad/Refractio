@@ -86,13 +86,15 @@ export const SuperAdminUser = ({ user }) => {
                     <Table.Row key={detail.teamId}>
                       <Table.Cell>{detail.teamName}</Table.Cell>
                       <Table.Cell>{detail.role.name}</Table.Cell>
-                      <Table.Cell>
+                      <Table.Cell className='text-capitalize'>
                         {detail.userStatus === 'disabled'
-                          ? 'deleted'
+                          ? 'Deleted'
                           : detail.userStatus}
                       </Table.Cell>
-                      <Table.Cell>{detail.teamStatus}</Table.Cell>
-                      <Table.Cell>
+                      <Table.Cell className='text-capitalize'>
+                        {detail.teamStatus}
+                      </Table.Cell>
+                      <Table.Cell className='text-capitalize'>
                         {detail.subscription.status || 'N/A'}
                       </Table.Cell>
                       <Table.Cell>

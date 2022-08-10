@@ -60,7 +60,7 @@ const ManageOpportunities = () => {
                 {opportunities.map((opportunity) => (
                   <Table.Row key={opportunity._id}>
                     <Table.Cell>{opportunity.name}</Table.Cell>
-                    <Table.Cell>
+                    <Table.Cell className='text-capitalize'>
                       {opportunity.status === 'disabled'
                         ? 'deleted'
                         : opportunity.status}
