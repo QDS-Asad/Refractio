@@ -57,6 +57,12 @@ const SideBar = () => {
         </Menu.Item>
       )}
       {userLogin.role.roleId === ROLES.SUPER_ADMIN && (
+        <Menu.Item as={NavLink} to='/admin/teams'>
+          <Image src='/images/team.svg' verticalAlign='middle' />
+          <span className='ps-2'>Teams management</span>
+        </Menu.Item>
+      )}
+      {userLogin.role.roleId === ROLES.SUPER_ADMIN && (
         <Menu.Item as={NavLink} to='/admin/orders'>
           <Image src='/images/manage-orders.svg' verticalAlign='middle' />
           <span className='ps-2'>Orders management</span>
