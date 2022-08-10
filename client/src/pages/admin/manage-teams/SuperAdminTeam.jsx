@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { Table, Icon, Loader, Message } from 'semantic-ui-react';
-import refractioApi from '../../common/refractioApi';
-import { formatDate } from '../../utils/dateHelper';
+import { formatDate } from '../../../utils/dateHelper';
+import refractioApi from '../../../common/refractioApi';
 
-export const SuperAdminUser = ({ user }) => {
+export const SuperAdminTeam = ({ user }) => {
   const [activeIndex, setActiveIndex] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [userDetails, setUser] = React.useState([]);
@@ -19,7 +19,7 @@ export const SuperAdminUser = ({ user }) => {
     try {
       setLoading(true);
       let { data: response } = await refractioApi.get(
-        `/users/user-details/${id}`
+        `/users/team-users/${id}`
       );
       setUser(response.data);
       setLoading(false);
@@ -43,11 +43,23 @@ export const SuperAdminUser = ({ user }) => {
           }}
           style={{ cursor: 'pointer' }}>
           <Icon name={activeIndex ? 'dropdown' : 'caret right'} />
-          {user.firstName
-            ? user.firstName + ' ' + user.lastName
-            : 'Pending Invitation'}
+          {user.teamName || 'N/A'}
         </Table.Cell>
-        <Table.Cell>{user.email}</Table.Cell>
+        <Table.Cell className='text-capitalize'>{user.teamStatus}</Table.Cell>
+        <Table.Cell className='text-capitalize'>
+          {user.subscription.status || 'N/A'}{' '}
+          {`${
+            user.subscription.inactiveFor
+              ? `(Inactive for ${user.subscription.inactiveFor} day/s)`
+              : ''
+          }`}
+        </Table.Cell>
+        <Table.Cell>
+          {user.subscription.nextBillingAt
+            ? formatDate(user.subscription.nextBillingAt)
+            : 'N/A'}
+        </Table.Cell>
+        <Table.Cell>{user.totalMembers}</Table.Cell>
       </Table.Row>
       <Table.Row>
         {activeIndex && (
@@ -55,14 +67,10 @@ export const SuperAdminUser = ({ user }) => {
             <Table basic='very'>
               <Table.Header fullWidth>
                 <Table.Row>
-                  <Table.HeaderCell>Team Name</Table.HeaderCell>
+                  <Table.HeaderCell>Name</Table.HeaderCell>
                   <Table.HeaderCell>Role</Table.HeaderCell>
+                  <Table.HeaderCell>Email</Table.HeaderCell>
                   <Table.HeaderCell>User Status</Table.HeaderCell>
-                  <Table.HeaderCell>Team Status</Table.HeaderCell>
-                  <Table.HeaderCell>Subscription Status</Table.HeaderCell>
-                  <Table.HeaderCell>Next Billing At</Table.HeaderCell>
-                  <Table.HeaderCell>Total Opportunities</Table.HeaderCell>
-                  <Table.HeaderCell>Total Members</Table.HeaderCell>
                 </Table.Row>
               </Table.Header>
               <Table.Body>
@@ -82,34 +90,19 @@ export const SuperAdminUser = ({ user }) => {
                 )}
                 {!loading &&
                   userDetails.length > 0 &&
-                  userDetails.map((detail) => (
-                    <Table.Row key={detail.teamId}>
-                      <Table.Cell>{detail.teamName}</Table.Cell>
-                      <Table.Cell>{detail.role.name}</Table.Cell>
-                      <Table.Cell className='text-capitalize'>
-                        {detail.userStatus === 'disabled'
-                          ? 'Deleted'
-                          : detail.userStatus}
+                  userDetails.map((detail, index) => (
+                    <Table.Row key={index}>
+                      <Table.Cell>
+                        {detail.firstName
+                          ? detail.firstName + ' ' + detail.lastName
+                          : 'Pending Invitation'}
                       </Table.Cell>
                       <Table.Cell className='text-capitalize'>
-                        {detail.teamStatus}
+                        {detail.role.name}
                       </Table.Cell>
+                      <Table.Cell>{detail.email}</Table.Cell>
                       <Table.Cell className='text-capitalize'>
-                        {detail.subscription.status || 'N/A'}
-                      </Table.Cell>
-                      <Table.Cell>
-                        {detail.subscription.nextBillingAt
-                          ? formatDate(detail.subscription.nextBillingAt)
-                          : 'N/A'}
-                      </Table.Cell>
-                      <Table.Cell>
-                        {detail.totalOpportunities ||
-                        detail.totalOpportunities === 0
-                          ? detail.totalOpportunities + ' opportunity/s'
-                          : 'N/A'}
-                      </Table.Cell>
-                      <Table.Cell>
-                        {detail.totalMembers + ' member/s'}
+                        {detail.status}
                       </Table.Cell>
                     </Table.Row>
                   ))}
