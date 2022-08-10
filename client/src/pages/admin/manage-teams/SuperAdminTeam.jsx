@@ -47,7 +47,12 @@ export const SuperAdminTeam = ({ user }) => {
         </Table.Cell>
         <Table.Cell className='text-capitalize'>{user.teamStatus}</Table.Cell>
         <Table.Cell className='text-capitalize'>
-          {user.inactiveFor ? 'Expired' : 'Active'}
+          {user.subscription.status || 'N/A'}{' '}
+          {`${
+            user.subscription.inactiveFor
+              ? `(Inactive for ${user.subscription.inactiveFor} day/s)`
+              : ''
+          }`}
         </Table.Cell>
         <Table.Cell>
           {user.subscription.nextBillingAt
