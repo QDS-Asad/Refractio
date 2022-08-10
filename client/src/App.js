@@ -28,6 +28,7 @@ import OpportunityResponse from './pages/app/Opportunities/OpportunityResponse';
 import OpportunityEvaluate from './pages/app/Opportunities/OpportunityEvaluate';
 import WorkspaceLayout from './layouts/WorkspaceLayout';
 import WorkspaceSelection from './pages/workspaces/WorkspaceSelection';
+import ManageTeams from './pages/admin/manage-teams/ManageTeams';
 const App = () => {
   return (
     <Routes>
@@ -49,14 +50,12 @@ const App = () => {
       <Route path='' element={<AppLayout />}>
         <Route
           path=''
-          element={<Navigate replace to='opportunities' />}
-        ></Route>
+          element={<Navigate replace to='opportunities' />}></Route>
         <Route
           path='opportunities'
           element={
             <ProtectedRoute
-              roles={[ROLES.ADMIN, ROLES.ORGANIZER, ROLES.PARTICIPANT]}
-            >
+              roles={[ROLES.ADMIN, ROLES.ORGANIZER, ROLES.PARTICIPANT]}>
               <Opportunities />
             </ProtectedRoute>
           }
@@ -65,8 +64,7 @@ const App = () => {
           path='opportunityresponse/:id'
           element={
             <ProtectedRoute
-              roles={[ROLES.ADMIN, ROLES.ORGANIZER, ROLES.PARTICIPANT]}
-            >
+              roles={[ROLES.ADMIN, ROLES.ORGANIZER, ROLES.PARTICIPANT]}>
               <OpportunityResponse />
             </ProtectedRoute>
           }
@@ -75,8 +73,7 @@ const App = () => {
           path='opportunityevaluate/:id'
           element={
             <ProtectedRoute
-              roles={[ROLES.ADMIN, ROLES.ORGANIZER, ROLES.PARTICIPANT]}
-            >
+              roles={[ROLES.ADMIN, ROLES.ORGANIZER, ROLES.PARTICIPANT]}>
               <OpportunityEvaluate />
             </ProtectedRoute>
           }
@@ -85,8 +82,7 @@ const App = () => {
           path='opportunities/:id'
           element={
             <ProtectedRoute
-              roles={[ROLES.ADMIN, ROLES.ORGANIZER, ROLES.PARTICIPANT]}
-            >
+              roles={[ROLES.ADMIN, ROLES.ORGANIZER, ROLES.PARTICIPANT]}>
               <OpportunityDetail />
             </ProtectedRoute>
           }
@@ -95,8 +91,7 @@ const App = () => {
           path='opportunities/:id/edit'
           element={
             <ProtectedRoute
-              roles={[ROLES.ADMIN, ROLES.ORGANIZER, ROLES.PARTICIPANT]}
-            >
+              roles={[ROLES.ADMIN, ROLES.ORGANIZER, ROLES.PARTICIPANT]}>
               <OpportunityEdit />
             </ProtectedRoute>
           }
@@ -105,8 +100,7 @@ const App = () => {
           path='team'
           element={
             <ProtectedRoute
-              roles={[ROLES.ADMIN, ROLES.ORGANIZER, ROLES.PARTICIPANT]}
-            >
+              roles={[ROLES.ADMIN, ROLES.ORGANIZER, ROLES.PARTICIPANT]}>
               <TeamMembers />
             </ProtectedRoute>
           }
@@ -127,6 +121,14 @@ const App = () => {
           element={
             <ProtectedRoute roles={[ROLES.SUPER_ADMIN]}>
               <ManageUsers />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='teams'
+          element={
+            <ProtectedRoute roles={[ROLES.SUPER_ADMIN]}>
+              <ManageTeams />
             </ProtectedRoute>
           }
         />

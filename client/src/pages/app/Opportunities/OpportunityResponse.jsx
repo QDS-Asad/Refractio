@@ -172,19 +172,23 @@ const OpportunityResponse = () => {
     <>
       {opportunity && (
         <Grid stretched>
-          <Grid.Column width={11}>
+          <Grid.Column computer={11} tablet={11} mobile={16}>
             {displayMessage && (
               <Message header={message} success className='success-message' />
             )}
-            <Header as='h3' className='primary-dark-color'>
-              {opportunity.name}
+
+            <Grid>
+              <Grid.Column computer={8} tablet={8} mobile={16}>
+                <Header as='h3' className='primary-dark-color'>
+                  {opportunity.name}
+                </Header>
+              </Grid.Column>
               {!responsePublished && (
-                <>
+                <Grid.Column computer={8} tablet={8} mobile={16}>
                   <Button
-                    primary
                     type='submit'
                     form='create-opportunity'
-                    className='btn-secondary'
+                    className='btn-secondary me-3 my-1'
                     floated='right'
                     disabled={loading || responseLoading}>
                     Submit
@@ -196,15 +200,14 @@ const OpportunityResponse = () => {
                   />
                   <Button
                     onClick={handleDraft}
-                    primary
-                    className='btn-outline me-3'
+                    className='btn-outline me-3 my-1'
                     floated='right'
                     disabled={loading || responseLoading}>
                     Save as Draft
                   </Button>
-                </>
+                </Grid.Column>
               )}
-            </Header>
+            </Grid>
             <div style={{ padding: '1em' }}>
               <Form
                 id='create-opportunity'
@@ -244,9 +247,10 @@ const OpportunityResponse = () => {
           </Grid.Column>
           <>
             <Grid.Column
-              width={5}
-              style={{ backgroundColor: '#EDF1F6', height: '100%' }}
-            >
+              computer={5}
+              tablet={5}
+              mobile={16}
+              style={{ backgroundColor: '#EDF1F6', height: '100%' }}>
               <div className='clearfix'>
                 <Header floated='left'>Opportunity Information</Header>
               </div>

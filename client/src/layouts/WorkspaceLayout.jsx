@@ -20,7 +20,7 @@ const WorkspaceLayout = () => {
             as='h3'
             image='/logo-dark.svg'
             content='Refractio'
-            className='primary-dark-color'
+            className='primary-dark-color mt-3'
             textAlign='center'
           />
           <Header as='h2' className='text-center my-5'>
