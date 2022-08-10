@@ -373,7 +373,7 @@ const OpportunityDetail = () => {
                 <>
                   <Button
                     primary
-                    className='btn-secondary my-1'
+                    className='btn-secondary my-1 me-3'
                     floated='right'
                     type='submit'
                     form='create-opportunity'>

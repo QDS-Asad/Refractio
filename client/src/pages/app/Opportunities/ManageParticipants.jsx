@@ -87,33 +87,32 @@ const ManageParticipants = ({
                 <List.Item>
                   {opportunity.participants.includes(member._id) ? (
                     <List.Content floated='right'>
-                      {opportunity.status !== 'completed' && (
-                        <Button
-                          onClick={() => {
-                            if (
-                              opportunity.participants.length <= 2 &&
-                              opportunity.status !== 'draft'
-                            ) {
-                              setViewParticipant(false);
-                              onDeletingOpportunity();
-                            } else {
-                              dispatch(
-                                removeMemberOpportunity(
-                                  opportunity._id,
-                                  member._id
-                                )
-                              );
-                            }
-                          }}
-                          disabled={
-                            loading ||
-                            opportunityLoading ||
-                            opportunity.createdById !== userId
+                      <Button
+                        onClick={() => {
+                          if (
+                            opportunity.participants.length <= 2 &&
+                            opportunity.status !== 'draft'
+                          ) {
+                            setViewParticipant(false);
+                            onDeletingOpportunity();
+                          } else {
+                            dispatch(
+                              removeMemberOpportunity(
+                                opportunity._id,
+                                member._id
+                              )
+                            );
                           }
-                          className='btn-link-danger'>
-                          Remove
-                        </Button>
-                      )}
+                        }}
+                        disabled={
+                          loading ||
+                          opportunityLoading ||
+                          opportunity.createdById !== userId ||
+                          opportunity.status === 'completed'
+                        }
+                        className='btn-link-danger'>
+                        Remove
+                      </Button>
                     </List.Content>
                   ) : (
                     opportunity.status === 'draft' && (

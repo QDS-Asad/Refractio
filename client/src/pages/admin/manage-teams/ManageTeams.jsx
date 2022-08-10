@@ -9,33 +9,37 @@ import {
   Table,
 } from 'semantic-ui-react';
 import {
-  fetchOpportunityList,
-  opportunityManageListSelector,
-} from '../../../features/opportunities/opportunityManageListSlice';
+  fetchAllTeamList,
+  getTeamsSelector,
+  resetGetTeam,
+} from '../../../features/team/getTeamsSlice';
+import { SuperAdminTeam } from './SuperAdminTeam';
 
-const ManageOpportunities = () => {
-  const {
-    loading,
-    error,
-    opportunities,
-    page,
-    totalPages,
-    limit,
-  } = useSelector(opportunityManageListSelector);
+const ManageTeams = () => {
+  const { loading, error, members, page, limit, totalPages } = useSelector(
+    getTeamsSelector
+  );
+
   const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(fetchAllTeamList(page, limit));
+  }, [dispatch]);
+  useEffect(() => {
+    return () => {
+      dispatch(resetGetTeam());
+    };
+  }, []);
 
   const onPageChange = (e, { activePage }) => {
-    dispatch(fetchOpportunityList(activePage, limit));
+    dispatch(fetchAllTeamList(activePage, limit));
   };
-  useEffect(() => {
-    dispatch(fetchOpportunityList(page, limit));
-  }, [dispatch]);
+
   return (
     <>
       <Grid>
-        <Grid.Column computer={16} tablet={16} mobile={16}>
+        <Grid.Column computer={12} tablet={10} mobile={16}>
           <Header as='h3' className='primary-dark-color' floated='left'>
-            Opportunities management
+            Team management
           </Header>
         </Grid.Column>
       </Grid>
@@ -47,32 +51,26 @@ const ManageOpportunities = () => {
                 {error}
               </Message>
             )}
-            <Table sortable basic='very' className='table-striped'>
+            <Table basic='very' className='table-striped'>
               <Table.Header>
                 <Table.Row>
-                  <Table.HeaderCell>Name</Table.HeaderCell>
-                  <Table.HeaderCell>Status</Table.HeaderCell>
-                  <Table.HeaderCell>Participants</Table.HeaderCell>
+                  <Table.HeaderCell>Team Name</Table.HeaderCell>
+                  <Table.HeaderCell>Team Status</Table.HeaderCell>
+                  <Table.HeaderCell>Subscription Status</Table.HeaderCell>
+                  <Table.HeaderCell>Next Billing At</Table.HeaderCell>
+                  <Table.HeaderCell>Total Members</Table.HeaderCell>
                 </Table.Row>
               </Table.Header>
 
               <Table.Body>
-                {opportunities.map((opportunity) => (
-                  <Table.Row key={opportunity._id}>
-                    <Table.Cell>{opportunity.name}</Table.Cell>
-                    <Table.Cell className='text-capitalize'>
-                      {opportunity.status === 'disabled'
-                        ? 'deleted'
-                        : opportunity.status}
-                    </Table.Cell>
-                    <Table.Cell>{opportunity.totalParticipants}</Table.Cell>
-                  </Table.Row>
+                {members.map((user) => (
+                  <SuperAdminTeam user={user} />
                 ))}
               </Table.Body>
 
               <Table.Footer>
                 <Table.Row>
-                  <Table.HeaderCell colSpan='4' className='clearfix'>
+                  <Table.HeaderCell colSpan='5' className='clearfix'>
                     <Pagination
                       floated='right'
                       boundaryRange={0}
@@ -98,4 +96,4 @@ const ManageOpportunities = () => {
   );
 };
 
-export default ManageOpportunities;
+export default ManageTeams;
