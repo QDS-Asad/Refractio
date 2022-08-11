@@ -7,7 +7,7 @@ const ResultsOpportunity = memo(({ evaluation }) => {
   return (
     evaluation.length > 0 && (
       <Grid>
-        <Grid.Column width={5} className='Results'>
+        <Grid.Column computer={5} mobile={16} className='Results'>
           <Header as='h3' className='primary-dark-color mb-3'>
             Participants
           </Header>
@@ -46,19 +46,25 @@ const ResultsOpportunity = memo(({ evaluation }) => {
             )}
           </List>
         </Grid.Column>
-        <Grid.Column width={11}>
-          <Button.Group>
-            <Button
-              onClick={() => setCurrentSection(1)}
-              className={currentSection === 1 ? 'btn' : ''}>
-              Evaluation of Comprehension
-            </Button>
-            <Button
-              onClick={() => setCurrentSection(2)}
-              className={currentSection === 2 ? 'btn' : ''}>
-              Evaluation of Quality of Idea-Response
-            </Button>
-          </Button.Group>
+        <Grid.Column computer={11} mobile={16}>
+          <Grid>
+            <Button.Group style={{}}>
+              <Grid.Column computer={4} mobile={16}>
+                <Button
+                  onClick={() => setCurrentSection(1)}
+                  className={currentSection === 1 ? 'btn' : ''}>
+                  Evaluation of Comprehension
+                </Button>
+              </Grid.Column>
+              <Grid.Column computer={4} mobile={16}>
+                <Button
+                  onClick={() => setCurrentSection(2)}
+                  className={currentSection === 2 ? 'btn' : ''}>
+                  Evaluation of Quality of Idea-Response
+                </Button>
+              </Grid.Column>
+            </Button.Group>
+          </Grid>
           <div className='mt-4'>
             {currentSection === 1
               ? evaluation[currentParticipant].comprehension.qa.map(

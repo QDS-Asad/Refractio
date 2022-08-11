@@ -174,7 +174,11 @@ const OpportunityResponse = () => {
         <Grid stretched>
           <Grid.Column computer={11} tablet={11} mobile={16}>
             {displayMessage && (
-              <Message header={message} success className='success-message' />
+              <Message
+                header={message}
+                success
+                className='success-message mb-3'
+              />
             )}
 
             <Grid>
