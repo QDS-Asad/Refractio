@@ -49,22 +49,32 @@ export const SuperAdminTeam = ({ user, remove }) => {
           {user.teamStatus === 'disabled' ? 'deleted' : user.teamStatus}
         </Table.Cell>
         <Table.Cell className='text-capitalize'>
-          {user.subscription.status || 'N/A'}{' '}
-          {`${
-            user.subscription.inactiveFor
-              ? `(Inactive for ${user.subscription.inactiveFor} day/s)`
-              : ''
-          }`}
+          {user.teamStatus !== 'disabled' ? (
+            <>
+              {user.subscription.status || 'N/A'}{' '}
+              {`${
+                user.subscription.inactiveFor
+                  ? `(Inactive for ${user.subscription.inactiveFor} day/s)`
+                  : ''
+              }`}
+            </>
+          ) : (
+            'N/A'
+          )}
         </Table.Cell>
         <Table.Cell>
-          {user.subscription.nextBillingAt
-            ? formatDate(user.subscription.nextBillingAt)
+          {user.teamStatus !== 'disabled'
+            ? user.subscription.nextBillingAt
+              ? formatDate(user.subscription.nextBillingAt)
+              : 'N/A'
             : 'N/A'}
         </Table.Cell>
         <Table.Cell>{user.totalMembers}</Table.Cell>
         <Table.Cell className='clearfix'>
           {user.teamStatus !== 'disabled' && (
-            <Button className='btn-link' onClick={() => remove(user._id)}>
+            <Button
+              className='btn-link-danger'
+              onClick={() => remove(user._id)}>
               Remove
             </Button>
           )}
