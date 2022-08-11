@@ -292,6 +292,7 @@ const Subscription = () => {
                         placeholder='Enter team name'
                         error={!!errors.teamName}
                         onBlur={handleChange}
+                        onChange={handleChange}
                       />
 
                       {errors && errors.teamName && (
@@ -306,6 +307,7 @@ const Subscription = () => {
                         placeholder='Enter name on card'
                         error={!!errors.nameOnCard}
                         onBlur={handleChange}
+                        onChange={handleChange}
                       />
 
                       {errors && errors.nameOnCard && (
@@ -320,6 +322,7 @@ const Subscription = () => {
                         placeholder='0000 0000 0000 0000'
                         error={!!errors.cardNumber}
                         onBlur={handleChange}
+                        onChange={handleChange}
                       />
 
                       {errors && errors.cardNumber && (
@@ -335,6 +338,7 @@ const Subscription = () => {
                           placeholder='MM/YY'
                           error={!!errors.cardExpiry}
                           onBlur={handleChange}
+                          onChange={handleChange}
                         />
 
                         {errors && errors.cardExpiry && (
@@ -349,6 +353,7 @@ const Subscription = () => {
                           placeholder='3 digits'
                           error={!!errors.cardCvv}
                           onBlur={handleChange}
+                          onChange={handleChange}
                         />
 
                         {errors && errors.cardCvv && (
