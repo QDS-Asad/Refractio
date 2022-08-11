@@ -75,7 +75,7 @@ const ManageTeams = () => {
                   <Table.HeaderCell>Subscription Status</Table.HeaderCell>
                   <Table.HeaderCell>Next Billing At</Table.HeaderCell>
                   <Table.HeaderCell>Total Members</Table.HeaderCell>
-                  <Table.HeaderCell></Table.HeaderCell>
+                  <Table.HeaderCell />
                 </Table.Row>
               </Table.Header>
 

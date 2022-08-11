@@ -44,7 +44,7 @@ const RemoveTeamAdmin = ({ deleteTeam, setDeleteTeam, id, setId }) => {
               {error}
             </Message>
           )}
-          <p>Do you want to remove this team?</p>
+          <p>Do you want to delete this team?</p>
         </Modal.Description>
       </Modal.Content>
       <Modal.Actions>
