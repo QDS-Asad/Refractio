@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { Table, Icon, Loader, Message } from 'semantic-ui-react';
+import { Table, Icon, Loader, Message, Button } from 'semantic-ui-react';
 import { formatDate } from '../../../utils/dateHelper';
 import refractioApi from '../../../common/refractioApi';
 
-export const SuperAdminTeam = ({ user }) => {
+export const SuperAdminTeam = ({ user, remove }) => {
   const [activeIndex, setActiveIndex] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [userDetails, setUser] = React.useState([]);
@@ -45,7 +45,9 @@ export const SuperAdminTeam = ({ user }) => {
           <Icon name={activeIndex ? 'dropdown' : 'caret right'} />
           {user.teamName || 'N/A'}
         </Table.Cell>
-        <Table.Cell className='text-capitalize'>{user.teamStatus}</Table.Cell>
+        <Table.Cell className='text-capitalize'>
+          {user.teamStatus === 'disabled' ? 'deleted' : user.teamStatus}
+        </Table.Cell>
         <Table.Cell className='text-capitalize'>
           {user.subscription.status || 'N/A'}{' '}
           {`${
@@ -60,6 +62,13 @@ export const SuperAdminTeam = ({ user }) => {
             : 'N/A'}
         </Table.Cell>
         <Table.Cell>{user.totalMembers}</Table.Cell>
+        <Table.Cell className='clearfix'>
+          {user.teamStatus !== 'disabled' && (
+            <Button className='btn-link' onClick={() => remove(user._id)}>
+              Remove
+            </Button>
+          )}
+        </Table.Cell>
       </Table.Row>
       <Table.Row>
         {activeIndex && (
