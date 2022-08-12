@@ -88,7 +88,7 @@ const OpportunityEdit = () => {
                   name='q2'
                   fluid
                   readOnly
-                  placeholder='e.g. Describe the EXPECTED RESULTS from action taken to pursue Opportunity'
+                  placeholder='e.g. Describe the specific ACTION to take to pursue the Opportunity'
                 />
               </Form.Field>
 
