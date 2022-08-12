@@ -22,7 +22,7 @@ function QuestionsOpportunityForm({
           opportunity.
         </Header.Subheader>
       </Header>
-      <Form.Field>
+      {((opportunity.status == 'completed' && watchComprehensionQ1) || opportunity.status !== 'completed') && <Form.Field>
         <label>Question 1 (Required)</label>
         <Form.Input
           name='comprehensionQ1'
@@ -40,8 +40,9 @@ function QuestionsOpportunityForm({
           <Message error content={errors.comprehensionQ1.message} />
         )}
       </Form.Field>
+      }
 
-      <Form.Field>
+      {((opportunity.status == 'completed' && watchComprehensionQ2) || opportunity.status !== 'completed') && <Form.Field>
         <label>Question 2</label>
         <Form.Input
           name='comprehensionQ2'
@@ -59,6 +60,7 @@ function QuestionsOpportunityForm({
           <Message error content={errors.comprehensionQ2.message} />
         )}
       </Form.Field>
+      }
       <Header>
         Evaluation of Quality of Idea-Response
         <Header.Subheader>
@@ -66,7 +68,7 @@ function QuestionsOpportunityForm({
           responses.
         </Header.Subheader>
       </Header>
-      <Form.Field>
+      {((opportunity.status == 'completed' && watchQualityOfIdeaQ1) || opportunity.status !== 'completed') && <Form.Field>
         <label>Question 1 (Required)</label>
         <Form.Input
           name='qualityOfIdeaQ1'
@@ -84,8 +86,8 @@ function QuestionsOpportunityForm({
           <Message error content={errors.qualityOfIdeaQ1.message} />
         )}
       </Form.Field>
-
-      <Form.Field>
+      }
+      {((opportunity.status == 'completed' && watchQualityOfIdeaQ2) || opportunity.status !== 'completed') && <Form.Field>
         <label>Question 2</label>
         <Form.Input
           name='qualityOfIdeaQ2'
@@ -97,14 +99,14 @@ function QuestionsOpportunityForm({
           disabled={
             opportunity.status !== 'draft' || opportunity.createdById !== userId
           }
-          placeholder='e.g. Describe the EXPECTED RESULTS from action taken to pursue Opportunity'
+          placeholder='e.g. Describe the specific ACTION to take to pursue the Opportunity'
         />
         {errors && errors.qualityOfIdeaQ2 && (
           <Message error content={errors.qualityOfIdeaQ2.message} />
         )}
       </Form.Field>
-
-      <Form.Field>
+      }
+      {((opportunity.status == 'completed' && watchQualityOfIdeaQ3) || opportunity.status !== 'completed') && <Form.Field>
         <label>Question 3</label>
         <Form.Input
           name='qualityOfIdeaQ3'
@@ -122,8 +124,8 @@ function QuestionsOpportunityForm({
           <Message error content={errors.qualityOfIdeaQ3.message} />
         )}
       </Form.Field>
-
-      <Form.Field>
+      }
+      {((opportunity.status == 'completed' && watchQualityOfIdeaQ4) || opportunity.status !== 'completed') && <Form.Field>
         <label>Question 4</label>
         <Form.Input
           name='qualityOfIdeaQ4'
@@ -141,8 +143,8 @@ function QuestionsOpportunityForm({
           <Message error content={errors.qualityOfIdeaQ4.message} />
         )}
       </Form.Field>
-
-      <Form.Field>
+      }
+      {((opportunity.status == 'completed' && watchQualityOfIdeaQ5) || opportunity.status !== 'completed') && <Form.Field>
         <label>Question 5</label>
         <Form.Input
           name='qualityOfIdeaQ5'
@@ -160,6 +162,7 @@ function QuestionsOpportunityForm({
           <Message error content={errors.qualityOfIdeaQ5.message} />
         )}
       </Form.Field>
+    }
     </>
   );
 }

@@ -71,7 +71,7 @@ const WorkspaceSelection = () => {
 
   return (
     <>
-      {workspaces && workspaces.activeTeamList.length > 0 && (
+      {/* {workspaces && workspaces.activeTeamList.length > 0 && ( */}
         <Card fluid>
           <Card.Content>
             <Card.Header className='fw-light'>
@@ -92,7 +92,7 @@ const WorkspaceSelection = () => {
               </Message>
             )}
             <List selection animated divided relaxed='very'>
-              {workspaces.activeTeamList.map((workspace) => (
+              {workspaces && workspaces.activeTeamList.length > 0 && (workspaces.activeTeamList.map((workspace) => (
                 <List.Item
                   key={workspace.teamId}
                   onClick={() => handleTeamSelection(workspace.teamId)}>
@@ -106,11 +106,11 @@ const WorkspaceSelection = () => {
                     </List.Description>
                   </List.Content>
                 </List.Item>
-              ))}
+              ))) || (<h5 className='text-center'>No Team Found</h5>)}
             </List>
           </Card.Content>
         </Card>
-      )}
+      {/* )} */}
 
       <Card fluid className='my-5'>
         <Card.Content>

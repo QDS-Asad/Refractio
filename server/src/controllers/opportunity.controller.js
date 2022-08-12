@@ -427,14 +427,23 @@ exports.getOpportunityResponsesById = async (req, res, next) => {
             let evalObj = {};
             if (
               opportunityEvaluations &&
+              ((opportunityEvaluations.comprehension &&
+              opportunityEvaluations.comprehension.score) ||
+              (opportunityEvaluations.qualityOfIdea &&
+              opportunityEvaluations.qualityOfIdea.score))
+            ) {
+              evalObj = {status: opportunityEvaluations.status, comprehensionScore: opportunityEvaluations.comprehension.score, qualityOfIdeaScore: opportunityEvaluations.qualityOfIdea.score};
+            }
+            if (
+              opportunityEvaluations &&
               opportunityEvaluations.comprehension &&
               opportunityEvaluations.comprehension.score &&
               opportunityEvaluations.qualityOfIdea &&
               opportunityEvaluations.qualityOfIdea.score
             ) {
-              evalObj = {evaluation: OPPORTUNITY_EVALUATION_STATUS.COMPLETED, status: opportunityEvaluations.status, comprehensionScore: opportunityEvaluations.comprehension.score, qualityOfIdeaScore: opportunityEvaluations.qualityOfIdea.score};
+              evalObj = {...evalObj, evaluation: OPPORTUNITY_EVALUATION_STATUS.COMPLETED};
             } else {
-              evalObj = {evaluation: OPPORTUNITY_EVALUATION_STATUS.PENDING};
+              evalObj = {...evalObj, evaluation: OPPORTUNITY_EVALUATION_STATUS.PENDING};
             }
             let comprehension_answers = [];
             obj.comprehension.answers.map((comp, compKey) => {

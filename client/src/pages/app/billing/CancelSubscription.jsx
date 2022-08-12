@@ -41,7 +41,7 @@ const CancelSubscription = ({ cancelSubscription, setCancelSubscription }) => {
           )}
           <p>
             If you cancel your subscription you will not be able to use
-            Refractio for your team and all associated data will be deleted.
+            Refractio for your team and all associated data will be deleted, at the end of the subscription.
           </p>
         </Modal.Description>
       </Modal.Content>
