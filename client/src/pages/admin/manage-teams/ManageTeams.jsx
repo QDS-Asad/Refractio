@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Grid,
@@ -13,9 +14,12 @@ import {
   getTeamsSelector,
   resetGetTeam,
 } from '../../../features/team/getTeamsSlice';
+import RemoveTeamAdmin from './RemoveTeamAdmin';
 import { SuperAdminTeam } from './SuperAdminTeam';
 
 const ManageTeams = () => {
+  const [deleteTeam, setDeleteTeam] = useState(false);
+  const [id, setId] = useState(null);
   const { loading, error, members, page, limit, totalPages } = useSelector(
     getTeamsSelector
   );
@@ -29,7 +33,10 @@ const ManageTeams = () => {
       dispatch(resetGetTeam());
     };
   }, []);
-
+  const removeTeamMemberHandler = (id) => {
+    setId(id);
+    setDeleteTeam(true);
+  };
   const onPageChange = (e, { activePage }) => {
     dispatch(fetchAllTeamList(activePage, limit));
   };
@@ -41,6 +48,14 @@ const ManageTeams = () => {
           <Header as='h3' className='primary-dark-color' floated='left'>
             Team management
           </Header>
+          {id && (
+            <RemoveTeamAdmin
+              id={id}
+              deleteTeam={deleteTeam}
+              setDeleteTeam={setDeleteTeam}
+              setId={setId}
+            />
+          )}
         </Grid.Column>
       </Grid>
       <Grid>
@@ -51,6 +66,7 @@ const ManageTeams = () => {
                 {error}
               </Message>
             )}
+
             <Table basic='very' className='table-striped'>
               <Table.Header>
                 <Table.Row>
@@ -59,22 +75,27 @@ const ManageTeams = () => {
                   <Table.HeaderCell>Subscription Status</Table.HeaderCell>
                   <Table.HeaderCell>Next Billing At</Table.HeaderCell>
                   <Table.HeaderCell>Total Members</Table.HeaderCell>
+                  <Table.HeaderCell />
                 </Table.Row>
               </Table.Header>
 
               <Table.Body>
                 {members.map((user) => (
-                  <SuperAdminTeam user={user} />
+                  <SuperAdminTeam
+                    user={user}
+                    remove={removeTeamMemberHandler}
+                  />
                 ))}
               </Table.Body>
 
               <Table.Footer>
                 <Table.Row>
-                  <Table.HeaderCell colSpan='5' className='clearfix'>
+                  <Table.HeaderCell colSpan='6' className='clearfix'>
                     <Pagination
                       floated='right'
                       boundaryRange={0}
-                      defaultActivePage={page}
+                      // defaultActivePage={page}
+                      activePage={page}
                       ellipsisItem={null}
                       firstItem={null}
                       lastItem={null}

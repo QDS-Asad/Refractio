@@ -119,13 +119,7 @@ const TeamMembers = () => {
         {(userLogin.role.roleId === ROLES.ADMIN ||
           userLogin.role.roleId === ROLES.ORGANIZER) && (
           <Grid.Column width={8}>
-            <Button
-              primary
-              className='btn my-1'
-              floated='right'
-              onClick={() => setInviteTeamMember(true)}>
-              Add
-            </Button>
+           
             {userLogin.isTeamOwner && (
               <Button
                 primary
@@ -135,6 +129,13 @@ const TeamMembers = () => {
                 Change Team Name
               </Button>
             )}
+             <Button
+              primary
+              className='btn my-1'
+              floated='right'
+              onClick={() => setInviteTeamMember(true)}>
+              Add Team Member
+            </Button>
             <InviteTeamMember
               inviteTeamMember={inviteTeamMember}
               setInviteTeamMember={setInviteTeamMember}

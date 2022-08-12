@@ -1862,14 +1862,14 @@ exports.subscriptionRecurringPayment = async (req, res, next) => {
             code: HTTP_STATUS.SUCCESS.CODE,
           });
         } else {
-          errorResp(res, {
-            msg: error.message,
+          return errorResp(res, {
+            msg: 'team '+ERROR_MESSAGE.NOT_FOUND,
             code: HTTP_STATUS.NOT_FOUND.CODE,
           });
         }
       } else {
-        errorResp(res, {
-          msg: ERROR_MESSAGE.NOT_FOUND,
+        return errorResp(res, {
+          msg: 'teamSubscription '+ERROR_MESSAGE.NOT_FOUND,
           code: HTTP_STATUS.NOT_FOUND.CODE,
         });
       }

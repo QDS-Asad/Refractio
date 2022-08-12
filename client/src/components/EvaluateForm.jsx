@@ -78,7 +78,7 @@ const EvaluateForm = memo(
           <label style={{ fontSize: '13px' }} className='mb-3 mt-3'>
             <Header>
               {currentQuestion === 1
-                ? 'This responses demonstrates an excellent understanding of the subject matter of this opportunity.'
+                ? 'This response demonstrates an excellent understanding of the subject matter of this opportunity.'
                 : 'This is a well structured response. We need to consider this idea over others.'}
             </Header>
           </label>

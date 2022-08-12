@@ -292,6 +292,7 @@ const Subscription = () => {
                         placeholder='Enter team name'
                         error={!!errors.teamName}
                         onBlur={handleChange}
+                        onChange={handleChange}
                       />
 
                       {errors && errors.teamName && (
@@ -306,6 +307,7 @@ const Subscription = () => {
                         placeholder='Enter name on card'
                         error={!!errors.nameOnCard}
                         onBlur={handleChange}
+                        onChange={handleChange}
                       />
 
                       {errors && errors.nameOnCard && (
@@ -320,6 +322,7 @@ const Subscription = () => {
                         placeholder='0000 0000 0000 0000'
                         error={!!errors.cardNumber}
                         onBlur={handleChange}
+                        onChange={handleChange}
                       />
 
                       {errors && errors.cardNumber && (
@@ -335,6 +338,7 @@ const Subscription = () => {
                           placeholder='MM/YY'
                           error={!!errors.cardExpiry}
                           onBlur={handleChange}
+                          onChange={handleChange}
                         />
 
                         {errors && errors.cardExpiry && (
@@ -349,6 +353,7 @@ const Subscription = () => {
                           placeholder='3 digits'
                           error={!!errors.cardCvv}
                           onBlur={handleChange}
+                          onChange={handleChange}
                         />
 
                         {errors && errors.cardCvv && (
@@ -424,13 +429,13 @@ const Subscription = () => {
                           </div>
                         </List.Item>
                         <List.Item className='pt-4 pb-5'>
-                          <label className='mb-2'>Coupon code</label>
+                          <label className='mb-2'>Discount code</label>
                           <Input
                             name='text'
                             fluid
                             value={discountValue}
                             onChange={(e) => setDiscountValue(e.target.value)}
-                            placeholder='Enter coupon code'
+                            placeholder='Enter discount code'
                             tabIndex='1'
                             error={!!errorDiscount}
                             action>
@@ -489,7 +494,7 @@ const Subscription = () => {
                               : 0}
                           </List.Content>
                           <span className='fw-bold fs-4'>Total:</span>
-                          <p className='mt-5'>
+                          {/* <p className='mt-5'>
                             Unless you make any changes to your plan, you will
                             be billed automatically every month. You may cancel
                             your subscription at any time.
@@ -498,7 +503,7 @@ const Subscription = () => {
                             href='mailto:help@refractio.com'
                             className='primary-dark-color'>
                             help@refractio.com
-                          </a>
+                          </a> */}
                         </List.Item>
                       </List>
                     </Card.Content>

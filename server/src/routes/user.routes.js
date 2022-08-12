@@ -2184,7 +2184,7 @@ router.delete("/delete-team", Auth, User.deleteTeam);
 /**
  * @swagger
  *   /api/users/delete-team/{teamId}:
- *   get:
+ *   delete:
  *     description: user details
  *     tags: [Team]
  *     parameters:
