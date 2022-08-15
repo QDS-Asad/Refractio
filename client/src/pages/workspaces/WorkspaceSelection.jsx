@@ -106,7 +106,7 @@ const WorkspaceSelection = () => {
                     </List.Description>
                   </List.Content>
                 </List.Item>
-              ))) || (<h5 className='text-center'>No Team Found</h5>)}
+              ))) || ( workspaces && !workspaces.activeTeamList.length && !loading && <h5 className='text-center'>No Team(s) Found</h5>)}
             </List>
           </Card.Content>
         </Card>
