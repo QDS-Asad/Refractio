@@ -164,9 +164,9 @@ const Register = () => {
             label={
               <label>
                 I accept{' '}
-                <Link to='/' className='primary-color ms-1'>
+                <a href='https://refractio.com/terms-and-conditions' target='_blank' className='primary-color ms-1'>
                   Terms and Conditions
-                </Link>
+                </a>
               </label>
             }
           />
