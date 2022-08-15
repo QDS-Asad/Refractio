@@ -38,9 +38,9 @@ const ResultsOpportunity = memo(({ evaluation }) => {
                     Comprehension score:{' '}
                     {totalComprehensionAverageEvaluationScore}
                   </div>
-                  <div className='participantsScore'>
+                  {/* <div className='participantsScore'>
                     Quality score: {totalQualityOfIdeaAverageEvaluationScore}
-                  </div>
+                  </div> */}
                 </List.Item>
               )
             )}
@@ -120,13 +120,14 @@ const ResultsOpportunity = memo(({ evaluation }) => {
                     )}
                 <Divider />
                 <div className='indivisualScore'>
-                  <span>Total</span>
+                  <span>{currentSection === 1 && "Average or Weight"}</span>
                   <span>
                     {currentSection === 1
                       ? evaluation[currentParticipant]
                           .totalComprehensionAverageEvaluationScore
-                      : evaluation[currentParticipant]
-                          .totalQualityOfIdeaAverageEvaluationScore}
+                      : ""}  
+                      {/* evaluation[currentParticipant]
+                          .totalQualityOfIdeaAverageEvaluationScore */}
                   </span>
                 </div>
               </Grid.Column>
