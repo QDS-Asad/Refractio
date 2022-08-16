@@ -16,6 +16,7 @@
 
 .auth.ui.grid {
   margin: 0 !important;
+  box-shadow: none;
 }
 
 .primary-bg {
