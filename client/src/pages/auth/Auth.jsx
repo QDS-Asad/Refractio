@@ -18,7 +18,7 @@ const Auth = () => {
             content='Refractio'
           />
           <div
-            className={`d-flex justify-content-center align-items-center h-100 pt-5 ${isMobile &&
+            className={`d-flex justify-content-center align-items-center pt-5 ${isMobile &&
               'mt-5'}`}>
             <Outlet />
           </div>
