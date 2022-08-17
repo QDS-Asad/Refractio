@@ -47,7 +47,8 @@ const App = () => {
       <Route path='workspaces' element={<WorkspaceLayout />}>
         <Route path='' element={<WorkspaceSelection />} />
       </Route>
-      <Route path='' element={<AppLayout />}>
+      <Route p
+      ath='' element={<AppLayout />}>
         <Route
           path=''
           element={<Navigate replace to='opportunities' />}></Route>
@@ -140,14 +141,14 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-        <Route
+        {/* <Route
           path='subscriptions'
           element={
             <ProtectedRoute roles={[ROLES.SUPER_ADMIN]}>
               <ManageSubscriptions />
             </ProtectedRoute>
           }
-        />
+        /> */}
         <Route
           path='opportunities'
           element={
@@ -156,14 +157,14 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-        <Route
+        {/* <Route
           path='content'
           element={
             <ProtectedRoute roles={[ROLES.SUPER_ADMIN]}>
               <ManageContent />
             </ProtectedRoute>
           }
-        />
+        /> */}
       </Route>
       <Route path='forbidden' element={<Forbidden />} />
       <Route path='notfound' element={<NotFound />} />
