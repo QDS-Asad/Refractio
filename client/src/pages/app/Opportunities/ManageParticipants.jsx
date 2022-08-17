@@ -108,7 +108,7 @@ const ManageParticipants = ({
                           loading ||
                           opportunityLoading ||
                           opportunity.createdById !== userId ||
-                          opportunity.status === 'completed'
+                          opportunity.status !== 'draft'
                         }
                         className='btn-link-danger'>
                         Remove
